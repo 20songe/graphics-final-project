@@ -46,9 +46,6 @@ add_executable(${PROJECT_NAME}
 
     src/utils/aspectratiowidget/aspectratiowidget.hpp
 
-    src/camera/camera.h
-    src/camera/camera.cpp
-
 )
 
 # GLM: this creates its library and allows you to `#include "glm/..."`
