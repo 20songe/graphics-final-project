@@ -16,7 +16,7 @@ Real-time rendering of a landscape, featuring water, grass and a tree with falli
 
 4. Fresnel effect: how much each texture will contribute to the final result 
 
-5.  Lighting: normal map, so the water doesn't look flat (what will be our light source? A sun?)
+5.  Lighting: normal map, so the water doesn't look flat (what will be our light source? A sun?) 
 
 6. Depth: depth texture
 

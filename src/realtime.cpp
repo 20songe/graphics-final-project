@@ -61,6 +61,7 @@ void Realtime::initializeGL() {
 
 void Realtime::paintGL() {
     // Students: anything requiring OpenGL calls every frame should be done here
+    //The Big rendering pipeline happens here
 }
 
 void Realtime::resizeGL(int w, int h) {
