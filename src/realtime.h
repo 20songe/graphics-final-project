@@ -13,6 +13,10 @@
 #include <QTime>
 #include <QTimer>
 
+//additional import
+#include "water/watertile.h"
+#include "camera/camera.h"
+
 class Realtime : public QOpenGLWidget
 {
 public:
@@ -49,4 +53,22 @@ private:
 
     // Device Correction Variables
     int m_devicePixelRatio;
+    Camera camera;
+
+    //the shaders variables
+    GLuint m_shader;
+    GLuint m_post_shader;
+    GLuint m_fullscreen_vbo;
+    GLuint m_fullscreen_vao;
+    GLuint m_defaultFBO = 3;
+    GLuint m_fbo;
+    GLuint m_fbo_texture;
+    GLuint m_fbo_renderbuffer;
+    GLuint m_fbo_width;
+    GLuint m_fbo_height;
+
+    // Water rendering members
+    GLuint waterVAO;
+    GLuint waterShaderProgram;
+    std::vector<WaterTile> waters;
 };

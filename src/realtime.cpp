@@ -4,7 +4,9 @@
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <iostream>
+#include "glm/gtc/type_ptr.hpp"
 #include "settings.h"
+#include "camera/camera.h"
 
 // ================== Project 5: Lights, Camera
 
@@ -73,6 +75,30 @@ void Realtime::resizeGL(int w, int h) {
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
     // Students: anything requiring OpenGL calls when the program starts should be done here
+    camera.screenHeight = size().height();
+    camera.screenWidth = size().width();
+    camera.setProjectionMatrix(settings.nearPlane, settings.farPlane);
+    glUseProgram(m_shader);
+    glUniformMatrix4fv(glGetUniformLocation(m_shader, "proj"), 1, false, glm::value_ptr(camera.getProjectionMatrix()));
+
+    m_fbo_width = size().width() * m_devicePixelRatio;
+    m_fbo_height = size().height() * m_devicePixelRatio;
+    glUniform1f(glGetUniformLocation(m_post_shader, "deltaU"), 1.0f/(size().width() * m_devicePixelRatio));
+    glUniform1f(glGetUniformLocation(m_post_shader, "deltaV"), 1.0f/(size().height()  * m_devicePixelRatio));
+
+    // update post-processing filter params when screen is resized
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_fbo_renderbuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_fbo_width, m_fbo_height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    glUseProgram(0);
 }
 
 void Realtime::sceneChanged() {
