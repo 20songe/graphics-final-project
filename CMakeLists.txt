@@ -53,6 +53,7 @@ add_subdirectory(glm)
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
 add_library(StaticGLEW STATIC glew/src/glew.c
+    src/camera/camera.h src/camera/camera.cpp
 
 
 )
