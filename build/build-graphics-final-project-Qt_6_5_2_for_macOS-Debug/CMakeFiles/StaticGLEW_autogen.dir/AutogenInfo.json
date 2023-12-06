@@ -401,6 +401,12 @@
 			"MU",
 			"I2NATBFSMB/moc_camera.cpp",
 			null
+		],
+		[
+			"/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/src/water/watertile.h",
+			"MU",
+			"JWZRYSTEXQ/moc_watertile.cpp",
+			null
 		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
@@ -469,6 +475,11 @@
 		],
 		[
 			"/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/src/camera/camera.cpp",
+			"MU",
+			null
+		],
+		[
+			"/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/src/water/watertile.cpp",
 			"MU",
 			null
 		]
