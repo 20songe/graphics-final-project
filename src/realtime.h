@@ -13,10 +13,6 @@
 #include <QTime>
 #include <QTimer>
 
-//additional import
-#include "water/watertile.h"
-#include "camera/camera.h"
-
 class Realtime : public QOpenGLWidget
 {
 public:
@@ -46,6 +42,11 @@ private:
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second
     QElapsedTimer m_elapsedTimer;                       // Stores timer which keeps track of actual time between frames
 
+    GLuint m_vbo;
+    GLuint m_vao;
+    GLuint m_shader;
+    int m_data_size;
+
     // Input Related Variables
     bool m_mouseDown = false;                           // Stores state of left mouse button
     glm::vec2 m_prev_mouse_pos;                         // Stores mouse position
@@ -53,22 +54,4 @@ private:
 
     // Device Correction Variables
     int m_devicePixelRatio;
-    Camera camera;
-
-    //the shaders variables
-    GLuint m_shader;
-    GLuint m_post_shader;
-    GLuint m_fullscreen_vbo;
-    GLuint m_fullscreen_vao;
-    GLuint m_defaultFBO = 3;
-    GLuint m_fbo;
-    GLuint m_fbo_texture;
-    GLuint m_fbo_renderbuffer;
-    GLuint m_fbo_width;
-    GLuint m_fbo_height;
-
-    // Water rendering members
-    GLuint waterVAO;
-    GLuint waterShaderProgram;
-    std::vector<WaterTile> waters;
 };

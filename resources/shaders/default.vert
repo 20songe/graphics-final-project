@@ -3,12 +3,14 @@
 // declare a vec3 object-space position variable, using
 //         the `layout` and `in` keywords.
 layout(location = 0) in vec3 m_object_pos;
-layout(location = 1) in vec3 m_object_norm;
+//layout(location = 1) in vec2 m_object_uv;
+//layout(location = 2) in vec3 m_object_norm;
 
 // declare `out` variables for the world-space position and normal,
 //         to be passed to the fragment shader
 out vec3 m_world_pos;
-out vec3 m_world_norm;
+//out vec3 m_world_norm;
+//out vec3 m_uv;
 
 // declare a uniform mat4 to store model matrix
 uniform mat4 model;
@@ -22,11 +24,14 @@ void main() {
     // compute the world-space position and normal, then pass them to
     //         the fragment shader using the variables created in task 5
 
-    vec4 world_pos4 = model * vec4(m_object_pos, 1.0);
-    m_world_pos = vec3(world_pos4);
+//    vec4 world_pos4 = model * vec4(m_object_pos, 1.0);
+//    m_world_pos = vec3(world_pos4);
 
-    m_world_norm = m3 * normalize(m_object_norm);
+//    m_world_norm = m3 * normalize(m_object_norm);
+    m_world_pos = m_object_pos;
+   // m_world_norm = m_object_norm;
+    //m_uv = m_object_uv;
 
     // set gl_Position to the object space position transformed to clip space
-    gl_Position = proj * view * world_pos4;
+    gl_Position = proj * view * vec4(m_object_pos, 1.0);
 }

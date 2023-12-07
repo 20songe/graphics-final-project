@@ -4,9 +4,9 @@
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <iostream>
-#include "glm/gtc/type_ptr.hpp"
 #include "settings.h"
-#include "camera/camera.h"
+#include "objloader.h"
+#include "shaderloader.h"
 
 // ================== Project 5: Lights, Camera
 
@@ -50,10 +50,8 @@ void Realtime::initializeGL() {
         std::cerr << "Error while initializing GL: " << glewGetErrorString(err) << std::endl;
     }
     std::cout << "Initialized GL: Version " << glewGetString(GLEW_VERSION) << std::endl;
-
-    //bind and create the water VAO here
-
-
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    m_shader = ShaderLoader::createShaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
 
     // Allows OpenGL to draw objects appropriately on top of one another
     glEnable(GL_DEPTH_TEST);
@@ -61,13 +59,46 @@ void Realtime::initializeGL() {
     glEnable(GL_CULL_FACE);
     // Tells OpenGL how big the screen is
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
+    // Read our .obj file
+    std::vector< glm::vec3 > vertices;
+    std::vector< glm::vec2 > uvs;
+    std::vector< glm::vec3 > normals; // Won't be used at the moment.
+    objloader loader;
+    std::cout << "here" << std::endl;
+    bool res = loader.loadOBJ("scenefiles/tree_bad.obj", vertices, uvs, normals);
+    std::cout << "here 2 " << res << std::endl;
+    m_data_size = vertices.size();
+    // https://gamedev.net/forums/topic/692339-importing-obj-model-to-opengl/5357627/#google_vignette
+    glGenBuffers(1, &m_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(glm::vec3), &vertices[0], GL_STATIC_DRAW);
+
+    glGenVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
+    glEnableVertexAttribArray(0);
+   // glEnableVertexAttribArray(1);
+    //glEnableVertexAttribArray(2);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (GLvoid*)0);
+    //glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(NULL + (3 * sizeof(GLfloat)))); // Position to start from
+
+    //glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(NULL + (5 * sizeof(GLfloat))));
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 
     // Students: anything requiring OpenGL calls when the program starts should be done here
 }
 
 void Realtime::paintGL() {
     // Students: anything requiring OpenGL calls every frame should be done here
-    //The Big rendering pipeline happens here
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glUseProgram(m_shader);
+    glBindVertexArray(m_vao);
+    glDrawArrays(GL_TRIANGLES, 0, m_data_size / 3);
+    glBindVertexArray(0);
+    glUseProgram(0);
+
 }
 
 void Realtime::resizeGL(int w, int h) {
@@ -75,30 +106,6 @@ void Realtime::resizeGL(int w, int h) {
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
     // Students: anything requiring OpenGL calls when the program starts should be done here
-    camera.screenHeight = size().height();
-    camera.screenWidth = size().width();
-    camera.setProjectionMatrix(settings.nearPlane, settings.farPlane);
-    glUseProgram(m_shader);
-    glUniformMatrix4fv(glGetUniformLocation(m_shader, "proj"), 1, false, glm::value_ptr(camera.getProjectionMatrix()));
-
-    m_fbo_width = size().width() * m_devicePixelRatio;
-    m_fbo_height = size().height() * m_devicePixelRatio;
-    glUniform1f(glGetUniformLocation(m_post_shader, "deltaU"), 1.0f/(size().width() * m_devicePixelRatio));
-    glUniform1f(glGetUniformLocation(m_post_shader, "deltaV"), 1.0f/(size().height()  * m_devicePixelRatio));
-
-    // update post-processing filter params when screen is resized
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_fbo_renderbuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_fbo_width, m_fbo_height);
-    glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-    glUseProgram(0);
 }
 
 void Realtime::sceneChanged() {

@@ -1,43 +1,43 @@
 #version 330 core
 
 in vec3 m_world_pos;
-in vec3 m_world_norm;
+//in vec3 m_world_norm;
+//in vec2 m_uv;
 
 // Output color
 out vec4 fragColor;
 
-// Number of lights
-uniform int lightCount;
+//// Number of lights
+//uniform int lightCount;
 
-// Uniforms for ambient lighting
-uniform float m_ka;
-uniform vec4 m_ambient;
+//// Uniforms for ambient lighting
+//uniform float m_ka;
+//uniform vec4 m_ambient;
 
-// Uniforms for diffuse lighting
-uniform float m_kd;
-uniform vec4 m_diffuse;
+//// Uniforms for diffuse lighting
+//uniform float m_kd;
+//uniform vec4 m_diffuse;
 
-// Uniforms here, for specular lighting
-uniform float m_ks;
-uniform float shininess;
-uniform vec4 m_specular;
-uniform vec4 cam_pos;
+//// Uniforms here, for specular lighting
+//uniform float m_ks;
+//uniform float shininess;
+//uniform vec4 m_specular;
+//uniform vec4 cam_pos;
 
-// Uniforms for lights
-uniform vec4 light_illumination[8];
-uniform vec4 light_dir[8];
-uniform vec4 light_pos[8];
-uniform vec3 function[8];
-uniform int light_type[8];
-uniform float light_angle[8];
-uniform float light_penumbra[8];
+//// Uniforms for lights
+//uniform vec4 light_illumination[8];
+//uniform vec4 light_dir[8];
+//uniform vec4 light_pos[8];
+//uniform vec3 function[8];
+//uniform int light_type[8];
+//uniform float light_angle[8];
+//uniform float light_penumbra[8];
 
 float falloff(float angle, float inner, float outer) {
     return -2 * pow((angle - inner) / (outer - inner), 3) + 3 * pow((angle - inner) / (outer - inner), 2);
 }
 
 void main() {
-    fragColor =  vec4(0.0, 0.0, 1.0, 1.0);
 
 //        fragColor = m_ka * m_ambient;
 
@@ -99,5 +99,5 @@ void main() {
 
 //        }
 
-//        fragColor = clamp(fragColor, 0.0, 1.0);
+        fragColor = vec4(1.0);
 }
