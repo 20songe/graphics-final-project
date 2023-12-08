@@ -29,9 +29,9 @@ protected:
 
 private:
     GLuint m_shader;     // Stores id of shader program
-    GLuint m_sphere_vbo; // Stores id of vbo
-    GLuint m_sphere_vao; // Stores id of vao
-    std::vector<float> m_sphereData;
+    GLuint m_tree_vbo; // Stores id of vbo
+    GLuint m_tree_vao; // Stores id of vao
+    std::vector<float> m_treeData;
 
     glm::mat4 m_model = glm::mat4(1);
     glm::mat4 m_view  = glm::mat4(1);
