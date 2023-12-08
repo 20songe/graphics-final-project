@@ -23,9 +23,7 @@ uniform vec4 cam_pos;
 
 void main() {
     // Remember that you need to renormalize vectors here if you want them to be normalized
-
-    // Task 10: set your output color to white (i.e. vec4(1.0)). Make sure you get a white circle!
-    fragColor = vec4(1.0);
+//    fragColor = vec4(1.0);
 
     // Task 11: set your output color to the absolute value of your world-space normals,
     //          to make sure your normals are correct.
