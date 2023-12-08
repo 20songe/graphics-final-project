@@ -22,7 +22,7 @@ uniform float shininess;
 uniform vec4 cam_pos;
 
 void main() {
-    // Remember that you need to renormalize vectors here if you want them to be normalized
+//     Remember that you need to renormalize vectors here if you want them to be normalized
 //    fragColor = vec4(1.0);
 
     // Task 11: set your output color to the absolute value of your world-space normals,

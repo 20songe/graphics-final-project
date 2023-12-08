@@ -95,22 +95,22 @@ void GLRenderer::initializeGL() {
     // Unbind the tree VAO
     glBindVertexArray(0);
 
-//    // Generate and bind VBO for water
-//    glGenBuffers(1, &m_water_vbo);
-//    glBindBuffer(GL_ARRAY_BUFFER, m_water_vbo);
-//    // Assuming waterVertices is already defined
-//    glBufferData(GL_ARRAY_BUFFER, sizeof(waterVertices), waterVertices, GL_STATIC_DRAW);
+    // Generate and bind VBO for water
+    glGenBuffers(1, &m_water_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_water_vbo);
+    // Assuming waterVertices is already defined
+    glBufferData(GL_ARRAY_BUFFER, sizeof(waterVertices), waterVertices, GL_STATIC_DRAW);
 
-//    // Generate and bind VAO for water
-//    glGenVertexArrays(1, &m_water_vao);
-//    glBindVertexArray(m_water_vao);
+    // Generate and bind VAO for water
+    glGenVertexArrays(1, &m_water_vao);
+    glBindVertexArray(m_water_vao);
 
-//    // Enable and define attribute arrays for the water VAO
-//    glEnableVertexAttribArray(0); // For position
-//    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), reinterpret_cast<void*>(0));
+    // Enable and define attribute arrays for the water VAO
+    glEnableVertexAttribArray(0); // For position
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), reinterpret_cast<void*>(0));
 
-//    // Unbind the water VAO
-//    glBindVertexArray(0);
+    // Unbind the water VAO
+    glBindVertexArray(0);
 
     // Unbind the VBO
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -189,12 +189,12 @@ void GLRenderer::paintGL()
     // Unbind Vertex Array
     glBindVertexArray(0);
 
-//    // Render Water
-//    glBindVertexArray(m_water_vao);
-//    // Set up uniforms specific to the water (model matrix for water, etc.)
-//    // Here you can change uniforms as needed for water rendering
-//    glDrawArrays(GL_TRIANGLE_FAN, 0, 4); // Assuming water quad has 4 vertices
-//    glBindVertexArray(0);
+    // Render Water
+    glBindVertexArray(m_water_vao);
+    // Set up uniforms specific to the water (model matrix for water, etc.)
+    // Here you can change uniforms as needed for water rendering
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4); // Assuming water quad has 4 vertices
+    glBindVertexArray(0);
 
     //deactivate the shader program by passing 0 into glUseProgram
     glUseProgram(0);
