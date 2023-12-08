@@ -71,4 +71,6 @@ bool objloader::loadOBJ(
         out_vertices.push_back(vertex);
     }
 
+    return true;
+
 }

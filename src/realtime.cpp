@@ -32,6 +32,9 @@ void Realtime::finish() {
     this->makeCurrent();
 
     // Students: anything requiring OpenGL calls when the program exits should be done here
+    glDeleteBuffers(1, &m_vbo);
+    glDeleteVertexArrays(1, &m_vao);
+    glDeleteProgram(m_shader);
 
     this->doneCurrent();
 }
@@ -65,7 +68,7 @@ void Realtime::initializeGL() {
     std::vector< glm::vec3 > normals; // Won't be used at the moment.
     objloader loader;
     std::cout << "here" << std::endl;
-    bool res = loader.loadOBJ("scenefiles/tree_bad.obj", vertices, uvs, normals);
+    bool res = loader.loadOBJ("scenefiles/tree.obj", vertices, uvs, normals);
     std::cout << "here 2 " << res << std::endl;
     m_data_size = vertices.size();
     // https://gamedev.net/forums/topic/692339-importing-obj-model-to-opengl/5357627/#google_vignette
@@ -95,8 +98,10 @@ void Realtime::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(m_shader);
     glBindVertexArray(m_vao);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     glDrawArrays(GL_TRIANGLES, 0, m_data_size / 3);
     glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glUseProgram(0);
 
 }

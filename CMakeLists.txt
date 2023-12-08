@@ -43,10 +43,13 @@ add_executable(${PROJECT_NAME}
     src/utils/scenefilereader.h
     src/utils/sceneparser.h
 
-
     src/utils/aspectratiowidget/aspectratiowidget.hpp
+
     src/objloader.h
     src/objloader.cpp
+    
+    src/camera/camera.h
+    src/camera/camera.cpp
 
 )
 

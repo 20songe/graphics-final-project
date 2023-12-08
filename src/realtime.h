@@ -12,6 +12,7 @@
 #include <QOpenGLWidget>
 #include <QTime>
 #include <QTimer>
+#include "camera/camera.h"
 
 class Realtime : public QOpenGLWidget
 {
@@ -54,4 +55,7 @@ private:
 
     // Device Correction Variables
     int m_devicePixelRatio;
+
+    // Camera
+    Camera camera;
 };
