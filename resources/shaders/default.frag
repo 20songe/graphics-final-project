@@ -1,8 +1,8 @@
 #version 330 core
 
 in vec3 m_world_pos;
-//in vec3 m_world_norm;
-//in vec2 m_uv;
+in vec3 m_world_norm;
+in vec2 m_uv;
 
 // Output color
 out vec4 fragColor;

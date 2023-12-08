@@ -63,23 +63,15 @@ void Realtime::initializeGL() {
     // Tells OpenGL how big the screen is
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
-    glm::vec4 cameraWorldPos = camera.getPos();
-    glm::mat4 m_view = camera.getViewMatrix();
-    glm::mat4 m_proj = camera.getPerspectiveMatrix();
-
-    // camera data
-    GLint view_loc = glGetUniformLocation(m_shader, "view");
-    GLint proj_loc = glGetUniformLocation(m_shader, "proj");
-
     // Read our .obj file
     std::vector< glm::vec3 > vertices;
     std::vector< glm::vec2 > uvs;
     std::vector< glm::vec3 > normals; // Won't be used at the moment.
     objloader loader;
     std::cout << "here" << std::endl;
-    bool res = loader.loadOBJ("scenefiles/tree.obj", vertices, uvs, normals);
+    bool res = loader.loadOBJ("scenefiles/cube.obj", vertices, uvs, normals);
     std::cout << "here 2 " << res << std::endl;
-    m_data_size = vertices.size();
+    m_data_size = vertices.size() * sizeof(glm::vec3);
     // https://gamedev.net/forums/topic/692339-importing-obj-model-to-opengl/5357627/#google_vignette
     glGenBuffers(1, &m_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -88,13 +80,13 @@ void Realtime::initializeGL() {
     glGenVertexArrays(1, &m_vao);
     glBindVertexArray(m_vao);
     glEnableVertexAttribArray(0);
-   // glEnableVertexAttribArray(1);
-    //glEnableVertexAttribArray(2);
+//    glEnableVertexAttribArray(1);
+//    glEnableVertexAttribArray(2);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(GLfloat), (GLvoid*)0);
-    //glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(NULL + (3 * sizeof(GLfloat)))); // Position to start from
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), reinterpret_cast<void *>(0));
+//    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat))); // Position to start from
 
-    //glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), (GLvoid*)(NULL + (5 * sizeof(GLfloat))));
+//    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void *>(5 * sizeof(GLfloat)));
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -106,9 +98,22 @@ void Realtime::paintGL() {
     // Students: anything requiring OpenGL calls every frame should be done here
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(m_shader);
+
+    glm::vec4 cameraWorldPos = camera.getPos();
+    glm::mat4 m_view = camera.getViewMatrix();
+    glm::mat4 m_proj = camera.getPerspectiveMatrix();
+
+    // camera data
+    GLint view_loc = glGetUniformLocation(m_shader, "view");
+    GLint proj_loc = glGetUniformLocation(m_shader, "proj");
+
+    glUniformMatrix4fv(view_loc, 1, GL_FALSE, &m_view[0][0]);
+    glUniformMatrix4fv(proj_loc, 1, GL_FALSE, &m_proj[0][0]);
+
     glBindVertexArray(m_vao);
     glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
     glDrawArrays(GL_TRIANGLES, 0, m_data_size / 3);
+
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glUseProgram(0);
