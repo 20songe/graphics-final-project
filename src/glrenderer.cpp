@@ -108,7 +108,7 @@ void GLRenderer::initializeGL()
 //    m_sphereData = generateSphereData(10,20);
     std::vector<float> data;
     std::vector<std::string> line;
-    bool res = objloader.loadOBJ("scenefiles/cube.obj",
+    bool res = objloader.loadOBJ("scenefiles/tree.obj",
                                  data,
                                  line);
 

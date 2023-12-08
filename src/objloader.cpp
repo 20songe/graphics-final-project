@@ -37,11 +37,11 @@ bool objloader::loadOBJ(
     std::cout << "before while" << std::endl;
     while( 1 ){
 
-//        if (num_lines == 500) {
-//            break;
-//        }
+        //        if (num_lines == 500) {
+        //            break;
+        //        }
 
-        char* lineHeader =  new char[128];
+        char lineHeader[1000];
         // read the first word of the line
         int res = fscanf(file, "%s", lineHeader);
 
@@ -85,47 +85,50 @@ bool objloader::loadOBJ(
             normalIndices.push_back(normalIndex[1]);
             normalIndices.push_back(normalIndex[2]);
         }
+
     }
 
     for( unsigned int i=0; i<vertexIndices.size(); i ++ ) {
         int ind = 3 * (vertexIndices[i] - 1);
+        int uvInd = 3 * (uvIndices[i] - 1);
+        int normInd = 3 * (normalIndices[i] - 1);
         glm::vec3 vertex (temp_vertices[ ind ],
-                          temp_vertices[ ind + 1 ],
-                          temp_vertices[ ind + 2 ]);
+                         temp_vertices[ ind + 1 ],
+                         temp_vertices[ ind + 2 ]);
         glm::vec2 uv = glm::vec2(
-            temp_uvs [ 3 * (uvIndices[i] -1) ],
-            temp_uvs [ 3 * (uvIndices[i] - 1) + 1]);
+            temp_uvs [ uvInd ],
+            temp_uvs [ uvInd + 1]);
         glm::vec3 norm = glm::vec3(
-            temp_normals[3 * (normalIndices[i] - 1)],
-            temp_normals[3 * (normalIndices[i] - 1) + 1],
-            temp_normals[3 * (normalIndices[i] - 1) + 2]);
+            temp_normals[normInd],
+            temp_normals[normInd + 1],
+            temp_normals[normInd + 2]);
         insertVec3(data, vertex);
         insertVec2(data, uv);
         insertVec3(data, norm);
     }
 
-//    for ( unsigned int i = 0; i < vertexIndices.size(); i++) {
-//        unsigned int vertexIndex = 3 * (vertexIndices[i] - 1);
-//        glm::vec3 vertex(temp_vertices[ vertexIndex ],
-//                         temp_vertices[ vertexIndex + 1],
-//                         temp_vertices[ vertexIndex + 2]);
-//        insertVec3(out_vertices, vertex);
-//    }
+    //    for ( unsigned int i = 0; i < vertexIndices.size(); i++) {
+    //        unsigned int vertexIndex = 3 * (vertexIndices[i] - 1);
+    //        glm::vec3 vertex(temp_vertices[ vertexIndex ],
+    //                         temp_vertices[ vertexIndex + 1],
+    //                         temp_vertices[ vertexIndex + 2]);
+    //        insertVec3(out_vertices, vertex);
+    //    }
 
-//    for( unsigned int i=0; i<uvIndices.size(); i++ ) {
-//        unsigned int uvIndex = 2 * (uvIndices[i] - 1);
-//        glm::vec2 uv (temp_uvs[ uvIndex],
-//                     temp_uvs[ uvIndex + 1 ]);
-//        insertVec2(out_uvs, uv);
-//    }
+    //    for( unsigned int i=0; i<uvIndices.size(); i++ ) {
+    //        unsigned int uvIndex = 2 * (uvIndices[i] - 1);
+    //        glm::vec2 uv (temp_uvs[ uvIndex],
+    //                     temp_uvs[ uvIndex + 1 ]);
+    //        insertVec2(out_uvs, uv);
+    //    }
 
-//    for( unsigned int i=0; i<normalIndices.size(); i++ ) {
-//        unsigned int normalIndex = 3 * (normalIndices[i] - 1);
-//        glm::vec3 normal(temp_normals[ normalIndex ],
-//                         temp_normals[ normalIndex + 1],
-//                         temp_normals[normalIndex + 2]);
-//        insertVec3(out_normals, normal);
-//    }
+    //    for( unsigned int i=0; i<normalIndices.size(); i++ ) {
+    //        unsigned int normalIndex = 3 * (normalIndices[i] - 1);
+    //        glm::vec3 normal(temp_normals[ normalIndex ],
+    //                         temp_normals[ normalIndex + 1],
+    //                         temp_normals[normalIndex + 2]);
+    //        insertVec3(out_normals, normal);
+    //    }
 
     std::cout << "end of loop" << std::endl;
     return true;

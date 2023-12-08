@@ -45,6 +45,4 @@ void main() {
     vec3 reflection = normalize(-posToLight - 2.0 * dot(normN, -posToLight) * normN);
 
     fragColor += vec4(m_ks * pow(clamp(dot(reflection, posToCam), 0.0, 1.0), shininess));
-
-    fragColor = vec4(1.0);
 }
