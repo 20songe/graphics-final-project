@@ -62,6 +62,15 @@ void Realtime::initializeGL() {
     glEnable(GL_CULL_FACE);
     // Tells OpenGL how big the screen is
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
+
+    glm::vec4 cameraWorldPos = camera.getPos();
+    glm::mat4 m_view = camera.getViewMatrix();
+    glm::mat4 m_proj = camera.getPerspectiveMatrix();
+
+    // camera data
+    GLint view_loc = glGetUniformLocation(m_shader, "view");
+    GLint proj_loc = glGetUniformLocation(m_shader, "proj");
+
     // Read our .obj file
     std::vector< glm::vec3 > vertices;
     std::vector< glm::vec2 > uvs;
