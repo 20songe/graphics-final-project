@@ -37,6 +37,21 @@ private:
     GLuint m_water_vao;
     glm::mat4 m_waterModelMatrix = glm::mat4(1);
 
+    // FBO properties
+    GLuint reflectionFBO;
+    GLuint reflectionTexture;
+    GLuint reflectionDepthBuffer;
+
+    GLuint refractionFBO;
+    GLuint refractionTexture;
+    GLuint refractionDepthTexture;
+
+    // FBO dimensions
+    const unsigned int REFLECTION_WIDTH = 320;
+    const unsigned int REFLECTION_HEIGHT = 180;
+    const unsigned int REFRACTION_WIDTH = 1280;
+    const unsigned int REFRACTION_HEIGHT = 720;
+
     //tree related variables
     std::vector<float> m_treeData;
     glm::mat4 m_model = glm::mat4(1);
