@@ -242,7 +242,7 @@ void GLRenderer::rebuildMatrices() {
     // Update view matrix by rotating eye vector based on x and y angles
     m_view = glm::mat4(1);
     glm::mat4 rot = glm::rotate(glm::radians(-10 * m_angleX),glm::vec3(0,0,1));
-    glm::vec3 eye = glm::vec3(2,0,0);
+    glm::vec3 eye = glm::vec3(3,10,4);
     eye = glm::vec3(rot * glm::vec4(eye,1));
 
     rot = glm::rotate(glm::radians(-10 * m_angleY),glm::cross(glm::vec3(0,0,1),eye));
@@ -250,7 +250,7 @@ void GLRenderer::rebuildMatrices() {
 
     eye = eye * m_zoom;
 
-    m_view = glm::lookAt(eye,glm::vec3(0,0,0),glm::vec3(0,0,1));
+    m_view = glm::lookAt(eye,glm::vec3(0,0,0),glm::vec3(0,1,0));
 
     m_proj = glm::perspective(glm::radians(45.0),1.0 * width() / height(),0.01,100.0);
 
