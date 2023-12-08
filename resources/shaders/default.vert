@@ -24,7 +24,7 @@ void main() {
     // compute the world-space position and normal, then pass them to
     //         the fragment shader using the variables created in task 5
 
-    vec4 world_pos4 = model * vec4(m_object_pos, 1.0);
+    vec4 world_pos4 = vec4(m_object_pos, 1.0);
     m_world_pos = vec3(world_pos4);
 
 //    m_world_norm = m3 * normalize(m_object_norm);

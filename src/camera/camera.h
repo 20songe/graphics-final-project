@@ -2,7 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
-#include "utils/sceneparser.h"
+//#include "utils/sceneparser.h"
 
 // A class representing a virtual camera.
 
@@ -13,7 +13,7 @@
 class Camera {
 public:
     // Constructor
-    void init(int width, int height, const RenderData &metaData);
+    void init(int width, int height);
 
     // Update camera matrices
     void updatePerspective();

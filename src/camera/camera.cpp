@@ -9,17 +9,17 @@
  * @param height - height of scene
  * @param metaData - scene render data
  */
-void Camera::init(int width, int height, const RenderData &metaData) {
+void Camera::init(int width, int height) {
     this->c_width = width;
     this->c_height = height;
-    this->c_pos = glm::vec4(glm::vec3(metaData.cameraData.pos), 1.f);
+    this->c_pos = glm::vec4(0,0,0,1);
 
-    this->c_heightAngle = metaData.cameraData.heightAngle;
-    this->c_focalLength = metaData.cameraData.focalLength;
-    this->c_aperture = metaData.cameraData.aperture;
+    this->c_heightAngle = 45.0;
 
-    this->c_look = glm::normalize(glm::vec4(glm::vec3(metaData.cameraData.look), 0.f));
-    this->c_up = glm::normalize(glm::vec4(glm::vec3(metaData.cameraData.up),0.f));
+    this->c_look = glm::normalize(glm::vec4(-9, -3.2, -16, 0));
+    this->c_up = glm::normalize(glm::vec4(0, 1, 0, 0));
+
+    this->c_left = glm::vec4(glm::normalize(glm::cross(glm::vec3(c_up), glm::vec3(c_look))), 0.f);
 
     this->c_left = glm::vec4(glm::normalize(glm::cross(glm::vec3(c_up), glm::vec3(c_look))), 0.f);
 
