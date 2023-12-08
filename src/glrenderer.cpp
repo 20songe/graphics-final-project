@@ -121,11 +121,6 @@ void GLRenderer::paintGL()
     // Clear screen color and depth before painting
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-
-
-    // Bind Tree Vertex Data
-    glBindVertexArray(m_tree_vao);
-
     //activate the shader program by calling glUseProgram with `m_shader`
     glUseProgram(m_shader);
 
@@ -184,15 +179,18 @@ void GLRenderer::paintGL()
 
     glm::vec4 cameraPos = inverse(m_view) * glm::vec4(0.0, 0.0, 0.0, 1.0);
     glUniform4fv(cam_loc, 1, &cameraPos[0]);
-    // Draw Command
+
+    //Render Tree
+    glUniform1i(glGetUniformLocation(m_shader, "isWater"), 1); //render water off
+    glBindVertexArray(m_tree_vao);
     glDrawArrays(GL_TRIANGLES, 0, m_treeData.size() / 3);
     // Unbind Vertex Array
     glBindVertexArray(0);
 
     // Render Water
+    glUniform1i(glGetUniformLocation(m_shader, "isWater"), 1); //render water on
     glBindVertexArray(m_water_vao);
     // Set up uniforms specific to the water (model matrix for water, etc.)
-    // Here you can change uniforms as needed for water rendering
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4); // Assuming water quad has 4 vertices
     glBindVertexArray(0);
 
