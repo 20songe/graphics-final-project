@@ -108,13 +108,9 @@ void GLRenderer::initializeGL()
 //    m_sphereData = generateSphereData(10,20);
     std::vector<float> data;
     std::vector<std::string> line;
-    bool res = objloader.loadOBJ("/Users/ericasong/Documents/Github/Graphics/final-project/graphics-final-project/scenefiles/tree.obj",
+    bool res = objloader.loadOBJ("scenefiles/cube.obj",
                                  data,
                                  line);
-//    bool res = objloader.loadOBJ("/Users/ericasong/Documents/Github/Graphics/project-realtime/projects-realtime-20songe/scenefiles/lights-camera/meshes/bunny.obj",
-//                                 data,
-//                                 line);
-
 
     if (!res) {
         std::cout << "error parsing obj file" << std::endl;
