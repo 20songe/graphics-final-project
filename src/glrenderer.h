@@ -35,10 +35,10 @@ private:
     //water related variables
     GLuint m_water_vbo;
     GLuint m_water_vao;
+    glm::mat4 m_waterModelMatrix = glm::mat4(1);
 
-
+    //tree related variables
     std::vector<float> m_treeData;
-
     glm::mat4 m_model = glm::mat4(1);
     glm::mat4 m_view  = glm::mat4(1);
     glm::mat4 m_proj  = glm::mat4(1);

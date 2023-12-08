@@ -5,6 +5,7 @@
 
 #include <QMouseEvent>
 #include "glm/gtx/transform.hpp"
+#include <glm/gtc/type_ptr.hpp>
 
 #include "src/objloader.h"
 
@@ -191,6 +192,10 @@ void GLRenderer::paintGL()
     glUniform1i(glGetUniformLocation(m_shader, "isWater"), 1); //render water on
     glBindVertexArray(m_water_vao);
     // Set up uniforms specific to the water (model matrix for water, etc.)
+    m_waterModelMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+    GLint waterModelLoc = glGetUniformLocation(m_shader, "waterModel");
+    glUniformMatrix4fv(waterModelLoc, 1, GL_FALSE, glm::value_ptr(m_waterModelMatrix));
+
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4); // Assuming water quad has 4 vertices
     glBindVertexArray(0);
 

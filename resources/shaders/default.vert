@@ -12,6 +12,7 @@ out vec3 m_world_norm;
 
 // Uniforms:
 uniform mat4 model;
+uniform mat4 waterModel;
 uniform mat4 view;
 uniform mat4 proj;
 uniform int isWater; // Uniform to switch between water and general object rendering
@@ -19,7 +20,7 @@ uniform int isWater; // Uniform to switch between water and general object rende
 void main() {
     if (isWater == 1) {
           // Logic for water vertices
-          vec4 world_pos4 = model * vec4(m_object_pos.x, 0.0, m_object_pos.y, 1.0);
+          vec4 world_pos4 = waterModel * vec4(m_object_pos.x, 0.0, m_object_pos.y, 1.0);
           m_world_pos = vec3(world_pos4);
           uv_out = uv; // Use texture coordinates directly
           m_world_norm = normal; // Use normals directly
