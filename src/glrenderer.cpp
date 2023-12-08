@@ -79,9 +79,18 @@ GLRenderer::~GLRenderer()
 //    return data;
 //}
 
+// Water quad vertex positions
+const GLfloat waterVertices[] = {
+    -1.0f, -1.0f,  // Bottom Left
+    1.0f, -1.0f,  // Bottom Right
+    1.0f,  1.0f,  // Top Right
+    -1.0f,  1.0f   // Top Left
+};
 
-void GLRenderer::initializeGL()
-{
+
+
+void GLRenderer::initializeGL() {
+    // ... existing initialization code ...
     // Initialize GL extension wrangler
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
@@ -94,45 +103,132 @@ void GLRenderer::initializeGL()
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
 
-    //call ShaderLoader::createShaderProgram with the paths to the vertex
-    //and fragment shaders. Then, store its return value in `m_shader`
     m_shader = ShaderLoader::createShaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
 
-    // Generate and bind VBO
+    // Generate and bind VBO for the tree
     glGenBuffers(1, &m_tree_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_tree_vbo);
-    // Generate sphere data
-//    m_sphereData = generateSphereData(10,20);
+
+    //Load OBJ file
     std::vector<float> data;
     std::vector<std::string> line;
-    bool res = objloader.loadOBJ("scenefiles/tree.obj",
-                                 data,
-                                 line);
+        bool res = objloader.loadOBJ("scenefiles/cube.obj",
+                                     data,
+                                     line);
 
-    if (!res) {
-        std::cout << "error parsing obj file" << std::endl;
-        return;
-    }
+        if (!res) {
+            std::cout << "error parsing obj file" << std::endl;
+            return;
+        }
 
     m_treeData = data;
-    // Send data to VBO
-    glBufferData(GL_ARRAY_BUFFER,m_treeData.size() * sizeof(GLfloat),m_treeData.data(), GL_STATIC_DRAW);
-    // Generate, and bind vao
+
+    // Assuming m_treeData is already populated with tree vertex data
+    glBufferData(GL_ARRAY_BUFFER, m_treeData.size() * sizeof(GLfloat), m_treeData.data(), GL_STATIC_DRAW);
+
+    // Generate and bind VAO for the tree
     glGenVertexArrays(1, &m_tree_vao);
     glBindVertexArray(m_tree_vao);
 
-    // Enable and define attribute 0 to store vertex positions
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,8 * sizeof(GLfloat),reinterpret_cast<void *>(0));
-    glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,8 * sizeof(GLfloat),reinterpret_cast<void *>(3 * sizeof(GLfloat)));
-    glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,8 * sizeof(GLfloat), reinterpret_cast<void *>(5 * sizeof(GLfloat)));
+    // Enable and define attribute arrays for the tree VAO
+    glEnableVertexAttribArray(0); // For position
+    glEnableVertexAttribArray(1); // For UV
+    glEnableVertexAttribArray(2); // For normals
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void *>(0));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GLfloat), reinterpret_cast<void *>(5 * sizeof(GLfloat)));
 
-    // Clean-up bindings
+    // Unbind the tree VAO
     glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER,0);
+
+//    // Generate and bind VBO for water
+//    glGenBuffers(1, &m_water_vbo);
+//    glBindBuffer(GL_ARRAY_BUFFER, m_water_vbo);
+//    // Assuming waterVertices is already defined
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(waterVertices), waterVertices, GL_STATIC_DRAW);
+
+//    // Generate and bind VAO for water
+//    glGenVertexArrays(1, &m_water_vao);
+//    glBindVertexArray(m_water_vao);
+
+//    // Enable and define attribute arrays for the water VAO
+//    glEnableVertexAttribArray(0); // For position
+//    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), reinterpret_cast<void*>(0));
+
+//    // Unbind the water VAO
+//    glBindVertexArray(0);
+
+    // Unbind the VBO
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
+
+//void GLRenderer::initializeGL()
+//{
+//    // Initialize GL extension wrangler
+//    glewExperimental = GL_TRUE;
+//    GLenum err = glewInit();
+//    if (err != GLEW_OK) fprintf(stderr, "Error while initializing GLEW: %s\n", glewGetErrorString(err));
+//    fprintf(stdout, "Successfully initialized GLEW %s\n", glewGetString(GLEW_VERSION));
+
+//    // Set clear color to black
+//    glClearColor(0,0,0,1);
+
+//    // Enable depth testing
+//    glEnable(GL_DEPTH_TEST);
+
+//    m_shader = ShaderLoader::createShaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
+
+
+//    // Generate and bind VBO
+//    glGenBuffers(1, &m_tree_vbo); //tree
+//    glBindBuffer(GL_ARRAY_BUFFER, m_tree_vbo); //water
+
+//    glGenBuffers(1, &m_water_vbo);
+//    glBindBuffer(GL_ARRAY_BUFFER, m_water_vbo);
+
+
+//    //Load OBJ file
+//    std::vector<float> data;
+//    std::vector<std::string> line;
+////    bool res = objloader.loadOBJ("scenefiles/cube.obj",
+////                                 data,
+////                                 line);
+
+////    if (!res) {
+////        std::cout << "error parsing obj file" << std::endl;
+////        return;
+////    }
+
+//    m_treeData = data;
+
+//    // Send data to VBO
+//    glBufferData(GL_ARRAY_BUFFER,m_treeData.size() * sizeof(GLfloat),m_treeData.data(), GL_STATIC_DRAW);
+//    glBufferData(GL_ARRAY_BUFFER, sizeof(waterVertices), waterVertices, GL_STATIC_DRAW);
+
+//    // Generate, and bind vao
+//    glGenVertexArrays(1, &m_tree_vao); //tree
+//    glBindVertexArray(m_tree_vao);
+
+//    glGenVertexArrays(1, &m_water_vao); //water
+//    glBindVertexArray(m_water_vao);
+
+//    // Enable and define attribute 0 to store vertex positions
+//    glEnableVertexAttribArray(0);
+//    glEnableVertexAttribArray(1);
+//    glEnableVertexAttribArray(2);
+//    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,8 * sizeof(GLfloat),reinterpret_cast<void *>(0));
+//    glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,8 * sizeof(GLfloat),reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+//    glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,8 * sizeof(GLfloat), reinterpret_cast<void *>(5 * sizeof(GLfloat)));
+
+
+//    glEnableVertexAttribArray(0); // Assuming location 0 for position //won't this cause chaos?
+//    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(GLfloat), reinterpret_cast<void*>(0));
+
+//    // Clean-up bindings
+//    glBindVertexArray(0);
+//    glBindBuffer(GL_ARRAY_BUFFER,0);
+//}
 
 void GLRenderer::paintGL()
 {

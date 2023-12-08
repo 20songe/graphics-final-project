@@ -31,6 +31,12 @@ private:
     GLuint m_shader;     // Stores id of shader program
     GLuint m_tree_vbo; // Stores id of vbo
     GLuint m_tree_vao; // Stores id of vao
+
+    //water related variables
+    GLuint m_water_vbo;
+    GLuint m_water_vao;
+
+
     std::vector<float> m_treeData;
 
     glm::mat4 m_model = glm::mat4(1);
@@ -43,6 +49,7 @@ private:
     float m_kd;
     float m_ks;
     float m_shininess;
+
 
     QPoint m_prevMousePos;
     float  m_angleX;
