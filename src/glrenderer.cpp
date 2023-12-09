@@ -33,9 +33,105 @@ GLRenderer::~GLRenderer()
     //water related destroy
     glDeleteVertexArrays(1, &m_water_vao);
     glDeleteBuffers(1, &m_water_vbo);
+
+    //clean up FBOs
+    glDeleteFramebuffers(1, &reflectionFBO);
+    glDeleteTextures(1, &reflectionTexture);
+    glDeleteRenderbuffers(1, &reflectionDepthBuffer);
+
+    glDeleteFramebuffers(1, &refractionFBO);
+    glDeleteTextures(1, &refractionTexture);
+    glDeleteTextures(1, &refractionDepthTexture);
 }
 
 // ================== Helper Functions
+void GLRenderer::checkFBOStatus() {//for debugging purpose
+    if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cerr << "Framebuffer not complete!" << std::endl;
+    }
+}
+
+GLuint GLRenderer::createTextureAttachment(int width, int height) {
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, textureID, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureID, 0);
+    return textureID;
+}
+
+GLuint GLRenderer::createDepthTextureAttachment(int width, int height) {
+    GLuint textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+//    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, textureID, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, textureID, 0);
+    return textureID;
+}
+
+GLuint GLRenderer::createDepthBufferAttachment(int width, int height) {
+    GLuint depthBuffer;
+    glGenRenderbuffers(1, &depthBuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
+    return depthBuffer;
+}
+
+void GLRenderer::initializeReflectionFBO() {
+    glGenFramebuffers(1, &reflectionFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, reflectionFBO);
+    std::cout<<"check for reflection FBO"<<std::endl;
+    checkFBOStatus();
+
+    reflectionTexture = createTextureAttachment(REFLECTION_WIDTH, REFLECTION_HEIGHT);
+    std::cout<<"REFLECTION TEXTURE!"<<std::endl;
+    checkFBOStatus();
+
+    reflectionDepthBuffer = createDepthBufferAttachment(REFLECTION_WIDTH, REFLECTION_HEIGHT);
+    std::cout<<"DEPTH TEXTURE!"<<std::endl;
+    checkFBOStatus();
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
+void GLRenderer::initializeRefractionFBO() {
+    glGenFramebuffers(1, &refractionFBO);
+    glBindFramebuffer(GL_FRAMEBUFFER, refractionFBO);
+    std::cout<<"check for refraction FBO"<<std::endl;
+    checkFBOStatus();
+
+    refractionTexture = createTextureAttachment(REFRACTION_WIDTH, REFRACTION_HEIGHT);
+    refractionDepthTexture = createDepthTextureAttachment(REFRACTION_WIDTH, REFRACTION_HEIGHT);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+
+void GLRenderer::bindReflectionFBO() {
+    glBindFramebuffer(GL_FRAMEBUFFER, reflectionFBO);
+    glViewport(0, 0, REFLECTION_WIDTH, REFLECTION_HEIGHT);
+}
+
+void GLRenderer::bindRefractionFBO() {
+    glBindFramebuffer(GL_FRAMEBUFFER, refractionFBO);
+    glViewport(0, 0, REFRACTION_WIDTH, REFRACTION_HEIGHT);
+}
+
+void GLRenderer::unbindCurrentFBO() {
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, this->width(), this->height());
+}
+
+
+// ================== Rendering Pipeline
 // Water quad vertex positions
 const GLfloat waterVertices[] = {
     -1.0f, -1.0f,  // Bottom Left
@@ -95,6 +191,11 @@ void GLRenderer::initializeGL() {
 
     // Unbind the tree VAO
     glBindVertexArray(0);
+
+    // Initialize reflection and refraction framebuffers
+    std::cout<<"Start Initialization"<<std::endl;
+    initializeReflectionFBO();
+    initializeRefractionFBO();
 
     // Generate and bind VBO for water
     glGenBuffers(1, &m_water_vbo);
@@ -181,6 +282,15 @@ void GLRenderer::paintGL()
     glm::vec4 cameraPos = inverse(m_view) * glm::vec4(0.0, 0.0, 0.0, 1.0);
     glUniform4fv(cam_loc, 1, &cameraPos[0]);
 
+
+    //reflection pass
+    bindReflectionFBO();
+    unbindCurrentFBO();
+
+    //refraction pass
+    bindRefractionFBO();
+    unbindCurrentFBO();
+
     //Render Tree
     glUniform1i(glGetUniformLocation(m_shader, "isWater"), 1); //render water off
     glBindVertexArray(m_tree_vao);
@@ -190,12 +300,18 @@ void GLRenderer::paintGL()
 
     // Render Water
     glUniform1i(glGetUniformLocation(m_shader, "isWater"), 1); //render water on
+
+
     glBindVertexArray(m_water_vao);
     // Set up uniforms specific to the water (model matrix for water, etc.)
     m_waterModelMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     GLint waterModelLoc = glGetUniformLocation(m_shader, "waterModel");
     glUniformMatrix4fv(waterModelLoc, 1, GL_FALSE, glm::value_ptr(m_waterModelMatrix));
-
+    // Bind reflection and refraction textures
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, reflectionTexture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, refractionTexture);
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4); // Assuming water quad has 4 vertices
     glBindVertexArray(0);
 
@@ -203,7 +319,7 @@ void GLRenderer::paintGL()
     glUseProgram(0);
 }
 
-// ================== Other stencil code
+// ================== Other codes
 
 void GLRenderer::resizeGL(int w, int h)
 {

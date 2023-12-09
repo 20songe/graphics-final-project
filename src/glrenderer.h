@@ -22,6 +22,17 @@ protected:
     void paintGL()                       override; // Called every frame in a loop
     void resizeGL(int width, int height) override; // Called when window size changes
 
+    //added helpers
+    void initializeReflectionFBO();
+    void initializeRefractionFBO();
+    void bindReflectionFBO();
+    void bindRefractionFBO();
+    void unbindCurrentFBO();
+    void checkFBOStatus();
+    GLuint createTextureAttachment(int width, int height);
+    GLuint createDepthTextureAttachment(int width, int height);
+    GLuint createDepthBufferAttachment(int width, int height);
+
     void mousePressEvent(QMouseEvent *e) override; // Used for camera movement
     void mouseMoveEvent(QMouseEvent *e)  override; // Used for camera movement
     void wheelEvent(QWheelEvent *e)      override; // Used for camera movement
