@@ -100,7 +100,7 @@ void GLRenderer::initializeGL()
     // Task 1: call ShaderLoader::createShaderProgram with the paths to the vertex
     //         and fragment shaders. Then, store its return value in `m_shader`
     m_shader = ShaderLoader::createShaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
-    generator = *new ParticleGenerator(500);
+    generator = *new ParticleGenerator(100);
 
     // Generate and bind VBO
     glGenBuffers(1, &m_sphere_vbo);
@@ -243,9 +243,15 @@ void GLRenderer::wheelEvent(QWheelEvent *event) {
 void GLRenderer::timerEvent(QTimerEvent *event) {
     int elapsedms   = m_elapsedTimer.elapsed();
     float deltaTime = elapsedms * 0.001f;
-    m_elapsedTimer.restart();
     glm::vec3 offset(deltaTime);
-    generator.Update(deltaTime, 1, offset);
+    //std::cout << elapsedms << std::endl;
+    if (elapsedms >= 500) {
+        generator.Update(deltaTime, 1, offset);
+        m_elapsedTimer.restart();
+    }
+    else {
+        generator.Update(deltaTime, 0, offset);
+    }
     update();
 }
 

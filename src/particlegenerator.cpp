@@ -24,8 +24,8 @@ ParticleGenerator::ParticleGenerator(unsigned int amount):
 void ParticleGenerator::Update(float dt, unsigned int newParticles, glm::vec3 offset)
 {
     // add new particles
-//    for (unsigned int i = 0; i < newParticles; ++i)
-    if (dt < 100.f)
+    for (unsigned int i = 0; i < newParticles; ++i)
+    //if (dt > 1.f)
     {
         int unusedParticle = this->firstUnusedParticle();
         this->respawnParticle(this->particles[unusedParticle], offset);
@@ -96,14 +96,23 @@ void ParticleGenerator::init()
 //        1.0f, 0.0f, 1.f,
 //        1.0f, 0.0f, 0.f
 //    };
-    float particle_quad[] = {
-        0.0f, 0.0f, 0.1f,
-        0.1f, 0.0f, 0.f,
-        0.0f, 0.0f, 0.f,
+//    float particle_quad[] = {
+//        0.0f, 0.0f, 0.1f,
+//        0.1f, 0.0f, 0.f,
+//        0.0f, 0.0f, 0.f,
 
-        0.0f, 0.0f, 0.1f,
-        0.1f, 0.0f, 0.1f,
-        0.1f, 0.0f, 0.f
+//        0.0f, 0.0f, 0.1f,
+//        0.1f, 0.0f, 0.1f,
+//        0.1f, 0.0f, 0.f
+//    };
+    float particle_quad[] = {
+        -0.1f, 0.0f, 0.1f, //top left
+        -0.1f, 0.0f, -0.1f, //bottom left
+        0.1f, 0.0f, -0.1f, //bottom right
+
+        0.1f, 0.0f, 0.1f, //top right
+        -0.1f, 0.0f, 0.1f, //top left
+        0.1f, 0.0f, -0.1f //bottom right
     };
     shader = ShaderLoader::createShaderProgram("resources/shaders/particles.vert", "resources/shaders/particles.frag");
     glGenVertexArrays(1, &this->VAO);
@@ -154,5 +163,5 @@ void ParticleGenerator::respawnParticle(Particle &particle, glm::vec3 offset)
     particle.Position = glm::vec3(0.f, 5.f, 0.f) + glm::vec3(randomx, 0.f, randomy);
 
     particle.Life = 1.0f;
-    particle.Velocity = glm::vec3(0.f, 50.f, 0.f) * 0.1f;
+    particle.Velocity = glm::vec3(0.f, 1.f, 0.f) * 0.1f;
 }
