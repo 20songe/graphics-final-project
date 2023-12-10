@@ -38,7 +38,7 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 48,
+				"line" : 50,
 				"parent" : 0
 			}
 		]
@@ -173,14 +173,15 @@
 			"name" : "",
 			"sourceIndexes" : 
 			[
-				2
+				2,
+				3
 			]
 		},
 		{
 			"name" : "CMake Rules",
 			"sourceIndexes" : 
 			[
-				3
+				4
 			]
 		}
 	],
@@ -198,6 +199,11 @@
 			"compileGroupIndex" : 1,
 			"path" : "glew/src/glew.c",
 			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "resources/shaders/texture.frag",
+			"sourceGroupIndex" : 1
 		},
 		{
 			"backtrace" : 0,

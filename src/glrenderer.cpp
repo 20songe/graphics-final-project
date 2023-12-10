@@ -114,7 +114,6 @@ void GLRenderer::initializeRefractionFBO() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-
 void GLRenderer::bindReflectionFBO() {
     glBindFramebuffer(GL_FRAMEBUFFER, reflectionFBO);
     glViewport(0, 0, REFLECTION_WIDTH, REFLECTION_HEIGHT);
@@ -155,6 +154,7 @@ void GLRenderer::initializeGL() {
     glEnable(GL_DEPTH_TEST);
 
     m_shader = ShaderLoader::createShaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
+    m_texture_shader = ShaderLoader::createShaderProgram("resources/shaders/texture.vert", "resources/shaders/texture.frag");
 
     // Generate and bind VBO for the tree
     glGenBuffers(1, &m_tree_vbo);
@@ -284,12 +284,12 @@ void GLRenderer::paintGL()
 
 
     //reflection pass
-    bindReflectionFBO();
-    unbindCurrentFBO();
+//    bindReflectionFBO();
+//    unbindCurrentFBO();
 
-    //refraction pass
-    bindRefractionFBO();
-    unbindCurrentFBO();
+//    //refraction pass
+//    bindRefractionFBO();
+//    unbindCurrentFBO();
 
     //Render Tree
     glUniform1i(glGetUniformLocation(m_shader, "isWater"), 1); //render water off

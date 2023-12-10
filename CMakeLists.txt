@@ -44,7 +44,10 @@ qt_add_resources(${PROJECT_NAME} "Resources"
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
-add_library(StaticGLEW STATIC glew/src/glew.c)
+add_library(StaticGLEW STATIC glew/src/glew.c
+    resources/shaders/texture.frag
+    resources/shaders/texture.vert
+)
 include_directories(${PROJECT_NAME} PRIVATE glew/include)
 
 # Specifies libraries to be linked (Qt components, glew, etc)

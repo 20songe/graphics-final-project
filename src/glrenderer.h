@@ -40,6 +40,7 @@ protected:
 
 private:
     GLuint m_shader;     // Stores id of shader program
+    GLuint m_texture_shader;
     GLuint m_tree_vbo; // Stores id of vbo
     GLuint m_tree_vao; // Stores id of vao
 

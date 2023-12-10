@@ -38,7 +38,7 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 48,
+				"line" : 51,
 				"parent" : 0
 			}
 		]
@@ -173,14 +173,16 @@
 			"name" : "",
 			"sourceIndexes" : 
 			[
-				2
+				2,
+				3,
+				4
 			]
 		},
 		{
 			"name" : "CMake Rules",
 			"sourceIndexes" : 
 			[
-				3
+				5
 			]
 		}
 	],
@@ -198,6 +200,16 @@
 			"compileGroupIndex" : 1,
 			"path" : "glew/src/glew.c",
 			"sourceGroupIndex" : 0
+		},
+		{
+			"backtrace" : 1,
+			"path" : "resources/shaders/texture.frag",
+			"sourceGroupIndex" : 1
+		},
+		{
+			"backtrace" : 1,
+			"path" : "resources/shaders/texture.vert",
+			"sourceGroupIndex" : 1
 		},
 		{
 			"backtrace" : 0,
