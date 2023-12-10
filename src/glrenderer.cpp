@@ -283,13 +283,13 @@ void GLRenderer::paintGL()
     glUniform4fv(cam_loc, 1, &cameraPos[0]);
 
 
-//    //reflection pass
-//    bindReflectionFBO();
-//    unbindCurrentFBO();
+    //reflection pass
+    bindReflectionFBO();
+    unbindCurrentFBO();
 
-//    //refraction pass
-//    bindRefractionFBO();
-//    unbindCurrentFBO();
+    //refraction pass
+    bindRefractionFBO();
+    unbindCurrentFBO();
 
     //Render Tree
     glUniform1i(glGetUniformLocation(m_shader, "isWater"), 1); //render water off
