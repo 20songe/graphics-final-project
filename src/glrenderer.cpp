@@ -211,7 +211,7 @@ void GLRenderer::paintGL()
 
     // Task 3: deactivate the shader program by passing 0 into glUseProgram
     glUseProgram(0);
-    generator.Draw();
+    generator.Draw(m_model, m_view, m_proj);
 }
 
 // ================== Other stencil code
@@ -244,7 +244,7 @@ void GLRenderer::timerEvent(QTimerEvent *event) {
     int elapsedms   = m_elapsedTimer.elapsed();
     float deltaTime = elapsedms * 0.001f;
     m_elapsedTimer.restart();
-    glm::vec3 offset(deltaTime*5.f);
+    glm::vec3 offset(deltaTime);
     generator.Update(deltaTime, 1, offset);
     update();
 }

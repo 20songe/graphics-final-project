@@ -24,7 +24,8 @@ ParticleGenerator::ParticleGenerator(unsigned int amount):
 void ParticleGenerator::Update(float dt, unsigned int newParticles, glm::vec3 offset)
 {
     // add new particles
-    for (unsigned int i = 0; i < newParticles; ++i)
+//    for (unsigned int i = 0; i < newParticles; ++i)
+    if (dt < 10.f)
     {
         int unusedParticle = this->firstUnusedParticle();
         this->respawnParticle(this->particles[unusedParticle], offset);
@@ -42,7 +43,7 @@ void ParticleGenerator::Update(float dt, unsigned int newParticles, glm::vec3 of
 }
 
 // render all particles
-void ParticleGenerator::Draw()
+void ParticleGenerator::Draw(glm::mat4 model, glm::mat4 view, glm::mat4 proj)
 {
     // use additive blending to give it a 'glow' effect
     glUseProgram(shader);
@@ -55,6 +56,9 @@ void ParticleGenerator::Draw()
             //this->texture.Bind();
             //TODO add textures
             glUniform3fv(glGetUniformLocation(shader, "offset"), 1, &particle.Position[0]);
+            glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &view[0][0]);
+            glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
+            glUniformMatrix4fv(glGetUniformLocation(shader, "proj"), 1, GL_FALSE, &proj[0][0]);
             glBindVertexArray(this->VAO);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindVertexArray(0);
@@ -79,14 +83,23 @@ void ParticleGenerator::init()
 //        1.0f, 1.0f, 1.0f, 1.0f,
 //        1.0f, 0.0f, 1.0f, 0.0f
 //    };
+//    float particle_quad[] = {
+//        0.0f, 0.0f, 1.f,
+//        1.0f, 0.0f, 0.f,
+//        0.0f, 0.0f, 0.f,
+
+//        0.0f, 0.0f, 1.f,
+//        1.0f, 0.0f, 1.f,
+//        1.0f, 0.0f, 0.f
+//    };
     float particle_quad[] = {
-        0.0f, 1.0f, 0.f,
-        1.0f, 0.0f, 0.f,
+        0.0f, 0.0f, 0.1f,
+        0.1f, 0.0f, 0.f,
         0.0f, 0.0f, 0.f,
 
-        0.0f, 1.0f, 0.f,
-        1.0f, 1.0f, 0.f,
-        1.0f, 0.0f, 0.f
+        0.0f, 0.0f, 0.1f,
+        0.1f, 0.0f, 0.1f,
+        0.1f, 0.0f, 0.f
     };
     shader = ShaderLoader::createShaderProgram("resources/shaders/particles.vert", "resources/shaders/particles.frag");
     glGenVertexArrays(1, &this->VAO);
@@ -130,11 +143,11 @@ unsigned int ParticleGenerator::firstUnusedParticle()
 
 void ParticleGenerator::respawnParticle(Particle &particle, glm::vec3 offset)
 {
-    //float random = ((rand() % 100) - 50) / 10.0f;
+    float random = ((rand() % 100) - 50) / 10.0f;
     float rColor = 0.5f + ((rand() % 100) / 100.0f);
     // game object was used for position and velocity here?
-    particle.Position = glm::vec3(0.f) + offset;
+    particle.Position = glm::vec3(0.f, 0.f, 1.f) + glm::vec3(random) + offset;
 
     particle.Life = 1.0f;
-    particle.Velocity = glm::vec3(0.f) * 0.1f;
+    particle.Velocity = glm::vec3(10.f) * 0.1f;
 }

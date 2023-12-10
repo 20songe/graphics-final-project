@@ -37,7 +37,7 @@ public:
     // update all particles
     void Update(float dt, unsigned int newParticles, glm::vec3 offset = glm::vec3(0.0f));
     // render all particles
-    void Draw();
+    void Draw(glm::mat4 model, glm::mat4 view, glm::mat4 proj);
 private:
     // state
     std::vector<Particle> particles;
