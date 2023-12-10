@@ -192,10 +192,10 @@ void GLRenderer::initializeGL() {
     // Unbind the tree VAO
     glBindVertexArray(0);
 
-    // Initialize reflection and refraction framebuffers
-    std::cout<<"Start Initialization"<<std::endl;
-    initializeReflectionFBO();
-    initializeRefractionFBO();
+//    // Initialize reflection and refraction framebuffers
+//    std::cout<<"Start Initialization"<<std::endl;
+//    initializeReflectionFBO();
+//    initializeRefractionFBO();
 
     // Generate and bind VBO for water
     glGenBuffers(1, &m_water_vbo);
@@ -283,13 +283,13 @@ void GLRenderer::paintGL()
     glUniform4fv(cam_loc, 1, &cameraPos[0]);
 
 
-    //reflection pass
-    bindReflectionFBO();
-    unbindCurrentFBO();
+//    //reflection pass
+//    bindReflectionFBO();
+//    unbindCurrentFBO();
 
-    //refraction pass
-    bindRefractionFBO();
-    unbindCurrentFBO();
+//    //refraction pass
+//    bindRefractionFBO();
+//    unbindCurrentFBO();
 
     //Render Tree
     glUniform1i(glGetUniformLocation(m_shader, "isWater"), 1); //render water off
