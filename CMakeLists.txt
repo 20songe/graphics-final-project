@@ -33,6 +33,8 @@ add_executable(${PROJECT_NAME}
     src/shaderloader.h
     src/objloader.cpp
     src/objloader.h
+    src/particleemitter.h
+    src/particleemitter.cpp
 )
 # Specifies other files
 qt_add_resources(${PROJECT_NAME} "Resources"
@@ -41,6 +43,12 @@ qt_add_resources(${PROJECT_NAME} "Resources"
   FILES
   resources/shaders/default.vert
   resources/shaders/default.frag
+)
+
+target_sources(graphics_final_project_other_files
+  PRIVATE
+    resources/shaders/particles.vert
+    resources/shaders/particles.frag
 )
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
