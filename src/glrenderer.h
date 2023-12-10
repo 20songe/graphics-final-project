@@ -8,6 +8,8 @@
 #include "GL/glew.h" // Must always be first include
 #include <QOpenGLWidget>
 #include "glm/glm.hpp"
+#include <QElapsedTimer>
+#include "particlegenerator.h"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
@@ -26,6 +28,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *e)  override; // Used for camera movement
     void wheelEvent(QWheelEvent *e)      override; // Used for camera movement
     void rebuildMatrices();                        // Used for camera movement
+    void timerEvent(QTimerEvent *event) override;
 
 private:
     GLuint m_shader;     // Stores id of shader program
@@ -48,4 +51,9 @@ private:
     float  m_angleX;
     float  m_angleY;
     float  m_zoom;
+
+    // Tick Related Variables
+    int m_timer;                                        // Stores timer which attempts to run ~60 times per second
+    QElapsedTimer m_elapsedTimer;
+    ParticleGenerator generator;
 };

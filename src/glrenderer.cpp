@@ -83,6 +83,8 @@ std::vector<float> generateSphereData(int phiTesselations, int thetaTesselations
 
 void GLRenderer::initializeGL()
 {
+    m_timer = startTimer(1000/60);
+    m_elapsedTimer.start();
     // Initialize GL extension wrangler
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
@@ -97,9 +99,8 @@ void GLRenderer::initializeGL()
 
     // Task 1: call ShaderLoader::createShaderProgram with the paths to the vertex
     //         and fragment shaders. Then, store its return value in `m_shader`
-    std::cout << "here" << std::endl;
     m_shader = ShaderLoader::createShaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
-    std::cout << "here1" << std::endl;
+    generator = *new ParticleGenerator(500);
 
     // Generate and bind VBO
     glGenBuffers(1, &m_sphere_vbo);
@@ -210,6 +211,7 @@ void GLRenderer::paintGL()
 
     // Task 3: deactivate the shader program by passing 0 into glUseProgram
     glUseProgram(0);
+    generator.Draw();
 }
 
 // ================== Other stencil code
@@ -236,6 +238,15 @@ void GLRenderer::wheelEvent(QWheelEvent *event) {
     // Update zoom based on event parameter
     m_zoom -= event->angleDelta().y() / 100.f;
     rebuildMatrices();
+}
+
+void GLRenderer::timerEvent(QTimerEvent *event) {
+    int elapsedms   = m_elapsedTimer.elapsed();
+    float deltaTime = elapsedms * 0.001f;
+    m_elapsedTimer.restart();
+    glm::vec3 offset(deltaTime*5.f);
+    generator.Update(deltaTime, 1, offset);
+    update();
 }
 
 void GLRenderer::rebuildMatrices() {
