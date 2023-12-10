@@ -25,6 +25,7 @@ void main() {
     // Task 8: compute the world-space position and normal, then pass them to
     //         the fragment shader using the variables created in task 5
 
+    // source: https://medium.com/@joshmarinacci/water-ripples-with-vertex-shaders-6a9ecbdf091f
     vec4 world_pos4 = model * vec4(m_object_pos, 1.0);
 
     float dx = m_object_pos.x;
