@@ -25,7 +25,7 @@ void ParticleGenerator::Update(float dt, unsigned int newParticles, glm::vec3 of
 {
     // add new particles
 //    for (unsigned int i = 0; i < newParticles; ++i)
-    if (dt < 10.f)
+    if (dt < 100.f)
     {
         int unusedParticle = this->firstUnusedParticle();
         this->respawnParticle(this->particles[unusedParticle], offset);
@@ -34,10 +34,13 @@ void ParticleGenerator::Update(float dt, unsigned int newParticles, glm::vec3 of
     for (unsigned int i = 0; i < this->amount; ++i)
     {
         Particle &p = this->particles[i];
+        float height = p.Position.y;
         p.Life -= dt; // reduce life
-        if (p.Life > 0.0f)
+//        if (p.Life > 0.0f)
+        if (p.Position.y > 0.0f)
         {	// particle is alive, thus update
             p.Position -= p.Velocity * dt;
+//            p.Position -= 9.8*9.8*dt; // gravity?
         }
     }
 }
@@ -49,7 +52,8 @@ void ParticleGenerator::Draw(glm::mat4 model, glm::mat4 view, glm::mat4 proj)
     glUseProgram(shader);
     for (Particle particle : this->particles)
     {
-        if (particle.Life > 0.0f)
+//        if (particle.Life > 0.0f)
+        if (particle.Position.y > 0.0f)
         {
 //            this->shader.SetVector2f("offset", particle.Position);
 //            this->shader.SetVector4f("color", particle.Color);
@@ -124,14 +128,14 @@ unsigned int ParticleGenerator::firstUnusedParticle()
 {
     // first search from last used particle, this will usually return almost instantly
     for (unsigned int i = lastUsedParticle; i < this->amount; ++i){
-        if (this->particles[i].Life <= 0.0f){
+        if (this->particles[i].Position.y <= 0.0f){
             lastUsedParticle = i;
             return i;
         }
     }
     // otherwise, do a linear search
     for (unsigned int i = 0; i < lastUsedParticle; ++i){
-        if (this->particles[i].Life <= 0.0f){
+        if (this->particles[i].Position.y <= 0.0f){
             lastUsedParticle = i;
             return i;
         }
@@ -143,11 +147,12 @@ unsigned int ParticleGenerator::firstUnusedParticle()
 
 void ParticleGenerator::respawnParticle(Particle &particle, glm::vec3 offset)
 {
-    float random = ((rand() % 100) - 50) / 10.0f;
+    float randomx = ((rand() % 100) - 50) / 10.f;
+    float randomy = ((rand() % 100) - 50) / 10.f;
     float rColor = 0.5f + ((rand() % 100) / 100.0f);
     // game object was used for position and velocity here?
-    particle.Position = glm::vec3(0.f, 0.f, 1.f) + glm::vec3(random) + offset;
+    particle.Position = glm::vec3(0.f, 5.f, 0.f) + glm::vec3(randomx, 0.f, randomy);
 
     particle.Life = 1.0f;
-    particle.Velocity = glm::vec3(10.f) * 0.1f;
+    particle.Velocity = glm::vec3(0.f, 50.f, 0.f) * 0.1f;
 }
