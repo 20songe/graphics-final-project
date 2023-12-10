@@ -19,13 +19,23 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 proj;
 
+uniform float time;
+
 void main() {
     // Task 8: compute the world-space position and normal, then pass them to
     //         the fragment shader using the variables created in task 5
 
     vec4 world_pos4 = model * vec4(m_object_pos, 1.0);
-    m_world_pos = vec3(world_pos4);
-    m_world_norm = normal;
+
+    float dx = m_object_pos.x;
+    float dz = m_object_pos.z;
+    float freq = sqrt(dx * dx + dz * dz);
+    float amp = 1.0;
+    float angle = -time * 10.0 + freq * 6.0;
+    m_world_pos = m_object_pos;
+    m_world_pos[1] += sin(angle) * amp;
+
+    m_world_norm = normalize(vec3(0.0,-amp * freq * cos(angle),1.0));
 
     uv_out = uv;
 

@@ -26,6 +26,7 @@ GLRenderer::GLRenderer(QWidget *parent)
 
 GLRenderer::~GLRenderer()
 {
+    killTimer(m_timer);
     makeCurrent();
     doneCurrent();
 }
@@ -83,6 +84,9 @@ std::vector<float> generateSphereData(int phiTesselations, int thetaTesselations
 
 void GLRenderer::initializeGL()
 {
+    m_timer = startTimer(1000/60);
+    m_elapsedTimer.start();
+
     // Initialize GL extension wrangler
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
@@ -108,7 +112,7 @@ void GLRenderer::initializeGL()
 //    m_sphereData = generateSphereData(10,20);
     std::vector<float> data;
     std::vector<std::string> line;
-    bool res = objloader.loadOBJ("scenefiles/tree.obj",
+    bool res = objloader.loadOBJ("scenefiles/tess_plane.obj",
                                  data,
                                  line);
 
@@ -155,6 +159,9 @@ void GLRenderer::paintGL()
     }
     glUniformMatrix4fv(output, 1, GL_FALSE, &m_model[0][0]);
 
+    GLint time_loc = glGetUniformLocation(m_shader, "time");
+    glUniform1f(time_loc, m_time);
+
     // Task 7: pass in m_view and m_proj
     GLint view_loc = glGetUniformLocation(m_shader, "view");
     GLint proj_loc = glGetUniformLocation(m_shader, "proj");
@@ -200,7 +207,7 @@ void GLRenderer::paintGL()
     glUniform1f(ks_loc, m_ks);
     glUniform1f(shiny_loc, m_shininess);
 
-    glm::vec4 cameraPos = inverse(m_view) * glm::vec4(0.0, 0.0, 0.0, 1.0);
+    glm::vec4 cameraPos = inverse(m_view) * glm::vec4(3.0, 10.0, 4.0, 1.0);
     glUniform4fv(cam_loc, 1, &cameraPos[0]);
 
     // Draw Command
@@ -255,4 +262,14 @@ void GLRenderer::rebuildMatrices() {
     m_proj = glm::perspective(glm::radians(45.0),1.0 * width() / height(),0.01,100.0);
 
     update();
+}
+
+void GLRenderer::timerEvent(QTimerEvent *event) {
+    int elapsedms   = m_elapsedTimer.elapsed();
+    float deltaTime = elapsedms * 0.001f;
+//    m_elapsedTimer.restart();
+
+    m_time = deltaTime;
+
+    update(); // asks for a PaintGL() call to occur
 }
