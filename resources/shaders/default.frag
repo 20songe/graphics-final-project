@@ -23,6 +23,8 @@ uniform vec4 cam_pos;
 
 uniform vec4 clip;
 
+
+
 void main() {
     // Remember that you need to renormalize vectors here if you want them to be normalized
 

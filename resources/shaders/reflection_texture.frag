@@ -11,9 +11,12 @@ uniform float height;
 
 out vec4 fragColor;
 
+uniform sampler2D guiTexture;
+
 void main()
 {
 
-    fragColor = texture(texSampler, uv_out);
+//    fragColor = texture(texSampler, uv_out);
+    fragColor = texture(guiTexture, uv_out);
 
 }

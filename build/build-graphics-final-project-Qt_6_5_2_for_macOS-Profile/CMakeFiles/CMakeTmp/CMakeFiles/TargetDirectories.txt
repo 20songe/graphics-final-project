@@ -1,0 +1,3 @@
+/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/build/build-graphics-final-project-Qt_6_5_2_for_macOS-Profile/CMakeFiles/CMakeTmp/CMakeFiles/cmTC_98b71.dir
+/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/build/build-graphics-final-project-Qt_6_5_2_for_macOS-Profile/CMakeFiles/CMakeTmp/CMakeFiles/edit_cache.dir
+/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/build/build-graphics-final-project-Qt_6_5_2_for_macOS-Profile/CMakeFiles/CMakeTmp/CMakeFiles/rebuild_cache.dir

@@ -47,8 +47,7 @@ void pushVec3(glm::vec4 vec, std::vector<float>* data)
     data->push_back(vec.z);
 }
 
-std::vector<float> generateSphereData(int phiTesselations, int thetaTesselations)
-{
+std::vector<float> generateSphereData(int phiTesselations, int thetaTesselations){
     std::vector<float> data;
 
     data.clear();
@@ -111,6 +110,26 @@ void GLRenderer::makeFBO(){
 
 }
 
+//============== helper for debugging
+
+void displayTextureOnScreen(GLuint shader, GLuint texture, GLuint quadVAO, float x, float y, float width, float height) {
+    glUseProgram(shader);
+
+    // Calculate the position and size of the quad to cover the x, y, width, and height
+    // Set up transformation for the quad here if needed
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    // Pass texture sampler to shader
+    glUniform1i(glGetUniformLocation(shader, "guiTexture"), 0);
+
+    glBindVertexArray(quadVAO);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4); // Assuming the VAO represents a quad
+    glBindVertexArray(0);
+
+    glUseProgram(0);
+}
+
 // ================== Students, You'll Be Working In These Files
 
 void GLRenderer::initializeGL()
@@ -135,7 +154,7 @@ void GLRenderer::initializeGL()
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
     // Set clear color to black
-    glClearColor(0,0,0,1);
+    glClearColor(1,1,1,1);
 
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
@@ -154,8 +173,6 @@ void GLRenderer::initializeGL()
     // Generate and bind VBO
     glGenBuffers(1, &m_sphere_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_sphere_vbo);
-    // Generate sphere data
-//    m_sphereData = generateSphereData(10,20);
     std::vector<float> data;
     std::vector<std::string> line;
     bool res = objloader.loadOBJ("scenefiles/tree.obj",
@@ -304,6 +321,8 @@ void GLRenderer::paintGL()
 
     // Task 3: deactivate the shader program by passing 0 into glUseProgram
     glUseProgram(0);
+
+    displayTextureOnScreen(m_texture_shader,m_fbo_texture, m_fullscreen_vao, 0.0f, 0.0f, 0.25f, 0.25f);
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
     glViewport(0, 0, m_screen_width, m_screen_height);
