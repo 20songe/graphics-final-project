@@ -5,6 +5,8 @@ StaticGLEW_autogen/timestamp: \
   CMakeFiles/3.24.2/CMakeCXXCompiler.cmake \
   CMakeFiles/3.24.2/CMakeSystem.cmake \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glew/src/glew.c \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/src/camera/camera.cpp \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/src/camera/camera.h \
   /Users/lixiaodan/Qt/6.5.2/macos/lib/cmake/Qt6/FindWrapAtomic.cmake \
   /Users/lixiaodan/Qt/6.5.2/macos/lib/cmake/Qt6/FindWrapOpenGL.cmake \
   /Users/lixiaodan/Qt/6.5.2/macos/lib/cmake/Qt6/Qt6Config.cmake \

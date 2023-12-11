@@ -47,6 +47,7 @@ qt_add_resources(${PROJECT_NAME} "Resources"
 add_library(StaticGLEW STATIC glew/src/glew.c
     resources/shaders/texture.frag
     resources/shaders/texture.vert
+    src/camera/camera.h src/camera/camera.cpp
 )
 include_directories(${PROJECT_NAME} PRIVATE glew/include)
 

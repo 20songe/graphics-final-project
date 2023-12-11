@@ -393,7 +393,15 @@
 	"CMAKE_SOURCE_DIR" : "/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project",
 	"DEP_FILE" : "/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/build/build-graphics-final-project-Qt_6_5_2_for_macOS-Debug/StaticGLEW_autogen/deps",
 	"DEP_FILE_RULE_NAME" : "StaticGLEW_autogen/timestamp",
-	"HEADERS" : [],
+	"HEADERS" : 
+	[
+		[
+			"/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/src/camera/camera.h",
+			"MU",
+			"I2NATBFSMB/moc_camera.cpp",
+			null
+		]
+	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
 	"INCLUDE_DIR" : "/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/build/build-graphics-final-project-Qt_6_5_2_for_macOS-Debug/StaticGLEW_autogen/include",
 	"MOC_COMPILATION_FILE" : "/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/build/build-graphics-final-project-Qt_6_5_2_for_macOS-Debug/StaticGLEW_autogen/mocs_compilation.cpp",
@@ -455,6 +463,11 @@
 	[
 		[
 			"/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glew/src/glew.c",
+			"MU",
+			null
+		],
+		[
+			"/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/src/camera/camera.cpp",
 			"MU",
 			null
 		]

@@ -141,6 +141,13 @@ build CMakeFiles/StaticGLEW.dir/glew/src/glew.c.o: C_COMPILER__StaticGLEW_Debug 
   OBJECT_DIR = CMakeFiles/StaticGLEW.dir
   OBJECT_FILE_DIR = CMakeFiles/StaticGLEW.dir/glew/src
 
+build CMakeFiles/StaticGLEW.dir/src/camera/camera.cpp.o: CXX_COMPILER__StaticGLEW_Debug /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/src/camera/camera.cpp || cmake_object_order_depends_target_StaticGLEW
+  DEP_FILE = CMakeFiles/StaticGLEW.dir/src/camera/camera.cpp.o.d
+  FLAGS = -Wno-deprecated-volatile -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk -mmacosx-version-min=13.5 -std=gnu++20
+  INCLUDES = -I/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/build/build-graphics-final-project-Qt_6_5_2_for_macOS-Debug -I/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project -I/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/build/build-graphics-final-project-Qt_6_5_2_for_macOS-Debug/StaticGLEW_autogen/include -I/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/src -I/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/graphics_final_project -I/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/PRIVATE -I/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glew/include
+  OBJECT_DIR = CMakeFiles/StaticGLEW.dir
+  OBJECT_FILE_DIR = CMakeFiles/StaticGLEW.dir/src/camera
+
 
 # =============================================================================
 # Link build statements for STATIC_LIBRARY target StaticGLEW
@@ -149,7 +156,7 @@ build CMakeFiles/StaticGLEW.dir/glew/src/glew.c.o: C_COMPILER__StaticGLEW_Debug 
 #############################################
 # Link the static library libStaticGLEW.a
 
-build libStaticGLEW.a: CXX_STATIC_LIBRARY_LINKER__StaticGLEW_Debug CMakeFiles/StaticGLEW.dir/StaticGLEW_autogen/mocs_compilation.cpp.o CMakeFiles/StaticGLEW.dir/glew/src/glew.c.o || StaticGLEW_autogen StaticGLEW_autogen_timestamp_deps
+build libStaticGLEW.a: CXX_STATIC_LIBRARY_LINKER__StaticGLEW_Debug CMakeFiles/StaticGLEW.dir/StaticGLEW_autogen/mocs_compilation.cpp.o CMakeFiles/StaticGLEW.dir/glew/src/glew.c.o CMakeFiles/StaticGLEW.dir/src/camera/camera.cpp.o || StaticGLEW_autogen StaticGLEW_autogen_timestamp_deps
   ARCH_FLAGS = -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX14.0.sdk -mmacosx-version-min=13.5
   LANGUAGE_COMPILE_FLAGS = -Wno-deprecated-volatile -g
   OBJECT_DIR = CMakeFiles/StaticGLEW.dir
@@ -239,7 +246,7 @@ build StaticGLEW_autogen/timestamp StaticGLEW_autogen/mocs_compilation.cpp | ${c
 #############################################
 # Phony custom command for CMakeFiles/graphics_final_project_autogen_timestamp_deps
 
-build CMakeFiles/graphics_final_project_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles/graphics_final_project_autogen_timestamp_deps: phony /Users/lixiaodan/Qt/6.5.2/macos/./libexec/moc /Users/lixiaodan/Qt/6.5.2/macos/./libexec/uic libStaticGLEW.a || StaticGLEW_autogen StaticGLEW_autogen_timestamp_deps libStaticGLEW.a
+build CMakeFiles/graphics_final_project_autogen_timestamp_deps | ${cmake_ninja_workdir}CMakeFiles/graphics_final_project_autogen_timestamp_deps: phony libStaticGLEW.a /Users/lixiaodan/Qt/6.5.2/macos/./libexec/moc /Users/lixiaodan/Qt/6.5.2/macos/./libexec/uic || StaticGLEW_autogen StaticGLEW_autogen_timestamp_deps libStaticGLEW.a
 
 
 #############################################

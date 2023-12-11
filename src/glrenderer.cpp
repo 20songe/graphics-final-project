@@ -99,7 +99,6 @@ void GLRenderer::initializeRefractionFBO() {
     glGenFramebuffers(1, &refractionFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, refractionFBO); //refraction FBO is bounded
 
-
     refractionTexture = createTextureAttachment(REFRACTION_WIDTH, REFRACTION_HEIGHT);
     refractionDepthTexture = createDepthTextureAttachment(REFRACTION_WIDTH, REFRACTION_HEIGHT);
     std::cout<<"REFRACTION!!"<<std::endl;
