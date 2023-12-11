@@ -92,11 +92,11 @@ void GLRenderer::initializeReflectionFBO() {
 
     reflectionTexture = createTextureAttachment(REFLECTION_WIDTH, REFLECTION_HEIGHT);
     std::cout<<"REFLECTION TEXTURE!"<<std::endl;
-    checkFBOStatus();
+    checkFBOStatus(); //this still outputs framebuffer not complete
 
     reflectionDepthBuffer = createDepthBufferAttachment(REFLECTION_WIDTH, REFLECTION_HEIGHT);
     std::cout<<"DEPTH TEXTURE!"<<std::endl;
-    checkFBOStatus();
+    checkFBOStatus(); //this still outputs framebuffer not complete
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
