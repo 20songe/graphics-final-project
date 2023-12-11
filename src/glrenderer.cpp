@@ -274,8 +274,9 @@ void GLRenderer::paintGL(){
     bindReflectionFBO();
     // Set up the camera for the reflection pass
     float distance = 2 * m_camera.pos.y; // Assuming 'waterHeight' is the y value of the water surface, and it's 0
+    std::cout<<m_camera.pos.y<<std::endl;
     glm::vec4 reflectedPosition = m_camera.pos;
-    reflectedPosition.y -= distance; // Move camera position to the reflection point
+    reflectedPosition.y += distance; // Move camera position to the reflection point
 
     // Invert the pitch of the camera. This usually involves inverting the y-component of the camera's look vector.
     glm::vec4 reflectedLook = m_camera.look;
@@ -290,25 +291,25 @@ void GLRenderer::paintGL(){
         m_camera.near,
         m_camera.far
         );
-//    reflectionCamera.setViewMatrix();
-//    reflectionCamera.setProjectionMatrix(m_camera.near, m_camera.far);
+    reflectionCamera.setViewMatrix();
+    reflectionCamera.setProjectionMatrix(m_camera.near, m_camera.far);
 
-//    // Render your scene for reflection here
-//    renderSceneFromCamera(reflectionCamera);
-//    unbindCurrentFBO();
+    // Render your scene for reflection here
+    renderSceneFromCamera(reflectionCamera);
+    unbindCurrentFBO();
 
-//    glUseProgram(m_texture_shader);
+    glUseProgram(m_texture_shader);
 
-//    glUniform1i(glGetUniformLocation(m_texture_shader, "reflectionTexture"), 0);
-//    glUniform1i(glGetUniformLocation(m_texture_shader, "refractionTexture"), 1);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "reflectionTexture"), 0);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "refractionTexture"), 1);
 
-//    // Activate and bind the reflection texture to  texture unit 0 and refraction texture to 1
-//    glActiveTexture(GL_TEXTURE0);
-//    glBindTexture(GL_TEXTURE_2D, reflectionTexture);
-//    glActiveTexture(GL_TEXTURE1);
-//    glBindTexture(GL_TEXTURE_2D, refractionTexture);
+    // Activate and bind the reflection texture to  texture unit 0 and refraction texture to 1
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, reflectionTexture);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, refractionTexture);
 
-//    glUseProgram(0);
+    glUseProgram(0);
 
 //    //refraction pass
 //    bindRefractionFBO();
@@ -316,7 +317,7 @@ void GLRenderer::paintGL(){
 //    // TODO: Render your scene for refraction here
 //    unbindCurrentFBO();
 
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 }
 
