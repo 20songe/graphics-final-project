@@ -826,6 +826,7 @@ graphics_final_project_autogen/timestamp: \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/vec3.hpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/vec4.hpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/vector_relational.hpp \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/src/camera/camera.h \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/src/glrenderer.cpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/src/glrenderer.h \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/src/main.cpp \

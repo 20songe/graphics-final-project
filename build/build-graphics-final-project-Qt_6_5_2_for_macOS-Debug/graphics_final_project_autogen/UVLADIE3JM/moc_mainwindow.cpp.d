@@ -821,6 +821,7 @@
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/vec3.hpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/vec4.hpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/vector_relational.hpp \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/src/camera/camera.h \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/src/glrenderer.h \
   /Users/lixiaodan/Qt/6.5.2/macos/lib/QtCore.framework/Versions/A/Headers/q20memory.h \
   /Users/lixiaodan/Qt/6.5.2/macos/lib/QtCore.framework/Versions/A/Headers/q20type_traits.h \

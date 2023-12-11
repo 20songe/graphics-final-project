@@ -8,6 +8,7 @@
 #include "GL/glew.h" // Must always be first include
 #include <QOpenGLWidget>
 #include "glm/glm.hpp"
+#include "camera/camera.h"
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
@@ -49,6 +50,11 @@ private:
     GLuint m_water_vao;
     glm::mat4 m_waterModelMatrix = glm::mat4(1);
 
+    Camera m_camera;
+    void renderSceneFromCamera(Camera& camera);
+//    void renderSceneFromCamera();
+
+
     // FBO properties
     void makeFBO();
     GLuint m_fullscreen_vbo;
@@ -82,7 +88,6 @@ private:
     float m_kd;
     float m_ks;
     float m_shininess;
-
 
     QPoint m_prevMousePos;
     float  m_angleX;

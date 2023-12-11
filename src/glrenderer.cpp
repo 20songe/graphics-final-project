@@ -149,6 +149,15 @@ void GLRenderer::initializeGL() {
     glEnable(GL_DEPTH_TEST);
 
     m_devicePixelRatio = this->devicePixelRatio();
+    m_camera = Camera(
+        glm::vec4(0, 0, -1, 0), // Initial look vector
+        glm::vec4(0, 5, 10, 1),  // Initial position vector
+        glm::vec4(0, 1, 0, 0),   // Up vector
+        this->width(),            // Width of the viewport
+        this->height(),           // Height of the viewport
+        0.1f,                     // Near clipping plane
+        100.0f                    // Far clipping plane
+        );
     m_shader = ShaderLoader::createShaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
 
     /**
@@ -261,35 +270,65 @@ void GLRenderer::paintGL(){
     // Clear screen color and depth before painting
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-////        reflection pass
-//    bindReflectionFBO();
+    //reflection pass
+    bindReflectionFBO();
+    // Set up the camera for the reflection pass
+    float distance = 2 * m_camera.pos.y; // Assuming 'waterHeight' is the y value of the water surface, and it's 0
+    glm::vec4 reflectedPosition = m_camera.pos;
+    reflectedPosition.y -= distance; // Move camera position to the reflection point
+
+    // Invert the pitch of the camera. This usually involves inverting the y-component of the camera's look vector.
+    glm::vec4 reflectedLook = m_camera.look;
+    reflectedLook.y = -reflectedLook.y;
+
+    Camera reflectionCamera(
+        reflectedLook,
+        reflectedPosition,
+        m_camera.up,
+        m_camera.screenWidth,
+        m_camera.screenHeight,
+        m_camera.near,
+        m_camera.far
+        );
+//    reflectionCamera.setViewMatrix();
+//    reflectionCamera.setProjectionMatrix(m_camera.near, m_camera.far);
+
+//    // Render your scene for reflection here
+//    renderSceneFromCamera(reflectionCamera);
 //    unbindCurrentFBO();
 
-////    refraction pass
+//    glUseProgram(m_texture_shader);
+
+//    glUniform1i(glGetUniformLocation(m_texture_shader, "reflectionTexture"), 0);
+//    glUniform1i(glGetUniformLocation(m_texture_shader, "refractionTexture"), 1);
+
+//    // Activate and bind the reflection texture to  texture unit 0 and refraction texture to 1
+//    glActiveTexture(GL_TEXTURE0);
+//    glBindTexture(GL_TEXTURE_2D, reflectionTexture);
+//    glActiveTexture(GL_TEXTURE1);
+//    glBindTexture(GL_TEXTURE_2D, refractionTexture);
+
+//    glUseProgram(0);
+
+//    //refraction pass
 //    bindRefractionFBO();
+//    // TODO: Set up camera for refraction render
+//    // TODO: Render your scene for refraction here
 //    unbindCurrentFBO();
 
-    glUseProgram(m_texture_shader);
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Activate and bind the reflection texture to texture unit 0
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, reflectionTexture);
-    glUniform1i(glGetUniformLocation(m_texture_shader, "reflectionTexture"), 0);
+}
 
-    // Activate and bind the refraction texture to texture unit 1
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, refractionTexture);
-    glUniform1i(glGetUniformLocation(m_texture_shader, "refractionTexture"), 1);
-
-
+void GLRenderer::renderSceneFromCamera(Camera& camera) {
     //activate the shader program by calling glUseProgram with `m_shader`
     glUseProgram(m_shader);
 
     //pass in m_model as a uniform into the shader program
     GLint output = glGetUniformLocation(m_shader, "model");
     if (output == -1) {
-        std::cout << "no location for model" << std::endl;
-        return;
+            std::cout << "no location for model" << std::endl;
+            return;
     }
     glUniformMatrix4fv(output, 1, GL_FALSE, &m_model[0][0]);
 
@@ -298,18 +337,18 @@ void GLRenderer::paintGL(){
     GLint proj_loc = glGetUniformLocation(m_shader, "proj");
 
     if (view_loc == -1 || proj_loc == -1) {
-        std::cout << "view and/or projection matrix not found" << std::endl;
-        return;
+            std::cout << "view and/or projection matrix not found" << std::endl;
+            return;
     }
 
-    glUniformMatrix4fv(view_loc, 1, GL_FALSE, &m_view[0][0]);
-    glUniformMatrix4fv(proj_loc, 1, GL_FALSE, &m_proj[0][0]);
+    glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(camera.getViewMatrix()));
+    glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(camera.getProjectionMatrix()));
 
     //pass m_ka into the fragment shader as a uniform
     GLint ka_loc = glGetUniformLocation(m_shader, "m_ka");
     if (ka_loc == -1) {
-        std::cout << "ambient term not found" << std::endl;
-        return;
+            std::cout << "ambient term not found" << std::endl;
+            return;
     }
     glUniform1f(ka_loc, m_ka);
 
@@ -318,8 +357,8 @@ void GLRenderer::paintGL(){
     GLint light_loc = glGetUniformLocation(m_shader, "light_pos");
 
     if (kd_loc == -1 || light_loc == -1) {
-        std::cout << "diffuse term not found" << std::endl;
-        return;
+            std::cout << "diffuse term not found" << std::endl;
+            return;
     }
 
     glUniform1f(kd_loc, m_kd);
@@ -331,14 +370,14 @@ void GLRenderer::paintGL(){
     GLint cam_loc = glGetUniformLocation(m_shader, "cam_pos");
 
     if (ks_loc == -1 || shiny_loc == -1 || cam_loc == -1) {
-        std::cout << "specular term not found" << std::endl;
-        return;
+            std::cout << "specular term not found" << std::endl;
+            return;
     }
 
     glUniform1f(ks_loc, m_ks);
     glUniform1f(shiny_loc, m_shininess);
 
-    glm::vec4 cameraPos = inverse(m_view) * glm::vec4(0.0, 0.0, 0.0, 1.0);
+    glm::vec4 cameraPos = inverse(camera.getViewMatrix()) * glm::vec4(0.0, 0.0, 0.0, 1.0);
     glUniform4fv(cam_loc, 1, &cameraPos[0]);
 
     //Render Tree
@@ -350,7 +389,6 @@ void GLRenderer::paintGL(){
 
     // Render Water
     glUniform1i(glGetUniformLocation(m_shader, "isWater"), 1); //render water on
-
 
     glBindVertexArray(m_water_vao);
     // Set up uniforms specific to the water (model matrix for water, etc.)
