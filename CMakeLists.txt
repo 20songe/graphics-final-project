@@ -41,6 +41,7 @@ qt_add_resources(${PROJECT_NAME} "Resources"
   PREFIX
   "/"
   FILES
+  resources/images/kitten.png
   resources/shaders/default.vert
   resources/shaders/default.frag
   resources/shaders/particles.frag

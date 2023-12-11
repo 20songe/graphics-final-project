@@ -15,8 +15,8 @@ ParticleGenerator::ParticleGenerator()
 {
 }
 
-ParticleGenerator::ParticleGenerator(unsigned int amount):
-    amount(amount)
+ParticleGenerator::ParticleGenerator(unsigned int amount, GLuint texture, GLuint shader):
+    amount(amount), texture(texture), shader(shader)
 {
     this->init();
 }
@@ -49,7 +49,10 @@ void ParticleGenerator::Update(float dt, unsigned int newParticles, glm::vec3 of
 void ParticleGenerator::Draw(glm::mat4 model, glm::mat4 view, glm::mat4 proj)
 {
     // use additive blending to give it a 'glow' effect
+    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(shader);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
     for (Particle particle : this->particles)
     {
 //        if (particle.Life > 0.0f)
@@ -69,6 +72,7 @@ void ParticleGenerator::Draw(glm::mat4 model, glm::mat4 view, glm::mat4 proj)
         }
     }
     // don't forget to reset to default blending mode
+    glBindTexture(GL_TEXTURE_2D, 0);
     glUseProgram(0);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -77,54 +81,37 @@ void ParticleGenerator::Draw(glm::mat4 model, glm::mat4 view, glm::mat4 proj)
 void ParticleGenerator::init()
 {
     // set up mesh and attribute properties
-    unsigned int VBO;
-//    float particle_quad[] = {
-//        0.0f, 1.0f, 0.0f, 1.0f,
-//        1.0f, 0.0f, 1.0f, 0.0f,
-//        0.0f, 0.0f, 0.0f, 0.0f,
 
-//        0.0f, 1.0f, 0.0f, 1.0f,
-//        1.0f, 1.0f, 1.0f, 1.0f,
-//        1.0f, 0.0f, 1.0f, 0.0f
-//    };
-//    float particle_quad[] = {
-//        0.0f, 0.0f, 1.f,
-//        1.0f, 0.0f, 0.f,
-//        0.0f, 0.0f, 0.f,
 
-//        0.0f, 0.0f, 1.f,
-//        1.0f, 0.0f, 1.f,
-//        1.0f, 0.0f, 0.f
-//    };
-//    float particle_quad[] = {
-//        0.0f, 0.0f, 0.1f,
-//        0.1f, 0.0f, 0.f,
-//        0.0f, 0.0f, 0.f,
 
-//        0.0f, 0.0f, 0.1f,
-//        0.1f, 0.0f, 0.1f,
-//        0.1f, 0.0f, 0.f
-//    };
-    float particle_quad[] = {
-        -0.1f, 0.0f, 0.1f, //top left
-        -0.1f, 0.0f, -0.1f, //bottom left
-        0.1f, 0.0f, -0.1f, //bottom right
+    GLuint VBO;
+    std::vector<GLfloat> particle_quad = {
+        -0.1f, 0.0f, 0.1f, 0.f, 1.f,//top left
+        -0.1f, 0.0f, -0.1f, 0.f, 0.f, //bottom left
+        0.1f, 0.0f, -0.1f, 1.f, 0.f,//bottom right
 
-        0.1f, 0.0f, 0.1f, //top right
-        -0.1f, 0.0f, 0.1f, //top left
-        0.1f, 0.0f, -0.1f //bottom right
+        0.1f, 0.0f, 0.1f, 1.f, 1.f, //top right
+        -0.1f, 0.0f, 0.1f, 0.f, 1.f, //top left
+        0.1f, 0.0f, -0.1f, 1.f, 0.f //bottom right
     };
-    shader = ShaderLoader::createShaderProgram("resources/shaders/particles.vert", "resources/shaders/particles.frag");
+
+
+
     glGenVertexArrays(1, &this->VAO);
     glGenBuffers(1, &VBO);
     glBindVertexArray(this->VAO);
     // fill mesh buffer
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(particle_quad), particle_quad, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, particle_quad.size()*sizeof(GLfloat), particle_quad.data(), GL_STATIC_DRAW);
     // set mesh attributes
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (void*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<void*>(3 * sizeof(GLfloat)));
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+
+
 
     // create this->amount default particle instances
     for (unsigned int i = 0; i < this->amount; ++i)

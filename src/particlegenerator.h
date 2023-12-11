@@ -33,7 +33,7 @@ class ParticleGenerator
 public:
     // constructor
     ParticleGenerator();
-    ParticleGenerator(unsigned int amount);
+    ParticleGenerator(unsigned int amount, GLuint texture, GLuint shader);
     // update all particles
     void Update(float dt, unsigned int newParticles, glm::vec3 offset = glm::vec3(0.0f));
     // render all particles
@@ -43,6 +43,7 @@ private:
     std::vector<Particle> particles;
     unsigned int amount;
     GLuint shader;
+    GLuint texture;
     // render state
     unsigned int VAO;
     // initializes buffer and vertex attributes
