@@ -16,6 +16,7 @@ public:
     glm::mat4 viewMat;
     glm::mat4 invViewMat;
     glm::mat4 proj;
+    float pitch;
     int screenWidth;
     int screenHeight;
     float near = 0.1f;
@@ -27,7 +28,9 @@ public:
     // You might also want to define another function that return the inverse of the view matrix.
     glm::mat4 getViewMatrix();
     glm::mat4 calculateViewMatrix();
+    float calculatePitch();
     void setViewMatrix();
+    void setPosition(glm::vec4 position);
 
     // Returns the aspect ratio of the camera.
     float getAspectRatio() const;

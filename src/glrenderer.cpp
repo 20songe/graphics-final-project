@@ -269,9 +269,7 @@ void GLRenderer::paintGL(){
     // Clear screen color and depth before painting
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //reflection pass
-    glEnable(GL_CLIP_DISTANCE0);
-    bindReflectionFBO();
+    //Adjust the camera here
     // Set up the camera for the reflection pass
     float distance = 2 * m_camera.pos.y; // Assuming 'waterHeight' is the y value of the water surface, and it's 0
     std::cout<<m_camera.pos.y<<std::endl;
@@ -294,6 +292,10 @@ void GLRenderer::paintGL(){
     reflectionCamera.setViewMatrix();
     reflectionCamera.setProjectionMatrix(m_camera.near, m_camera.far);
 
+    //reflection pass
+    glEnable(GL_CLIP_DISTANCE0);
+    bindReflectionFBO();
+
     // Render your scene for reflection here
     renderSceneFromCamera(reflectionCamera);
     unbindCurrentFBO();
@@ -308,7 +310,6 @@ void GLRenderer::paintGL(){
     glBindTexture(GL_TEXTURE_2D, reflectionTexture);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, refractionTexture);
-    glDisable(GL_CLIP_DISTANCE0);
 
     glUseProgram(0);
 

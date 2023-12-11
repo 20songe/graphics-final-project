@@ -1,6 +1,7 @@
 #include <stdexcept>
 #include "camera.h"
 #include <glm/gtx/transform.hpp>
+#include <glm/gtx/vector_angle.hpp>
 
 /**
  * @brief Stores information about the camera for future use in ray tracing and
@@ -18,6 +19,7 @@ Camera::Camera(glm::vec4 newLook, glm::vec4 newPos, glm::vec4 newUp, int width, 
 {
     setProjectionMatrix(near, far);
     heightAngle = 45.0;
+    pitch = calculatePitch();
 }
 
 /**
@@ -35,7 +37,29 @@ glm::mat4 Camera::calculateViewMatrix() {
     return rotate * translate;
 }
 
+
+float Camera::calculatePitch() {
+    // Get a normalized copy of the look vector
+    glm::vec3 lookNorm = glm::normalize(glm::vec3(look));
+
+    // Project the look vector onto the XZ plane (by zeroing out the y component)
+    glm::vec3 lookXZProj = glm::normalize(glm::vec3(lookNorm.x, 0.0f, lookNorm.z));
+
+    // Calculate the angle in radians between the original look vector and its projection onto the XZ plane
+    float pitchRadians = glm::orientedAngle(lookXZProj, lookNorm, glm::vec3(1.0f, 0.0f, 0.0f));
+
+    // Convert radians to degrees if necessary
+    float pitchDegrees = glm::degrees(pitchRadians);
+
+    return pitchDegrees;
+}
+
 void Camera::setViewMatrix() {
+    viewMat = calculateViewMatrix();
+}
+
+void Camera::setPosition(glm::vec4 position) {
+    pos = position;
     viewMat = calculateViewMatrix();
 }
 
