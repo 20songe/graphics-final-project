@@ -15,17 +15,38 @@ ParticleGenerator::ParticleGenerator()
 {
 }
 
-ParticleGenerator::ParticleGenerator(unsigned int amount, GLuint texture, GLuint shader):
-    amount(amount), texture(texture), shader(shader)
+ParticleGenerator::ParticleGenerator(unsigned int amount):
+    amount(amount)
 {
     this->init();
 }
 
+glm::mat3 rotation(float angle, glm::vec3 axis) {
+
+    return glm::mat3{
+        glm::cos(angle) + axis[0] * axis[0] * (1 - glm::cos(angle)),
+        axis[0] * axis[1] * (1 - glm::cos(angle)) + axis[2] * glm::sin(angle),
+        -(axis[0] * axis[2] * (1 - glm::cos(angle)) + axis[1] * glm::sin(angle)),
+
+        axis[0] * axis[1] * (1 - glm::cos(angle)) - axis[2] * glm::sin(angle),
+        glm::cos(angle) + axis[1] * axis[1] * (1 - glm::cos(angle)),
+        axis[1] * axis[2] * (1 - glm::cos(angle)) + axis[0] * glm::sin(angle),
+
+        axis[0] * axis[2] * (1 - glm::cos(angle)) + axis[1] * glm::sin(angle),
+        axis[1] * axis[2] * (1 - glm::cos(angle)) - axis[0] * glm::sin(angle),
+        glm::cos(angle) + axis[2] * axis[2] * (1 - glm::cos(angle))
+    };
+
+}
+
+std::map<int, glm::vec3> color_map{{1, glm::vec3(0.7, -0.5, -0.7)}, {2, glm::vec3(0.5, 0.f, 0.f)}, {3, glm::vec3(0.2, 0.f, -0.3)}};
+
+
 void ParticleGenerator::Update(float dt, unsigned int newParticles, glm::vec3 offset)
 {
+    count += 0.1f;
     // add new particles
     for (unsigned int i = 0; i < newParticles; ++i)
-    //if (dt > 1.f)
     {
         int unusedParticle = this->firstUnusedParticle();
         this->respawnParticle(this->particles[unusedParticle], offset);
@@ -35,52 +56,92 @@ void ParticleGenerator::Update(float dt, unsigned int newParticles, glm::vec3 of
     {
         Particle &p = this->particles[i];
         float height = p.Position.y;
-        p.Life -= dt; // reduce life
-//        if (p.Life > 0.0f)
+
         if (p.Position.y > 0.0f)
         {	// particle is alive, thus update
-            p.Position -= p.Velocity * dt;
-//            p.Position -= 9.8*9.8*dt; // gravity?
+                glm::mat3 newModel = rotation(count, p.axis);
+                p.model = newModel;
+
+                glm::vec3 wind = glm::normalize(glm::vec3(rand() % 100 + 1 - 50, rand() % 100 + 1 - 50, rand() % 100 + 1 - 50))*0.1f;
+                p.Position -= (p.Velocity + wind) * dt;
+
         }
     }
 }
 
 // render all particles
-void ParticleGenerator::Draw(glm::mat4 model, glm::mat4 view, glm::mat4 proj)
+void ParticleGenerator::Draw(glm::mat4 view, glm::mat4 proj)
 {
-    // use additive blending to give it a 'glow' effect
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glUseProgram(shader);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    glBindTexture(GL_TEXTURE_2D, texture_color);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture_normal);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, texture_opacity);
     for (Particle particle : this->particles)
     {
-//        if (particle.Life > 0.0f)
         if (particle.Position.y > 0.0f)
         {
-//            this->shader.SetVector2f("offset", particle.Position);
-//            this->shader.SetVector4f("color", particle.Color);
-            //this->texture.Bind();
-            //TODO add textures
             glUniform3fv(glGetUniformLocation(shader, "offset"), 1, &particle.Position[0]);
+            glUniform3fv(glGetUniformLocation(shader, "leaf_shade"), 1, &particle.leaf_shade[0]);
+
             glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &view[0][0]);
-            glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
+            glUniformMatrix3fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &particle.model[0][0]);
             glUniformMatrix4fv(glGetUniformLocation(shader, "proj"), 1, GL_FALSE, &proj[0][0]);
             glBindVertexArray(this->VAO);
             glDrawArrays(GL_TRIANGLES, 0, 6);
             glBindVertexArray(0);
         }
     }
-    // don't forget to reset to default blending mode
     glBindTexture(GL_TEXTURE_2D, 0);
     glUseProgram(0);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 }
 
 void ParticleGenerator::init()
 {
-    // set up mesh and attribute properties
+
+    QImage m_color_image = QImage(QString(":/resources/images/cs1230leaftextures/leaf_color.png"));
+    m_color_image = m_color_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+
+    glGenTextures(1, &texture_color);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture_color);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_color_image.width(), m_color_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_color_image.bits());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+
+    QImage m_normal_image = QImage(QString(":/resources/images/cs1230leaftextures/leaf_normal.png"));
+    m_normal_image = m_normal_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+    glGenTextures(1, &texture_normal);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, texture_normal);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_normal_image.width(), m_normal_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_normal_image.bits());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    QImage m_opacity_image = QImage(QString(":/resources/images/cs1230leaftextures/leaf_opacity.png"));
+    m_opacity_image = m_opacity_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+    glGenTextures(1, &texture_opacity);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, texture_opacity);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_opacity_image.width(), m_opacity_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_opacity_image.bits());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+
+
+    shader = ShaderLoader::createShaderProgram("resources/shaders/particles.vert", "resources/shaders/particles.frag");
+
+    glUseProgram(shader);
+    glUniform1i(glGetUniformLocation(shader, "leaf_color"), 0);
+    glUniform1i(glGetUniformLocation(shader, "normal"), 1);
+    glUniform1i(glGetUniformLocation(shader, "opacity"), 2);
+    glUseProgram(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
 
 
 
@@ -141,14 +202,16 @@ unsigned int ParticleGenerator::firstUnusedParticle()
     return 0;
 }
 
+
+
 void ParticleGenerator::respawnParticle(Particle &particle, glm::vec3 offset)
 {
-    float randomx = ((rand() % 100) - 50) / 10.f;
-    float randomy = ((rand() % 100) - 50) / 10.f;
-    float rColor = 0.5f + ((rand() % 100) / 100.0f);
-    // game object was used for position and velocity here?
-    particle.Position = glm::vec3(0.f, 5.f, 0.f) + glm::vec3(randomx, 0.f, randomy);
-
-    particle.Life = 1.0f;
+    float randomx = (((rand() % 100) - 50) / 10.f)*0.5;
+    float randomz = (((rand() % 100) - 50) / 10.f)*0.5;
+    particle.Position = glm::vec3(0.f, 5.f, 0.f) + glm::vec3(randomx, 0.f, randomz);
+    particle.axis = glm::normalize(glm::vec3(rand(), rand(), rand()));
+    particle.model = rotation(0, particle.axis);
+    int randNum = (rand() % 3) + 1;
+    particle.leaf_shade = color_map[randNum];
     particle.Velocity = glm::vec3(0.f, 1.f, 0.f) * 0.1f;
 }

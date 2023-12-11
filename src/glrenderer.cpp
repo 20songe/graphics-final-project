@@ -97,32 +97,16 @@ void GLRenderer::initializeGL()
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
 
-    // Task 1: call ShaderLoader::createShaderProgram with the paths to the vertex
-    //         and fragment shaders. Then, store its return value in `m_shader`
+    // enable alpha
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
     m_shader = ShaderLoader::createShaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
-    QImage m_image = QImage(QString(":/resources/images/kitten.png"));
-    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
-    GLuint texture;
-    glGenTextures(1, &texture);
-    // Task 9: Set the active texture slot to texture slot 0
-    glActiveTexture(GL_TEXTURE0);
 
-    // Task 4: Bind kitten texture
-    glBindTexture(GL_TEXTURE_2D, texture);
 
-    // Task 5: Load image into kitten texture
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
 
-    // Task 6: Set min and mag filters' interpolation mode to linear
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    GLuint shader = ShaderLoader::createShaderProgram("resources/shaders/particles.vert", "resources/shaders/particles.frag");
-
-    glUseProgram(shader);
-    glUniform1i(glGetUniformLocation(shader, "text"), 0);
-    glUseProgram(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    generator = *new ParticleGenerator(100, texture, shader);
+    generator = *new ParticleGenerator(100);
 
     // Generate and bind VBO
     glGenBuffers(1, &m_sphere_vbo);
@@ -233,7 +217,7 @@ void GLRenderer::paintGL()
 
     // Task 3: deactivate the shader program by passing 0 into glUseProgram
     glUseProgram(0);
-    generator.Draw(m_model, m_view, m_proj);
+    generator.Draw(m_view, m_proj);
 }
 
 // ================== Other stencil code

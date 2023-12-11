@@ -16,12 +16,13 @@
 #include <glm/glm.hpp>
 
 
-// Represents a single particle and its state
 struct Particle {
     glm::vec3 Position, Velocity;
-    float     Life;
+    glm::mat3 model;
+    glm::vec3 axis;
+    glm::vec3 leaf_shade;
 
-    Particle() : Position(0.0f), Velocity(0.0f), Life(1.0f) { }
+    Particle() : Position(0.0f), Velocity(0.0f), model(1.0f) { }
 };
 
 
@@ -33,17 +34,20 @@ class ParticleGenerator
 public:
     // constructor
     ParticleGenerator();
-    ParticleGenerator(unsigned int amount, GLuint texture, GLuint shader);
+    ParticleGenerator(unsigned int amount);
     // update all particles
     void Update(float dt, unsigned int newParticles, glm::vec3 offset = glm::vec3(0.0f));
     // render all particles
-    void Draw(glm::mat4 model, glm::mat4 view, glm::mat4 proj);
+    void Draw(glm::mat4 view, glm::mat4 proj);
 private:
     // state
     std::vector<Particle> particles;
     unsigned int amount;
     GLuint shader;
-    GLuint texture;
+    GLuint texture_color;
+    GLuint texture_normal;
+    GLuint texture_opacity;
+    float count = 0.f;
     // render state
     unsigned int VAO;
     // initializes buffer and vertex attributes

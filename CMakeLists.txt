@@ -42,6 +42,9 @@ qt_add_resources(${PROJECT_NAME} "Resources"
   "/"
   FILES
   resources/images/kitten.png
+  resources/images/cs1230leaftextures/leaf_color.png
+  resources/images/cs1230leaftextures/leaf_normal.png
+  resources/images/cs1230leaftextures/leaf_opacity.png
   resources/shaders/default.vert
   resources/shaders/default.frag
   resources/shaders/particles.frag
