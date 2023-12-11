@@ -52,17 +52,17 @@ void GLRenderer::checkFBOStatus() {//for debugging purpose
 }
 
 GLuint GLRenderer::createTextureAttachment(int width, int height) {
-    GLuint textureID;
-    glGenTextures(1, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    GLuint texture;
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureID, 0);
-    return textureID;
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture, 0);
+    return texture;
 }
 
-GLuint GLRenderer::createDepthTextureAttachment(int width, int height) {
+GLuint GLRenderer::createDepthTextureAttachment(int width, int height) { //add depth texture buffer
     GLuint textureID;
     glGenTextures(1, &textureID);
     glBindTexture(GL_TEXTURE_2D, textureID);
@@ -84,14 +84,13 @@ GLuint GLRenderer::createDepthBufferAttachment(int width, int height) {
 
 void GLRenderer::initializeReflectionFBO() {
     glGenFramebuffers(1, &reflectionFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, reflectionFBO); //reflection FBO is bounded
+    glBindFramebuffer(GL_FRAMEBUFFER, reflectionFBO); //reflection FBO is binded
 
     reflectionTexture = createTextureAttachment(REFLECTION_WIDTH, REFLECTION_HEIGHT);
     reflectionDepthBuffer = createDepthBufferAttachment(REFLECTION_WIDTH, REFLECTION_HEIGHT);
-    std::cout<<"REFLECTION!!"<<std::endl;
-    checkFBOStatus(); //this still outputs framebuffer not complete
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    checkFBOStatus(); //this still outputs framebuffer not complete
+    unbindCurrentFBO();
 }
 
 
@@ -104,7 +103,7 @@ void GLRenderer::initializeRefractionFBO() {
     std::cout<<"REFRACTION!!"<<std::endl;
     checkFBOStatus();
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    unbindCurrentFBO();
 }
 
 void GLRenderer::bindReflectionFBO() {
@@ -318,13 +317,13 @@ void GLRenderer::paintGL()
     glUniform4fv(cam_loc, 1, &cameraPos[0]);
 
 
-    //reflection pass
-//    bindReflectionFBO();
-//    unbindCurrentFBO();
+//    reflection pass
+    bindReflectionFBO();
+    unbindCurrentFBO();
 
-//    //refraction pass
-//    bindRefractionFBO();
-//    unbindCurrentFBO();
+    //refraction pass
+    bindRefractionFBO();
+    unbindCurrentFBO();
 
     //Render Tree
     glUniform1i(glGetUniformLocation(m_shader, "isWater"), 1); //render water off
