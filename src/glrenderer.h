@@ -50,6 +50,11 @@ private:
     glm::mat4 m_waterModelMatrix = glm::mat4(1);
 
     // FBO properties
+    void makeFBO();
+    GLuint m_fullscreen_vbo;
+    GLuint m_fullscreen_vao;
+    GLuint m_defaultFBO = 3;
+    GLuint m_fbo;
     GLuint reflectionFBO;
     GLuint reflectionTexture;
     GLuint reflectionDepthBuffer;

@@ -154,8 +154,10 @@ void GLRenderer::initializeGL() {
     glEnable(GL_DEPTH_TEST);
 
     m_shader = ShaderLoader::createShaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
-    m_texture_shader = ShaderLoader::createShaderProgram("resources/shaders/texture.vert", "resources/shaders/texture.frag");
 
+    /**
+     * Here begins loading rendering data
+    **/
     // Generate and bind VBO for the tree
     glGenBuffers(1, &m_tree_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_tree_vbo);
@@ -192,11 +194,6 @@ void GLRenderer::initializeGL() {
     // Unbind the tree VAO
     glBindVertexArray(0);
 
-//    // Initialize reflection and refraction framebuffers
-//    std::cout<<"Start Initialization"<<std::endl;
-//    initializeReflectionFBO();
-//    initializeRefractionFBO();
-
     // Generate and bind VBO for water
     glGenBuffers(1, &m_water_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_water_vbo);
@@ -216,6 +213,61 @@ void GLRenderer::initializeGL() {
 
     // Unbind the VBO
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    /**
+     * Load data end, deal with FBO and texture shader now
+     **/
+    //    // Initialize reflection and refraction framebuffers
+    //    std::cout<<"Start Initialization"<<std::endl;
+    initializeReflectionFBO();
+    initializeRefractionFBO();
+
+    m_texture_shader = ShaderLoader::createShaderProgram("resources/shaders/texture.vert", "resources/shaders/texture.frag");
+
+    std::vector<GLfloat> fullscreen_quad_data =
+        { //     POSITIONS   // // UV Coords //
+            -1.0f,  1.0f, 0.0f,  0.0f,  1.0f,
+            -1.0f, -1.0f, 0.0f,  0.0f,  0.0f,
+            1.0f, -1.0f, 0.0f,  1.0f,  0.0f,
+            1.0f,  1.0f, 0.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f, 0.0f,  0.0f,  1.0f,
+            1.0f, -1.0f, 0.0f,  1.0f,  0.0f
+        };
+
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "tex"), 0);
+    glUniform1f(glGetUniformLocation(m_texture_shader, "deltaU"), 1.0f/(size().width() * m_devicePixelRatio));
+    glUniform1f(glGetUniformLocation(m_texture_shader, "deltaV"), 1.0f/(size().height()  * m_devicePixelRatio));
+
+    glGenBuffers(1, &m_fullscreen_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_fullscreen_vbo);
+    glBufferData(GL_ARRAY_BUFFER, fullscreen_quad_data.size()*sizeof(GLfloat), fullscreen_quad_data.data(), GL_STATIC_DRAW);
+    glGenVertexArrays(1, &m_fullscreen_vao);
+    glBindVertexArray(m_fullscreen_vao);
+
+    glEnableVertexAttribArray(0); // position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
+
+    glEnableVertexAttribArray(1); // uv coords
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat),  reinterpret_cast<void*>(3 * sizeof(GLfloat)));
+
+    // Unbind the fullscreen quad's VBO and VAO
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
+    // generate and bind FBO (properties set in makeFBO)
+    glGenFramebuffers(1, &m_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+    // unbind at end
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+    glBindTexture(GL_FRAMEBUFFER, m_defaultFBO);
+
+    makeFBO();
+
+
+
 }
 
 void GLRenderer::paintGL()
@@ -351,7 +403,6 @@ void GLRenderer::rebuildMatrices() {
     glm::mat4 rot = glm::rotate(glm::radians(-10 * m_angleX),glm::vec3(0,0,1));
     glm::vec3 eye = glm::vec3(2,0,0);
     eye = glm::vec3(rot * glm::vec4(eye,1));
-
     rot = glm::rotate(glm::radians(-10 * m_angleY),glm::cross(glm::vec3(0,0,1),eye));
     eye = glm::vec3(rot * glm::vec4(eye,1));
 
