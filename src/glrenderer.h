@@ -40,6 +40,9 @@ private:
     GLuint m_shader;     // Stores id of shader program
     GLuint m_sphere_vbo; // Stores id of vbo
     GLuint m_sphere_vao; // Stores id of vao
+//    GLuint createTextureAttachment(int width, int height);
+    void makeFBO();
+    void paintTexture(GLuint texture);
     std::vector<float> m_sphereData;
 
     void timerEvent(QTimerEvent *event) override;
@@ -51,6 +54,34 @@ private:
 
     glm::mat4 m_model = glm::mat4(1);
     glm::mat4 m_view  = glm::mat4(1);
+
+    glm::mat4 m_reflect = glm::mat4(1,0,0,0,
+                                    0,-1,0,0,
+                                    0,0,1,0,
+                                    0,0,0,1) * m_view
+                          *glm::mat4(-1,0,0,0,
+                                      0,1,0,0,
+                                      0,0,1,0,
+                                      0,0,0,1) ;
+
+    // Device Correction Variables
+    int m_devicePixelRatio;
+
+    // FBO fields
+    GLuint m_defaultFBO;
+    int m_screen_width;
+    int m_screen_height;
+    int m_fbo_width;
+    int m_fbo_height;
+    GLuint m_fullscreen_vbo;
+    GLuint m_fullscreen_vao;
+    GLuint m_fbo;
+    GLuint m_fbo_texture;
+    GLuint m_fbo_renderbuffer;
+    GLuint m_texture_shader;
+
+    glm::vec4 m_clip = glm::vec4(0,1,0,0);
+    glm::mat4 m_inv_view = inverse(glm::mat4(1));
     glm::mat4 m_proj  = glm::mat4(1);
 
     glm::vec4 m_lightPos; // The world-space position of the point light

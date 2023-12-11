@@ -11,6 +11,7 @@ layout(location = 2) in vec3 normal;
 out vec3 m_world_pos;
 out vec2 uv_out;
 out vec3 m_world_norm;
+out int should_render;
 
 // Task 6: declare a uniform mat4 to store model matrix
 uniform mat4 model;
@@ -20,6 +21,7 @@ uniform mat4 view;
 uniform mat4 proj;
 
 uniform float time;
+uniform int is_reflection;
 
 void main() {
     // Task 8: compute the world-space position and normal, then pass them to
@@ -28,15 +30,21 @@ void main() {
     // source: https://medium.com/@joshmarinacci/water-ripples-with-vertex-shaders-6a9ecbdf091f
     vec4 world_pos4 = model * vec4(m_object_pos, 1.0);
 
-    float dx = m_object_pos.x;
-    float dz = m_object_pos.z;
-    float freq = sqrt(dx * dx + dz * dz);
-    float amp = 1.0;
-    float angle = -time * 10.0 + freq * 6.0;
-    m_world_pos = m_object_pos;
-    m_world_pos[1] += sin(angle) * amp;
+    if (is_reflection == 0) {
+        float dx = m_object_pos.x;
+        float dz = m_object_pos.z;
+        float freq = 2.0 * sqrt(dx * dx + dz * dz);
+        float amp = 1.0 - 1.0 / (0.65 * freq);
+        float angle = -time * 10.0 + freq * 6.0;
+        m_world_pos = m_object_pos;
+        m_world_pos[1] += sin(angle) * amp;
 
-    m_world_norm = normalize(vec3(0.0,-amp * freq * cos(angle),1.0));
+        m_world_norm = normalize(vec3(0.0,-amp * freq * cos(angle),1.0));
+    }
+    else {
+        m_world_pos = m_object_pos;
+        m_world_norm = normalize(normal);
+    }
 
     uv_out = uv;
 

@@ -21,28 +21,36 @@ uniform float m_ks;
 uniform float shininess;
 uniform vec4 cam_pos;
 
+uniform vec4 clip;
+
 void main() {
     // Remember that you need to renormalize vectors here if you want them to be normalized
 
     // Task 10: set your output color to white (i.e. vec4(1.0)). Make sure you get a white circle!
-    fragColor = vec4(1.0);
+//    fragColor = vec4(1.0);
 
-    // Task 11: set your output color to the absolute value of your world-space normals,
-    //          to make sure your normals are correct.
-    fragColor = vec4(abs(m_world_norm), 1.0);
+//    // Task 11: set your output color to the absolute value of your world-space normals,
+//    //          to make sure your normals are correct.
+//    fragColor = vec4(abs(m_world_norm), 1.0);
+    float clipPos = dot (m_world_pos, clip.xyz) + clip.w;
+    if (clipPos < 0.0) {
+        fragColor = vec4(0);
+    }
+    else {
+        // Task 12: add ambient component to output color
+        fragColor = vec4(m_ka) * vec4(0.0,0.5, 1.0, 1.0);
 
-    // Task 12: add ambient component to output color
-    fragColor = vec4(m_ka);
+        // Task 13: add diffuse component to output color
+        vec3 normN = normalize(m_world_norm);
 
-    // Task 13: add diffuse component to output color
-    vec3 normN = normalize(m_world_norm);
+        vec3 posToLight = normalize(vec3(light_pos) - m_world_pos);
+        fragColor += vec4(m_kd * clamp(dot(normN, posToLight), 0.0, 1.0));
 
-    vec3 posToLight = normalize(vec3(light_pos) - m_world_pos);
-    fragColor += vec4(m_kd * clamp(dot(normN, posToLight), 0.0, 1.0));
+        // Task 14: add specular component to output color
+        vec3 posToCam = normalize(vec3(cam_pos) - m_world_pos);
+        vec3 reflection = normalize(-posToLight - 2.0 * dot(normN, -posToLight) * normN);
 
-    // Task 14: add specular component to output color
-    vec3 posToCam = normalize(vec3(cam_pos) - m_world_pos);
-    vec3 reflection = normalize(-posToLight - 2.0 * dot(normN, -posToLight) * normN);
+        fragColor += vec4(m_ks * pow(clamp(dot(reflection, posToCam), 0.0, 1.0), shininess));
+    }
 
-    fragColor += vec4(m_ks * pow(clamp(dot(reflection, posToCam), 0.0, 1.0), shininess));
 }

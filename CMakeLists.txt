@@ -43,6 +43,14 @@ qt_add_resources(${PROJECT_NAME} "Resources"
   resources/shaders/default.frag
 )
 
+target_sources(graphics_final_project_other_files
+  PRIVATE
+  resources/shaders/reflection_texture.frag
+  resources/shaders/reflection_texture.vert
+
+
+)
+
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
 add_library(StaticGLEW STATIC glew/src/glew.c)
 include_directories(${PROJECT_NAME} PRIVATE glew/include)
