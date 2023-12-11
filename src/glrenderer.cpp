@@ -58,7 +58,6 @@ GLuint GLRenderer::createTextureAttachment(int width, int height) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, textureID, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureID, 0);
     return textureID;
 }
@@ -70,7 +69,6 @@ GLuint GLRenderer::createDepthTextureAttachment(int width, int height) {
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-//    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, textureID, 0);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, textureID, 0);
     return textureID;
 }
@@ -86,16 +84,11 @@ GLuint GLRenderer::createDepthBufferAttachment(int width, int height) {
 
 void GLRenderer::initializeReflectionFBO() {
     glGenFramebuffers(1, &reflectionFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, reflectionFBO);
-    std::cout<<"check for reflection FBO"<<std::endl;
-    checkFBOStatus();
+    glBindFramebuffer(GL_FRAMEBUFFER, reflectionFBO); //reflection FBO is bounded
 
     reflectionTexture = createTextureAttachment(REFLECTION_WIDTH, REFLECTION_HEIGHT);
-    std::cout<<"REFLECTION TEXTURE!"<<std::endl;
-    checkFBOStatus(); //this still outputs framebuffer not complete
-
     reflectionDepthBuffer = createDepthBufferAttachment(REFLECTION_WIDTH, REFLECTION_HEIGHT);
-    std::cout<<"DEPTH TEXTURE!"<<std::endl;
+    std::cout<<"REFLECTION!!"<<std::endl;
     checkFBOStatus(); //this still outputs framebuffer not complete
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -104,12 +97,13 @@ void GLRenderer::initializeReflectionFBO() {
 
 void GLRenderer::initializeRefractionFBO() {
     glGenFramebuffers(1, &refractionFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, refractionFBO);
-    std::cout<<"check for refraction FBO"<<std::endl;
-    checkFBOStatus();
+    glBindFramebuffer(GL_FRAMEBUFFER, refractionFBO); //refraction FBO is bounded
+
 
     refractionTexture = createTextureAttachment(REFRACTION_WIDTH, REFRACTION_HEIGHT);
     refractionDepthTexture = createDepthTextureAttachment(REFRACTION_WIDTH, REFRACTION_HEIGHT);
+    std::cout<<"REFRACTION!!"<<std::endl;
+    checkFBOStatus();
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
