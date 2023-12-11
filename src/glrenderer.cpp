@@ -141,7 +141,9 @@ void GLRenderer::initializeGL() {
     fprintf(stdout, "Successfully initialized GLEW %s\n", glewGetString(GLEW_VERSION));
 
     // Set clear color to black
-    glClearColor(0,0,0,1);
+//    glClearColor(0,0,0,1);
+    glClearColor(0.1f, 0.1f, 0.4f, 1.0f); // A dark blue color
+
 
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
@@ -233,6 +235,8 @@ void GLRenderer::initializeGL() {
     glUniform1f(glGetUniformLocation(m_texture_shader, "deltaU"), 1.0f/(size().width() * m_devicePixelRatio));
     glUniform1f(glGetUniformLocation(m_texture_shader, "deltaV"), 1.0f/(size().height()  * m_devicePixelRatio));
 
+    //more texture uniforms that need to be sent in
+
     glGenBuffers(1, &m_fullscreen_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_fullscreen_vbo);
     glBufferData(GL_ARRAY_BUFFER, fullscreen_quad_data.size()*sizeof(GLfloat), fullscreen_quad_data.data(), GL_STATIC_DRAW);
@@ -253,10 +257,30 @@ void GLRenderer::initializeGL() {
 
 
 
-void GLRenderer::paintGL()
-{
+void GLRenderer::paintGL(){
     // Clear screen color and depth before painting
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+////        reflection pass
+//    bindReflectionFBO();
+//    unbindCurrentFBO();
+
+////    refraction pass
+//    bindRefractionFBO();
+//    unbindCurrentFBO();
+
+    glUseProgram(m_texture_shader);
+
+    // Activate and bind the reflection texture to texture unit 0
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, reflectionTexture);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "reflectionTexture"), 0);
+
+    // Activate and bind the refraction texture to texture unit 1
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, refractionTexture);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "refractionTexture"), 1);
+
 
     //activate the shader program by calling glUseProgram with `m_shader`
     glUseProgram(m_shader);
@@ -317,15 +341,6 @@ void GLRenderer::paintGL()
     glm::vec4 cameraPos = inverse(m_view) * glm::vec4(0.0, 0.0, 0.0, 1.0);
     glUniform4fv(cam_loc, 1, &cameraPos[0]);
 
-
-    //reflection pass
-//    bindReflectionFBO();
-//    unbindCurrentFBO();
-
-//    //refraction pass
-//    bindRefractionFBO();
-//    unbindCurrentFBO();
-
     //Render Tree
     glUniform1i(glGetUniformLocation(m_shader, "isWater"), 1); //render water off
     glBindVertexArray(m_tree_vao);
@@ -342,11 +357,6 @@ void GLRenderer::paintGL()
     m_waterModelMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(-90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
     GLint waterModelLoc = glGetUniformLocation(m_shader, "waterModel");
     glUniformMatrix4fv(waterModelLoc, 1, GL_FALSE, glm::value_ptr(m_waterModelMatrix));
-    // Bind reflection and refraction textures
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, reflectionTexture);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, refractionTexture);
     glDrawArrays(GL_TRIANGLE_FAN, 0, 4); // Assuming water quad has 4 vertices
     glBindVertexArray(0);
 
