@@ -271,33 +271,21 @@ void GLRenderer::paintGL(){
 
     //Adjust the camera here
     // Set up the camera for the reflection pass
-    float distance = 2 * m_camera.pos.y; // Assuming 'waterHeight' is the y value of the water surface, and it's 0
-    std::cout<<m_camera.pos.y<<std::endl;
-    glm::vec4 reflectedPosition = m_camera.pos;
-    reflectedPosition.y += distance; // Move camera position to the reflection point
+    glm::vec4 cameraPosition = m_camera.pos;
+    float pitch = m_camera.pitch;
 
-    // Invert the pitch of the camera. This usually involves inverting the y-component of the camera's look vector.
-    glm::vec4 reflectedLook = m_camera.look;
-    reflectedLook.y = -reflectedLook.y;
-
-    Camera reflectionCamera(
-        reflectedLook,
-        reflectedPosition,
-        m_camera.up,
-        m_camera.screenWidth,
-        m_camera.screenHeight,
-        m_camera.near,
-        m_camera.far
-        );
-    reflectionCamera.setViewMatrix();
-    reflectionCamera.setProjectionMatrix(m_camera.near, m_camera.far);
+    //bring the camera underneath the water
+    cameraPosition.y *= -1;
+    pitch *= -1;
+    m_camera.setPosition(cameraPosition);
+    m_camera.setPitch(pitch);
 
     //reflection pass
     glEnable(GL_CLIP_DISTANCE0);
     bindReflectionFBO();
 
     // Render your scene for reflection here
-    renderSceneFromCamera(reflectionCamera);
+    renderSceneFromCamera(m_camera);
     unbindCurrentFBO();
 
     glUseProgram(m_texture_shader);
@@ -384,7 +372,7 @@ void GLRenderer::renderSceneFromCamera(Camera& camera) {
     glUniform4fv(cam_loc, 1, &cameraPos[0]);
 
     //Render Tree
-    glUniform1i(glGetUniformLocation(m_shader, "isWater"), 1); //render water off
+    glUniform1i(glGetUniformLocation(m_shader, "isWater"), 0); //render water off
     glBindVertexArray(m_tree_vao);
     glDrawArrays(GL_TRIANGLES, 0, m_treeData.size() / 3);
     // Unbind Vertex Array

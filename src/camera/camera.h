@@ -30,6 +30,7 @@ public:
     glm::mat4 calculateViewMatrix();
     float calculatePitch();
     void setViewMatrix();
+    void setPitch(float pitch);
     void setPosition(glm::vec4 position);
 
     // Returns the aspect ratio of the camera.

@@ -37,7 +37,6 @@ glm::mat4 Camera::calculateViewMatrix() {
     return rotate * translate;
 }
 
-
 float Camera::calculatePitch() {
     // Get a normalized copy of the look vector
     glm::vec3 lookNorm = glm::normalize(glm::vec3(look));
@@ -52,6 +51,23 @@ float Camera::calculatePitch() {
     float pitchDegrees = glm::degrees(pitchRadians);
 
     return pitchDegrees;
+}
+
+void Camera::setPitch(float pitch) {
+    this->pitch = pitch;
+
+    // Calculate the camera's right vector by crossing the look and up vectors
+    glm::vec3 right = glm::normalize(glm::cross(glm::vec3(look), glm::vec3(up)));
+
+    // Rotate the look vector around the right vector by the change in pitch
+    glm::vec3 newLook = glm::vec3(look);
+    newLook = glm::rotate(newLook, pitch - glm::asin(newLook.y), right);
+
+    // Update the look vector of the camera
+    look = glm::vec4(newLook, 0.0);
+
+    // Recalculate the view matrix with the new look vector
+    viewMat = calculateViewMatrix();
 }
 
 void Camera::setViewMatrix() {
