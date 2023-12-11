@@ -144,7 +144,6 @@ void GLRenderer::initializeGL() {
 //    glClearColor(0,0,0,1);
     glClearColor(0.1f, 0.1f, 0.4f, 1.0f); // A dark blue color
 
-
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
 
@@ -271,6 +270,7 @@ void GLRenderer::paintGL(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //reflection pass
+    glEnable(GL_CLIP_DISTANCE0);
     bindReflectionFBO();
     // Set up the camera for the reflection pass
     float distance = 2 * m_camera.pos.y; // Assuming 'waterHeight' is the y value of the water surface, and it's 0
@@ -308,6 +308,7 @@ void GLRenderer::paintGL(){
     glBindTexture(GL_TEXTURE_2D, reflectionTexture);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, refractionTexture);
+    glDisable(GL_CLIP_DISTANCE0);
 
     glUseProgram(0);
 
