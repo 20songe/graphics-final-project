@@ -54,6 +54,7 @@ private:
     GLuint m_fullscreen_vbo;
     GLuint m_fullscreen_vao;
     GLuint m_defaultFBO = 3;
+    float m_devicePixelRatio;
     GLuint m_fbo;
     GLuint reflectionFBO;
     GLuint reflectionTexture;

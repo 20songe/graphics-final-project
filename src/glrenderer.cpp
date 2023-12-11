@@ -153,6 +153,7 @@ void GLRenderer::initializeGL() {
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
 
+    m_devicePixelRatio = this->devicePixelRatio();
     m_shader = ShaderLoader::createShaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
 
     /**
@@ -242,12 +243,11 @@ void GLRenderer::initializeGL() {
     glGenBuffers(1, &m_fullscreen_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_fullscreen_vbo);
     glBufferData(GL_ARRAY_BUFFER, fullscreen_quad_data.size()*sizeof(GLfloat), fullscreen_quad_data.data(), GL_STATIC_DRAW);
+
     glGenVertexArrays(1, &m_fullscreen_vao);
     glBindVertexArray(m_fullscreen_vao);
-
     glEnableVertexAttribArray(0); // position
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), 0);
-
     glEnableVertexAttribArray(1); // uv coords
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat),  reinterpret_cast<void*>(3 * sizeof(GLfloat)));
 
@@ -255,20 +255,10 @@ void GLRenderer::initializeGL() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    // generate and bind FBO (properties set in makeFBO)
-    glGenFramebuffers(1, &m_fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-
-    // unbind at end
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-    glBindTexture(GL_FRAMEBUFFER, m_defaultFBO);
-
-    makeFBO();
-
-
-
+    glUseProgram(0);
 }
+
+
 
 void GLRenderer::paintGL()
 {
