@@ -8,9 +8,14 @@
 struct RenderShapeData {
     ScenePrimitive primitive;
     glm::mat4 ctm; // the cumulative transformation matrix
-    glm::mat4 inv;
-    glm::mat3 top3;
-    int num_triangles;
+
+    // --- student code ---
+
+    // TODO: get a shape to render
+
+    glm::mat4 ctmInverse;
+
+    // --- student code ---
 };
 
 // Struct which contains all the data needed to render a scene

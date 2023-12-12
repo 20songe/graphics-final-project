@@ -5,93 +5,100 @@
 #include <chrono>
 #include <iostream>
 
-/**
- * @brief calcCTM - function to calculate the CTM from a list of transformations
- * @param transformations - list of transformations
- * @param ctm
- */
-void calcCTM(std::vector<SceneTransformation*> &transformations, glm::mat4 &ctm) {
-    for (SceneTransformation* transformation : transformations) {
-        glm::mat4 t;
-        switch(transformation->type) {
-        case(TransformationType::TRANSFORMATION_MATRIX):
-            ctm = ctm * transformation->matrix;
-            break;
-        case(TransformationType::TRANSFORMATION_ROTATE):
-            ctm = ctm * glm::rotate(transformation->angle, transformation->rotate);
-            break;
-        case(TransformationType::TRANSFORMATION_SCALE):
-            ctm = ctm * glm::scale(transformation->scale);
-            break;
-        case(TransformationType::TRANSFORMATION_TRANSLATE):
-            ctm = ctm * glm::translate(transformation->translate);
-            break;
-        }
+// --- student code ---
 
+void appendTransformation(SceneTransformation &ctm, SceneTransformation *transformation) {
+
+    if (ctm.type != TransformationType::TRANSFORMATION_MATRIX) {return;}
+    switch (transformation->type) {
+    case TransformationType::TRANSFORMATION_TRANSLATE:
+        ctm.matrix *= glm::translate(transformation->translate);
+        break;
+
+    case TransformationType::TRANSFORMATION_SCALE:
+        ctm.matrix *= glm::scale(transformation->scale);
+        break;
+
+    case TransformationType::TRANSFORMATION_ROTATE:
+        ctm.matrix *= glm::rotate(transformation->angle, transformation->rotate);
+        break;
+
+    case TransformationType::TRANSFORMATION_MATRIX:
+        ctm.matrix *= transformation->matrix;
+        break;
     }
+
 }
 
-/**
- * @brief dfsParseTree - recursive function to parse data read from file
- * @param n - scene node
- * @param renderData - render data
- * @param ctm - cumulated transformation matrix
- */
-void dfsParseTree(SceneNode* n, RenderData &renderData, glm::mat4 ctm) {
-    calcCTM(n->transformations, ctm);
+void recursiveHelper(SceneNode* node, SceneTransformation ctm, std::vector<RenderShapeData> &shapes, std::vector<SceneLightData> &lights) {
 
-    for (ScenePrimitive* primitive : n->primitives) {
-        glm::mat3 top3 = glm::transpose(glm::inverse(glm::mat3(ctm)));
+    // create the ctm
+    for (auto transformation : node->transformations) {
+        // todo: should this be sored by type?
+        appendTransformation(ctm, transformation);
+    }
 
-        renderData.shapes.push_back(RenderShapeData{*primitive, ctm, glm::inverse(ctm), top3});
+    // go through primitives
+    for (auto primitive : node->primitives) {
+        RenderShapeData data = RenderShapeData();
+        data.primitive = *primitive;
+        data.ctm = ctm.matrix;
+        data.ctmInverse = glm::inverse(ctm.matrix);
+        shapes.push_back(data);
+    }
 
+    // go through lights
+    for (auto light : node->lights) {
+        SceneLightData data = SceneLightData();
+        data.angle = light->angle;
+        data.color = light->color;
+        data.dir = ctm.matrix * light->dir;
+        data.function = light->function;
+        data.height = light->height;
+        data.id = light->id;
+        data.penumbra = light->penumbra;
+        data.pos = ctm.matrix * glm::vec4{0.f, 0.f, 0.f, 1.f};
+        data.type = light->type;
+        data.width = light->width;
+
+        lights.push_back(data);
     }
-    for (SceneLight* light : n->lights) {
-        renderData.lights.push_back(SceneLightData{light->id,
-            light->type,
-            light->color,
-            light->function,
-            ctm * glm::vec4(0.f, 0.f, 0.f, 1.f),
-            ctm * light->dir,
-            light->penumbra,
-            light->angle,
-            light->width,
-            light->height
-        });
+
+    // go though the children (depth first)
+    for (auto child : node->children) {
+        recursiveHelper(child, ctm, shapes, lights);
     }
-    if (n->children.empty()) {
-        return;
-    }
-    else {
-        for (SceneNode* nextNode : n->children) {
-            dfsParseTree(nextNode, renderData, ctm);
-        }
-    }
+
 }
 
-/**
- * @brief SceneParser::parse - parses the scene
- * @param filepath - file path to JSON with scene data
- * @param renderData - stores the render data
- * @return
- */
+// --- end student code
+
 bool SceneParser::parse(std::string filepath, RenderData &renderData) {
-
     ScenefileReader fileReader = ScenefileReader(filepath);
     bool success = fileReader.readJSON();
     if (!success) {
         return false;
     }
 
+    // TODO: Use your Lab 5 code here
+
+    // --- student code ---
+
     renderData.globalData = fileReader.getGlobalData();
     renderData.cameraData = fileReader.getCameraData();
 
-
     SceneNode* root = fileReader.getRootNode();
+
     renderData.shapes.clear();
     renderData.lights.clear();
 
-    dfsParseTree(root, renderData, glm::mat4(1.f));
+    SceneTransformation ctm = SceneTransformation();
+    ctm.type = TransformationType::TRANSFORMATION_MATRIX;
+    ctm.matrix = glm::mat4(1.f);
+
+    recursiveHelper(root, ctm, renderData.shapes, renderData.lights);
+
+    // --- student code end ---
 
     return true;
 }

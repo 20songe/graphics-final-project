@@ -79,7 +79,7 @@ struct SceneCameraData {
     glm::vec4 look;
     glm::vec4 up;
 
-    float heightAngle = glm::radians(45.f); // The height angle of the camera in RADIANS
+    float heightAngle; // The height angle of the camera in RADIANS
 
     float aperture;    // Only applicable for depth of field
     float focalLength; // Only applicable for depth of field

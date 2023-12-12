@@ -1,6 +1,7 @@
 #pragma once
 
 // Defined before including GLEW to suppress deprecation messages on macOS
+#include "utils/camera.h"
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION
 #endif
@@ -13,16 +14,19 @@
 #include <QTime>
 #include <QTimer>
 
-//additional import
-#include "water/watertile.h"
-#include "camera/camera.h"
+// --- student code ---
+
+#include "utils/objloader.h"
+#include "particlesystem.h"
+
+// --- student code end ---
 
 class Realtime : public QOpenGLWidget
 {
 public:
     Realtime(QWidget *parent = nullptr);
     void finish();                                      // Called on program exit
-    void sceneChanged();
+    void sceneChanged(int selection);
     void settingsChanged();
     void saveViewportImage(std::string filePath);
 
@@ -53,22 +57,125 @@ private:
 
     // Device Correction Variables
     int m_devicePixelRatio;
-    Camera camera;
 
-    //the shaders variables
+
+    // --- student code ---
+
+    // final project
+
+    int m_numWaterPoints;
+    float m_waterPointElapsedTimes[8];
+    glm::vec4 m_waterPointCenters[8];
+
+    particlesystem m_generator;
+
+    objloader m_objloader;
+
+    QImage m_image;
+
+    std::vector<float> m_meshData0;
+    std::vector<float> m_meshData1;
+    std::vector<float> m_meshData2;
+    std::vector<float> m_meshData3;
+    std::vector<float> m_meshData4;
+    std::vector<float> m_meshData5;
+    std::vector<float> m_meshData6;
+    std::vector<float> m_meshData7;
+
+    GLuint m_mesh_vbo0;
+    GLuint m_mesh_vbo1;
+    GLuint m_mesh_vbo2;
+    GLuint m_mesh_vbo3;
+    GLuint m_mesh_vbo4;
+    GLuint m_mesh_vbo5;
+    GLuint m_mesh_vbo6;
+    GLuint m_mesh_vbo7;
+
+    GLuint m_mesh_vao0;
+    GLuint m_mesh_vao1;
+    GLuint m_mesh_vao2;
+    GLuint m_mesh_vao3;
+    GLuint m_mesh_vao4;
+    GLuint m_mesh_vao5;
+    GLuint m_mesh_vao6;
+    GLuint m_mesh_vao7;
+
+    GLuint m_texture0;
+    GLuint m_texture1;
+    GLuint m_texture2;
+    GLuint m_texture3;
+    GLuint m_texture4;
+    GLuint m_texture5;
+    GLuint m_texture6;
+    GLuint m_texture7;
+
+    GLuint m_normal_texture0;
+    GLuint m_normal_texture1;
+    GLuint m_normal_texture2;
+    GLuint m_normal_texture3;
+    GLuint m_normal_texture4;
+    GLuint m_normal_texture5;
+    GLuint m_normal_texture6;
+    GLuint m_normal_texture7;
+
+    GLuint m_opacity_texture0;
+    GLuint m_opacity_texture1;
+    GLuint m_opacity_texture2;
+    GLuint m_opacity_texture3;
+    GLuint m_opacity_texture4;
+    GLuint m_opacity_texture5;
+    GLuint m_opacity_texture6;
+    GLuint m_opacity_texture7;
+
+    // old project
+    int m_prevParam0;
+    int m_prevParam1;
+    float m_prevParam2;
+    float m_prevParam3;
+    bool m_prevParam4;
+    bool m_prevParam5;
+    bool m_prevParam6;
+    bool m_prevParam7;
+
+    GLuint m_defaultFBO;
+
+    camera m_camera;
+
     GLuint m_shader;
-    GLuint m_post_shader;
+    GLuint m_texture_shader;
+
     GLuint m_fullscreen_vbo;
     GLuint m_fullscreen_vao;
-    GLuint m_defaultFBO = 3;
+
+    void makeFBO();
+    int m_fbo_width;
+    int m_fbo_height;
+    int m_screen_width;
+    int m_screen_height;
     GLuint m_fbo;
     GLuint m_fbo_texture;
     GLuint m_fbo_renderbuffer;
-    GLuint m_fbo_width;
-    GLuint m_fbo_height;
 
-    // Water rendering members
-    GLuint waterVAO;
-    GLuint waterShaderProgram;
-    std::vector<WaterTile> waters;
+    bool m_initialized = false;
+
+    int m_numDirLights;
+    int m_numPointLights;
+    int m_numSpotLights;
+
+    glm::vec4 m_dirLightDirs[8];
+    glm::vec4 m_dirLightColors[8];
+
+    glm::vec4 m_pointLightPos[8];
+    glm::vec4 m_pointLightColors[8];
+    glm::vec3 m_pointLightAttenuation[8];
+
+    glm::vec4 m_spotLightPos[8];
+    glm::vec4 m_spotLightDirs[8];
+    glm::vec4 m_spotLightColors[8];
+    glm::vec3 m_spotLightAttenuation[8];
+    float m_spotLightAngle[8];
+    float m_spotLightP[8];
+
+    // --- student code end ---
+
 };

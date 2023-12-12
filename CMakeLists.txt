@@ -33,32 +33,25 @@ add_executable(${PROJECT_NAME}
     src/utils/scenefilereader.cpp
     src/utils/sceneparser.cpp
 
-
     src/mainwindow.h
     src/realtime.h
     src/settings.h
-    src/shaderloader.h
-
     src/utils/scenedata.h
     src/utils/scenefilereader.h
     src/utils/sceneparser.h
-
-
+    src/utils/shaderloader.h
     src/utils/aspectratiowidget/aspectratiowidget.hpp
-
+    src/utils/shapes.h src/utils/shapes.cpp
+    src/utils/camera.h src/utils/camera.cpp
+    src/utils/objloader.h src/utils/objloader.cpp
+    src/particlesystem.h src/particlesystem.cpp
 )
 
 # GLM: this creates its library and allows you to `#include "glm/..."`
 add_subdirectory(glm)
 
 # GLEW: this creates its library and allows you to `#include "GL/glew.h"`
-add_library(StaticGLEW STATIC glew/src/glew.c
-    src/camera/camera.h src/camera/camera.cpp
-    src/water/watertile.h src/water/watertile.cpp
-
-
-
-)
+add_library(StaticGLEW STATIC glew/src/glew.c)
 include_directories(${PROJECT_NAME} PRIVATE glew/include)
 
 # Specifies libraries to be linked (Qt components, glew, etc)
@@ -76,15 +69,19 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
     PREFIX
         "/"
     FILES
+        resources/images/LeafSet017_4K-JPG_Color.jpg
+        resources/images/kitten.png
+        resources/images/leaf_normal.png
+        resources/images/leaf_color.png
+        resources/images/leaf_opacity.png
+        resources/images/testing.png
+        resources/images/bark_color.jpg
+        resources/images/bark_normal.jpg
+        resources/images/white.png
         resources/shaders/default.frag
         resources/shaders/default.vert
-)
-
-target_sources(projects_realtime_other_files
-  PRIVATE
-  resources/shaders/texture.vert
-  resources/shaders/texture.frag
-
+        resources/shaders/texture.frag
+        resources/shaders/texture.vert
 )
 
 # GLEW: this provides support for Windows (including 64-bit)

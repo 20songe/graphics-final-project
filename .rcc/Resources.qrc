@@ -1,0 +1,18 @@
+<RCC>
+  <qresource prefix="/">
+    <file alias="resources/images/LeafSet017_4K-JPG_Color.jpg">C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/resources/images/LeafSet017_4K-JPG_Color.jpg</file>
+    <file alias="resources/images/kitten.png">C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/resources/images/kitten.png</file>
+    <file alias="resources/images/leaf_normal.png">C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/resources/images/leaf_normal.png</file>
+    <file alias="resources/images/leaf_color.png">C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/resources/images/leaf_color.png</file>
+    <file alias="resources/images/leaf_opacity.png">C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/resources/images/leaf_opacity.png</file>
+    <file alias="resources/images/testing.png">C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/resources/images/testing.png</file>
+    <file alias="resources/images/bark_color.jpg">C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/resources/images/bark_color.jpg</file>
+    <file alias="resources/images/bark_normal.jpg">C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/resources/images/bark_normal.jpg</file>
+    <file alias="resources/images/white.png">C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/resources/images/white.png</file>
+    <file alias="resources/shaders/default.frag">C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/resources/shaders/default.frag</file>
+    <file alias="resources/shaders/default.vert">C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/resources/shaders/default.vert</file>
+    <file alias="resources/shaders/texture.frag">C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/resources/shaders/texture.frag</file>
+    <file alias="resources/shaders/texture.vert">C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/resources/shaders/texture.vert</file>
+  </qresource>
+</RCC>
+
