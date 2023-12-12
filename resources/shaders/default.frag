@@ -5,6 +5,7 @@
 in vec3 m_world_pos;
 in vec3 m_world_norm;
 in vec2 uv_out;
+in float obj_index;
 
 // Task 10: declare an out vec4 for your output color
 out vec4 fragColor;
@@ -33,7 +34,8 @@ void main() {
 //    //          to make sure your normals are correct.
 //    fragColor = vec4(abs(m_world_norm), 1.0);
     float clipPos = dot (m_world_pos, clip.xyz) + clip.w;
-    if (clipPos < 0.0) {
+    int int_obj = int(obj_index);
+    if (int_obj == 2) {
         fragColor = vec4(0);
     }
     else {
@@ -51,6 +53,9 @@ void main() {
         vec3 reflection = normalize(-posToLight - 2.0 * dot(normN, -posToLight) * normN);
 
         fragColor += vec4(m_ks * pow(clamp(dot(reflection, posToCam), 0.0, 1.0), shininess));
+
+        // set to red
+        fragColor = vec4(1,0,0,1);
     }
 
 }

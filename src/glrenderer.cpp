@@ -47,6 +47,11 @@ void pushVec3(glm::vec4 vec, std::vector<float>* data)
     data->push_back(vec.z);
 }
 
+void pushVec2(glm::vec2 vec, std::vector<float>* data) {
+    data->push_back(vec.x);
+    data->push_back(vec.y);
+}
+
 std::vector<float> generateSphereData(int phiTesselations, int thetaTesselations)
 {
     std::vector<float> data;
@@ -135,7 +140,7 @@ void GLRenderer::initializeGL()
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
     // Set clear color to black
-    glClearColor(0,0,0,1);
+    glClearColor(1,1,1,1);
 
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
@@ -178,14 +183,16 @@ void GLRenderer::initializeGL()
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,8 * sizeof(GLfloat),reinterpret_cast<void *>(0));
-    glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,8 * sizeof(GLfloat),reinterpret_cast<void *>(3 * sizeof(GLfloat)));
-    glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,8 * sizeof(GLfloat), reinterpret_cast<void *>(5 * sizeof(GLfloat)));
-
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,9 * sizeof(GLfloat),reinterpret_cast<void *>(0));
+    glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,9 * sizeof(GLfloat),reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,9 * sizeof(GLfloat), reinterpret_cast<void *>(5 * sizeof(GLfloat)));
+    glVertexAttribPointer(3,1,GL_FLOAT,GL_FALSE,9 * sizeof(GLfloat), reinterpret_cast<void *>(8 * sizeof(GLfloat)));
     // Clean-up bindings
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER,0);
 
+    // multiply corners of plane by projection matrix
     std::vector<GLfloat> fullscreen_quad_data =
         { //     POSITIONS    //
             -1.f,  1.f, 0.0f,
@@ -201,6 +208,25 @@ void GLRenderer::initializeGL()
             1.f, -1.f, 0.0f,
             1.0f, 0.0f
         };
+//    std::vector<GLfloat> fullscreen_quad_data;
+//    glm::vec4 lowerLeft (-5.203839f, 0.f, -5.203839f, 1.f);
+//    glm::vec4 lowerRight(5.203839f, 0.f, -5.203839f, 1.f);
+//    glm::vec4 upperLeft (-5.203839f, 0.f, 5.203839f, 1.f);
+//    glm::vec4 upperRight (5.203839f, 0.f, 5.203839f, 1.f);
+
+//    lowerLeft = m_proj * m_view * lowerLeft;
+//    lowerRight = m_proj *m_view * lowerRight;
+//    upperLeft = m_proj * m_view * upperLeft;
+//    upperRight = m_proj * m_view * upperRight;
+
+//    pushVec3(lowerLeft, &fullscreen_quad_data);
+//    pushVec2(glm::vec2(0.f,0.f), &fullscreen_quad_data);
+//    pushVec3(lowerRight, &fullscreen_quad_data);
+//    pushVec2(glm::vec2(1.f, 0.f), &fullscreen_quad_data);
+//    pushVec3(upperLeft, &fullscreen_quad_data);
+//    pushVec2(glm::vec2(0.f,1.f), &fullscreen_quad_data);
+//    pushVec3(upperRight, &fullscreen_quad_data);
+//    pushVec2(glm::vec2(1.f,1.f), &fullscreen_quad_data);
 
     // Generate and bind a VBO and a VAO for a fullscreen quad
     glGenBuffers(1, &m_fullscreen_vbo);
@@ -298,7 +324,7 @@ void GLRenderer::paintGL()
     glUniform4fv(clip_loc, 1, &m_clip[0]);
 
     // Draw Command
-    glDrawArrays(GL_TRIANGLES, 0, m_sphereData.size() / 3);
+    glDrawArrays(GL_TRIANGLES, 0, m_sphereData.size() / 9);
     // Unbind Vertex Array
     glBindVertexArray(0);
 
@@ -320,14 +346,29 @@ void GLRenderer::paintTexture(GLuint texture){
 
     GLuint height_loc = glGetUniformLocation(m_texture_shader, "height");
     GLuint width_loc = glGetUniformLocation(m_texture_shader, "width");
+//    GLuint reflect_loc = glGetUniformLocation(m_texture_shader, "reflection_projection");
+
     glUniform1f(height_loc, float(m_fbo_height));
     glUniform1f(width_loc, float(m_fbo_width));
-    glBindVertexArray(m_fullscreen_vao);
+//    glBindVertexArray(m_fullscreen_vao);
+
+    GLint view_loc = glGetUniformLocation(m_texture_shader, "view");
+    GLint proj_loc = glGetUniformLocation(m_texture_shader, "proj");
+
+    if (view_loc == -1 || proj_loc == -1) {
+        std::cout << "view and/or projection matrix not found" << std::endl;
+        return;
+    }
+
+    glUniformMatrix4fv(view_loc, 1, GL_FALSE, &m_view[0][0]);
+    glUniformMatrix4fv(proj_loc, 1, GL_FALSE, &m_proj[0][0]);
+    glBindVertexArray(m_sphere_vao);
     // Task 10: Bind "texture" to slot 0
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+//    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLES, 0, m_sphereData.size() / 9);
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
     glUseProgram(0);

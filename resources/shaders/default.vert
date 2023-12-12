@@ -5,6 +5,7 @@
 layout(location = 0) in vec3 m_object_pos;
 layout(location = 1) in vec2 uv;
 layout(location = 2) in vec3 normal;
+layout(location = 3) in float obj;
 
 // Task 5: declare `out` variables for the world-space position and normal,
 //         to be passed to the fragment shader
@@ -12,6 +13,7 @@ out vec3 m_world_pos;
 out vec2 uv_out;
 out vec3 m_world_norm;
 out int should_render;
+out float obj_index;
 
 // Task 6: declare a uniform mat4 to store model matrix
 uniform mat4 model;
@@ -28,6 +30,7 @@ void main() {
     //         the fragment shader using the variables created in task 5
 
     // source: https://medium.com/@joshmarinacci/water-ripples-with-vertex-shaders-6a9ecbdf091f
+    // source for reflections: http://khayyam.kaplinski.com/2011/09/reflective-water-with-glsl-part-i.html
     vec4 world_pos4 = model * vec4(m_object_pos, 1.0);
 
     if (is_reflection == 0) {
@@ -47,7 +50,7 @@ void main() {
     }
 
     uv_out = uv;
-
+    obj_index = obj;
     // Recall that transforming normals requires obtaining the inverse-transpose of the model matrix!
     // In projects 5 and 6, consider the performance implications of performing this here.
 
