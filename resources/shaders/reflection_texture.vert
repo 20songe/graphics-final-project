@@ -6,8 +6,7 @@ layout (location = 1) in vec2 uv_in;
 layout (location = 2) in vec3 normal;
 layout (location = 3) in float obj;
 
-// Task 16: create an "out" variable representing a UV coordinate
-//out vec2 uv_out;
+//create an "out" variable representing a UV coordinate
 out vec3 vertPos;
 out vec3 out_normal;
 out float obj_index;
@@ -18,17 +17,17 @@ uniform mat4 view;
 uniform float time;
 uniform vec4 center;
 
-const float tilling = 6.0;
+const float tiling = 6.0;
 
 void main() {
     if (int(obj) == 1 || time < 0) {
         vertPos = position;
-
         out_normal = normal;
         obj_index = obj;
-
         vec4 world_pos4 = vec4(position, 1.0);
         gl_Position = proj * view * world_pos4;
+        //but we want object space here
+        textureCoord = uv_in;
 
     }
     else if (int(obj) == 2 && time >= 0) {
@@ -55,7 +54,6 @@ void main() {
         }
 
         gl_Position = proj * view * vec4(vertPos, 1.0);
-        textureCoord = vec2(position.x/2.0 + 0.5, position.y/2.0 + 0.5) * tilling;
     }
 
 

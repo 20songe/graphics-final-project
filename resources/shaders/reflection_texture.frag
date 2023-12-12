@@ -68,9 +68,6 @@ void main(){
         vec3 posToCam = normalize(vec3(cam_pos) - vertPos);
         vec3 reflection = normalize(-posToLight - 2.0 * dot(normN, -posToLight) * normN);
 
-        //add DUDV map:
-        vec2 distortion1 = texture(dudvMap,vec2(textureCoord.x, textureCoord.y)).rg * 2.0 - 1.0;
-
         fragColor += vec4(m_ks * pow(clamp(dot(reflection, posToCam), 0.0, 1.0), shininess));
     }
     else if (int_obj == 1) {

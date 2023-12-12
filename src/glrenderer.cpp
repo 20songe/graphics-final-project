@@ -180,16 +180,13 @@ void GLRenderer::initializeGL(){
          glBindTexture(GL_TEXTURE_2D, 0);
     }
 
-//    // Task 9: Set the active texture slot to texture slot 2
-//    glActiveTexture(GL_TEXTURE2); // Set active texture slot to 2
-//    glBindTexture(GL_TEXTURE_2D, m_dudv_texture);
-
-    GLint uv_loc = glGetUniformLocation(m_texture_shader, "dudvMap");
-    glUniform1i(uv_loc, 2); // Set the sampler2D uniform to use texture slot 2
-
     GLuint sampler_loc = glGetUniformLocation(m_texture_shader, "texSampler");
     glUniform1i(sampler_loc, 0);
+
+    GLint dudvMap_loc = glGetUniformLocation(m_texture_shader, "dudvMap");
+    glUniform1i(dudvMap_loc, 2); // Set the dudvMap uniform to use texture slot 2
     glUseProgram(0);
+
     // Generate and bind VBO
     glGenBuffers(1, &m_obj_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_obj_vbo);
