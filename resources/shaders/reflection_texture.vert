@@ -11,11 +11,14 @@ layout (location = 3) in float obj;
 out vec3 vertPos;
 out vec3 out_normal;
 out float obj_index;
+out vec2 textureCoord;
 
 uniform mat4 proj;
 uniform mat4 view;
 uniform float time;
 uniform vec4 center;
+
+const float tilling = 6.0;
 
 void main() {
     if (int(obj) == 1 || time < 0) {
@@ -52,6 +55,7 @@ void main() {
         }
 
         gl_Position = proj * view * vec4(vertPos, 1.0);
+        textureCoord = vec2(position.x/2.0 + 0.5, position.y/2.0 + 0.5) * tilling;
     }
 
 

@@ -86,7 +86,7 @@ std::vector<float> generateSphereData(int phiTesselations, int thetaTesselations
 }
 
 void GLRenderer::makeFBO(){
-    // Task 19: Generate and bind an empty texture, set its min/mag filter interpolation, then unbind
+    // Generate and bind an empty texture, set its min/mag filter interpolation, then unbind
     glGenTextures(1, &m_fbo_texture);
 
     glActiveTexture(GL_TEXTURE0);
@@ -97,21 +97,21 @@ void GLRenderer::makeFBO(){
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,  GL_LINEAR);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    // Task 20: Generate and bind a renderbuffer of the right size, set its format, then unbind
+    // Generate and bind a renderbuffer of the right size, set its format, then unbind
     glGenRenderbuffers(1, &m_fbo_renderbuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_fbo_renderbuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_fbo_width, m_fbo_height);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-    // Task 18: Generate and bind an FBO
+    // Generate and bind an FBO
     glGenFramebuffers(1, &m_fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-    // Task 21: Add our texture as a color attachment, and our renderbuffer as a depth+stencil attachment, to our FBO
+    // Add our texture as a color attachment, and our renderbuffer as a depth+stencil attachment, to our FBO
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fbo_texture, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_fbo_renderbuffer);
 
-    // Task 22: Unbind the FBO
+    // Unbind the FBO
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 
 }
@@ -151,9 +151,44 @@ void GLRenderer::initializeGL(){
     m_texture_shader = ShaderLoader::createShaderProgram("resources/shaders/reflection_texture.vert", "resources/shaders/reflection_texture.frag");
     std::cout << "here1" << std::endl;
 
-//    glUseProgram(m_texture_shader);
+    //load the dudv map image
+    QString dudv_filepath = QString("resources/waterDUDV.png");
+
+    //obtain image from filepath
+    m_image.load(dudv_filepath);
+
+    if(m_image.isNull()){
+         qDebug() << "Failed to load the image:" << dudv_filepath;
+    } else {
+         //Format image to fit OpenGL
+         m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored(false, true);
+
+         //Generate dudv texture
+         glGenTextures(1, &m_dudv_texture);
+
+         //Bind dudv texture
+         glBindTexture(GL_TEXTURE_2D, m_dudv_texture);
+
+         //Load image into dudv texture
+         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+
+         //Set min and mag filters' interpolation mode to linear
+         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+         //
+         //Unbind dudv texture
+         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+//    // Task 9: Set the active texture slot to texture slot 2
+//    glActiveTexture(GL_TEXTURE2); // Set active texture slot to 2
+//    glBindTexture(GL_TEXTURE_2D, m_dudv_texture);
+
+    GLint uv_loc = glGetUniformLocation(m_texture_shader, "dudvMap");
+    glUniform1i(uv_loc, 2); // Set the sampler2D uniform to use texture slot 2
+
     GLuint sampler_loc = glGetUniformLocation(m_texture_shader, "texSampler");
-    glUniform1i(sampler_loc, GL_TEXTURE0);
+    glUniform1i(sampler_loc, 0);
     glUseProgram(0);
     // Generate and bind VBO
     glGenBuffers(1, &m_obj_vbo);
@@ -170,9 +205,9 @@ void GLRenderer::initializeGL(){
         return;
     }
     std::cout << "data read successfully" << std::endl;
-    m_sphereData = data;
+    m_objData = data;
     // Send data to VBO
-    glBufferData(GL_ARRAY_BUFFER,m_sphereData.size() * sizeof(GLfloat),m_sphereData.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER,m_objData.size() * sizeof(GLfloat),m_objData.data(), GL_STATIC_DRAW);
     // Generate, and bind vao
     glGenVertexArrays(1, &m_obj_vao);
     glBindVertexArray(m_obj_vao);
@@ -298,7 +333,7 @@ void GLRenderer::paintGL()
     glUniform4fv(cam_loc, 1, &cameraPos[0]);
 
     // Draw Command
-    glDrawArrays(GL_TRIANGLES, 0, m_sphereData.size() / 9);
+    glDrawArrays(GL_TRIANGLES, 0, m_objData.size() / 9);
     // Unbind Vertex Array
     glBindVertexArray(0);
 
@@ -383,7 +418,11 @@ void GLRenderer::paintTexture(GLuint texture){
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    glDrawArrays(GL_TRIANGLES, 0, m_sphereData.size() / 9);
+    //bind "dudv_texture" to slot 2
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, m_dudv_texture);
+
+    glDrawArrays(GL_TRIANGLES, 0, m_objData.size() / 9);
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
     glUseProgram(0);
