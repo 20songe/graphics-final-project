@@ -55,33 +55,32 @@ void main()
         }
 
 
-//        // Task 12: add ambient component to output color
-//        fragColor = vec4(m_ka);
+        //add ambient component to output color
         fragColor = fragColor / 81;
 
-//        // Task 13: add diffuse component to output color
+        //add diffuse component to output color
         vec3 normN = normalize(out_normal);
 
         vec3 posToLight = normalize(vec3(light_pos) - vertPos);
         fragColor += vec4(m_kd * clamp(dot(normN, posToLight), 0.0, 1.0) * vec4(0,0,1,0.5));
 
-//        // Task 14: add specular component to output color
+        //add specular component to output color
         vec3 posToCam = normalize(vec3(cam_pos) - vertPos);
         vec3 reflection = normalize(-posToLight - 2.0 * dot(normN, -posToLight) * normN);
 
         fragColor += vec4(m_ks * pow(clamp(dot(reflection, posToCam), 0.0, 1.0), shininess));
     }
     else if (int_obj == 1) {
-        // Task 12: add ambient component to output color
+        //add ambient component to output color
         fragColor = vec4(m_ka) * vec4(0.0,0.5, 1.0, 1.0);
 
-        // Task 13: add diffuse component to output color
+        //add diffuse component to output color
         vec3 normN = normalize(out_normal);
 
         vec3 posToLight = normalize(vec3(light_pos) - vertPos);
         fragColor += vec4(m_kd * clamp(dot(normN, posToLight), 0.0, 1.0));
 
-        // Task 14: add specular component to output color
+        //add specular component to output color
         vec3 posToCam = normalize(vec3(cam_pos) - vertPos);
         vec3 reflection = normalize(-posToLight - 2.0 * dot(normN, -posToLight) * normN);
 

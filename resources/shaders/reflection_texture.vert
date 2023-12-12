@@ -1,6 +1,6 @@
 #version 330 core
 
-// Task 15: add a second layout variable representing a UV coordinate
+//add a second layout variable representing a UV coordinate
 layout (location = 0) in vec3 position;
 layout (location = 1) in vec2 uv_in;
 layout (location = 2) in vec3 normal;

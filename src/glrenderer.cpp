@@ -185,7 +185,7 @@ void GLRenderer::initializeGL(){
     glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,9 * sizeof(GLfloat),reinterpret_cast<void *>(0));
     glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,9 * sizeof(GLfloat),reinterpret_cast<void *>(3 * sizeof(GLfloat)));
     glVertexAttribPointer(2,3,GL_FLOAT,GL_FALSE,9 * sizeof(GLfloat), reinterpret_cast<void *>(5 * sizeof(GLfloat)));
-    glVertexAttribPointer(3,1,GL_FLOAT,GL_FALSE,9 * sizeof(GLfloat), reinterpret_cast<void *>(8 * sizeof(GLfloat)));
+    glVertexAttribPointer(3,1,GL_FLOAT,GL_FALSE,9 * sizeof(GLfloat), reinterpret_cast<void *>(8 * sizeof(GLfloat))); //here you define the obj attribute
     // Clean-up bindings
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER,0);
@@ -302,7 +302,7 @@ void GLRenderer::paintGL()
     // Unbind Vertex Array
     glBindVertexArray(0);
 
-    // Task 3: deactivate the shader program by passing 0 into glUseProgram
+    //deactivate the shader program by passing 0 into glUseProgram
     glUseProgram(0);
 
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
@@ -349,7 +349,7 @@ void GLRenderer::paintTexture(GLuint texture){
     }
     glUniform1f(ka_loc, m_ka);
 
-    // Task 13: pass light position and m_kd into the fragment shader as a uniform
+    //pass light position and m_kd into the fragment shader as a uniform
     GLuint kd_loc = glGetUniformLocation(m_texture_shader, "m_kd");
     GLuint light_loc = glGetUniformLocation(m_texture_shader, "light_pos");
 
@@ -378,6 +378,7 @@ void GLRenderer::paintTexture(GLuint texture){
     glUniform4fv(cam_loc, 1, &cameraPos[0]);
 
     glBindVertexArray(m_obj_vao);
+
     //Bind "texture" to slot 0
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
