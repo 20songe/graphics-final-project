@@ -59,10 +59,10 @@ private:
                                     0,-1,0,0,
                                     0,0,1,0,
                                     0,0,0,1) * m_view
-                          *glm::mat4(-1,0,0,0,
+/*                          *glm::mat4(-1,0,0,0,
                                       0,1,0,0,
                                       0,0,1,0,
-                                      0,0,0,1) ;
+                                      0,0,0,1)*/ ;
 
     // Device Correction Variables
     int m_devicePixelRatio;
@@ -80,7 +80,6 @@ private:
     GLuint m_fbo_renderbuffer;
     GLuint m_texture_shader;
 
-    glm::vec4 m_clip = glm::vec4(0,1,0,0);
     glm::mat4 m_inv_view = inverse(glm::mat4(1));
     glm::mat4 m_proj  = glm::mat4(1);
 

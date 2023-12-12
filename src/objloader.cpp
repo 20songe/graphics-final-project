@@ -22,13 +22,13 @@ bool objloader::loadOBJ(
     std::vector<float> &data,
     std::vector<std::string> &line) {
 
-    std::vector< unsigned int > vertexIndices, uvIndices, normalIndices, temp_obj;
+    std::vector< unsigned int > vertexIndices, uvIndices, normalIndices;
+    std::vector< int > temp_obj;
     std::vector< float > temp_vertices;
     std::vector< float > temp_uvs;
     std::vector< float > temp_normals;
 
-    unsigned int obj_index = 0;
-    int count = 0;
+    int obj_index = 0;
 
     int num_ones = 0;
     FILE * file = fopen(path, "r");
@@ -42,7 +42,6 @@ bool objloader::loadOBJ(
         char lineHeader[128];
         // read the first word of the line
         int res = fscanf(file, "%s", lineHeader);
-        count += 1;
 
         if (res == -1 || res == EOF) {
             break; // EOF = End Of File. Quit the loop.
@@ -82,7 +81,7 @@ bool objloader::loadOBJ(
         } else if ( strcmp( lineHeader, "o" ) == 0 ) {
             char obj[128];
             fscanf(file, "%s\n", obj);
-            obj_index += 1;
+            obj_index = obj_index + 1;
         }
 
     }
@@ -92,7 +91,10 @@ bool objloader::loadOBJ(
         int ind = 3 * (vertexIndices[i] - 1);
         int uvInd = 3 * (uvIndices[i] - 1);
         int normInd = 3 * (normalIndices[i] - 1);
-        int objInd = temp_obj[i];
+
+        int objInd = floor(i / 3);
+        int currObj = temp_obj[objInd];
+
         glm::vec3 vertex (temp_vertices[ ind ],
                          temp_vertices[ ind + 1 ],
                          temp_vertices[ ind + 2 ]);
@@ -106,8 +108,7 @@ bool objloader::loadOBJ(
         insertVec3(data, vertex);
         insertVec2(data, uv);
         insertVec3(data, norm);
-        data.push_back(objInd);
-
+        data.push_back(currObj);
     }
 
     std::cout << "end of loop" << std::endl;

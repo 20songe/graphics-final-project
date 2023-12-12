@@ -140,7 +140,7 @@ void GLRenderer::initializeGL()
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
     // Set clear color to black
-    glClearColor(1,1,1,1);
+    glClearColor(0, 0, 0,1);
 
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
@@ -208,25 +208,6 @@ void GLRenderer::initializeGL()
             1.f, -1.f, 0.0f,
             1.0f, 0.0f
         };
-//    std::vector<GLfloat> fullscreen_quad_data;
-//    glm::vec4 lowerLeft (-5.203839f, 0.f, -5.203839f, 1.f);
-//    glm::vec4 lowerRight(5.203839f, 0.f, -5.203839f, 1.f);
-//    glm::vec4 upperLeft (-5.203839f, 0.f, 5.203839f, 1.f);
-//    glm::vec4 upperRight (5.203839f, 0.f, 5.203839f, 1.f);
-
-//    lowerLeft = m_proj * m_view * lowerLeft;
-//    lowerRight = m_proj *m_view * lowerRight;
-//    upperLeft = m_proj * m_view * upperLeft;
-//    upperRight = m_proj * m_view * upperRight;
-
-//    pushVec3(lowerLeft, &fullscreen_quad_data);
-//    pushVec2(glm::vec2(0.f,0.f), &fullscreen_quad_data);
-//    pushVec3(lowerRight, &fullscreen_quad_data);
-//    pushVec2(glm::vec2(1.f, 0.f), &fullscreen_quad_data);
-//    pushVec3(upperLeft, &fullscreen_quad_data);
-//    pushVec2(glm::vec2(0.f,1.f), &fullscreen_quad_data);
-//    pushVec3(upperRight, &fullscreen_quad_data);
-//    pushVec2(glm::vec2(1.f,1.f), &fullscreen_quad_data);
 
     // Generate and bind a VBO and a VAO for a fullscreen quad
     glGenBuffers(1, &m_fullscreen_vbo);
@@ -320,9 +301,6 @@ void GLRenderer::paintGL()
     glm::vec4 cameraPos = m_inv_view * glm::vec4(3.0, 10.0, 4.0, 1.0);
     glUniform4fv(cam_loc, 1, &cameraPos[0]);
 
-    GLint clip_loc = glGetUniformLocation(m_shader, "clip");
-    glUniform4fv(clip_loc, 1, &m_clip[0]);
-
     // Draw Command
     glDrawArrays(GL_TRIANGLES, 0, m_sphereData.size() / 9);
     // Unbind Vertex Array
@@ -350,10 +328,12 @@ void GLRenderer::paintTexture(GLuint texture){
 
     glUniform1f(height_loc, float(m_fbo_height));
     glUniform1f(width_loc, float(m_fbo_width));
-//    glBindVertexArray(m_fullscreen_vao);
 
-    GLint view_loc = glGetUniformLocation(m_texture_shader, "view");
-    GLint proj_loc = glGetUniformLocation(m_texture_shader, "proj");
+    GLuint time_loc = glGetUniformLocation(m_texture_shader, "time");
+    glUniform1f(time_loc, m_time);
+
+    GLuint view_loc = glGetUniformLocation(m_texture_shader, "view");
+    GLuint proj_loc = glGetUniformLocation(m_texture_shader, "proj");
 
     if (view_loc == -1 || proj_loc == -1) {
         std::cout << "view and/or projection matrix not found" << std::endl;
@@ -362,6 +342,43 @@ void GLRenderer::paintTexture(GLuint texture){
 
     glUniformMatrix4fv(view_loc, 1, GL_FALSE, &m_view[0][0]);
     glUniformMatrix4fv(proj_loc, 1, GL_FALSE, &m_proj[0][0]);
+
+    // Task 12: pass m_ka into the fragment shader as a uniform
+    GLuint ka_loc = glGetUniformLocation(m_texture_shader, "m_ka");
+    if (ka_loc == -1) {
+        std::cout << "ambient term not found" << std::endl;
+        return;
+    }
+    glUniform1f(ka_loc, m_ka);
+
+    // Task 13: pass light position and m_kd into the fragment shader as a uniform
+    GLuint kd_loc = glGetUniformLocation(m_texture_shader, "m_kd");
+    GLuint light_loc = glGetUniformLocation(m_texture_shader, "light_pos");
+
+    if (kd_loc == -1 || light_loc == -1) {
+        std::cout << "diffuse term not found" << std::endl;
+        return;
+    }
+
+    glUniform1f(kd_loc, m_kd);
+    glUniform4fv(light_loc, 1, &m_lightPos[0]);
+
+    // Task 14: pass shininess, m_ks, and world-space camera position
+    GLuint ks_loc = glGetUniformLocation(m_texture_shader, "m_ks");
+    GLuint shiny_loc = glGetUniformLocation(m_texture_shader, "shininess");
+    GLuint cam_loc = glGetUniformLocation(m_texture_shader, "cam_pos");
+
+    if (ks_loc == -1 || shiny_loc == -1 || cam_loc == -1) {
+        std::cout << "specular term not found" << std::endl;
+        return;
+    }
+
+    glUniform1f(ks_loc, m_ks);
+    glUniform1f(shiny_loc, m_shininess);
+
+    glm::vec4 cameraPos = m_inv_view * glm::vec4(3.0, 10.0, 4.0, 1.0);
+    glUniform4fv(cam_loc, 1, &cameraPos[0]);
+
     glBindVertexArray(m_sphere_vao);
     // Task 10: Bind "texture" to slot 0
     glActiveTexture(GL_TEXTURE0);
@@ -419,10 +436,10 @@ void GLRenderer::rebuildMatrices() {
                             0,-1,0,0,
                             0,0,1,0,
                             0,0,0,1) * m_view
-                  *glm::mat4(-1,0,0,0,
+/*                  *glm::mat4(-1,0,0,0,
                               0,1,0,0,
                               0,0,1,0,
-                              0,0,0,1) ;
+                              0,0,0,1)*/ ;
 
     m_proj = glm::perspective(glm::radians(45.0),1.0 * width() / height(),0.01,100.0);
 

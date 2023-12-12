@@ -22,8 +22,6 @@ uniform float m_ks;
 uniform float shininess;
 uniform vec4 cam_pos;
 
-uniform vec4 clip;
-
 void main() {
     // Remember that you need to renormalize vectors here if you want them to be normalized
 
@@ -33,12 +31,8 @@ void main() {
 //    // Task 11: set your output color to the absolute value of your world-space normals,
 //    //          to make sure your normals are correct.
 //    fragColor = vec4(abs(m_world_norm), 1.0);
-    float clipPos = dot (m_world_pos, clip.xyz) + clip.w;
     int int_obj = int(obj_index);
-    if (int_obj == 2) {
-        fragColor = vec4(0);
-    }
-    else {
+    if (int_obj != 2) {
         // Task 12: add ambient component to output color
         fragColor = vec4(m_ka) * vec4(0.0,0.5, 1.0, 1.0);
 
@@ -53,9 +47,9 @@ void main() {
         vec3 reflection = normalize(-posToLight - 2.0 * dot(normN, -posToLight) * normN);
 
         fragColor += vec4(m_ks * pow(clamp(dot(reflection, posToCam), 0.0, 1.0), shininess));
-
-        // set to red
-        fragColor = vec4(1,0,0,1);
+    }
+    else {
+        discard;
     }
 
 }

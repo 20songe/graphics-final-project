@@ -14,15 +14,35 @@ out float obj_index;
 
 uniform mat4 proj;
 uniform mat4 view;
+uniform float time;
 
 void main() {
     // Task 16: assign the UV layout variable to the UV "out" variable
-    uv_out = uv_in;
-    vertPos = position;
+//    uv_out = uv_in;
 
-    out_normal = normal;
-    obj_index = obj;
+    if (int(obj) == 1) {
+        vertPos = position;
 
-    vec4 world_pos4 = vec4(position, 1.0);
-    gl_Position = proj * view * world_pos4;
+        out_normal = normal;
+        obj_index = obj;
+
+        vec4 world_pos4 = vec4(position, 1.0);
+        gl_Position = proj * view * world_pos4;
+
+    }
+    else if (int(obj) == 2) {
+        float dx = position.x;
+        float dz = position.z;
+        float freq = 2.0 * sqrt(dx * dx + dz * dz);
+        float amp = 1.0 - 1.0 / (0.65 * freq);
+        float angle = -time * 10.0 + freq * 6.0;
+        vertPos = position;
+        vertPos[1] += sin(angle) * amp;
+
+        out_normal = normalize(vec3(0.0,-amp * freq * cos(angle),1.0));
+
+        gl_Position = proj * view * vec4(position, 1.0);
+    }
+
+
 }
