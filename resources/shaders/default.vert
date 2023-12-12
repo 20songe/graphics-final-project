@@ -23,31 +23,17 @@ uniform mat4 view;
 uniform mat4 proj;
 
 uniform float time;
-uniform int is_reflection;
 
 void main() {
     // Task 8: compute the world-space position and normal, then pass them to
     //         the fragment shader using the variables created in task 5
 
-    // source: https://medium.com/@joshmarinacci/water-ripples-with-vertex-shaders-6a9ecbdf091f
     // source for reflections: http://khayyam.kaplinski.com/2011/09/reflective-water-with-glsl-part-i.html
     vec4 world_pos4 = model * vec4(m_object_pos, 1.0);
 
-    if (is_reflection == 0) {
-        float dx = m_object_pos.x;
-        float dz = m_object_pos.z;
-        float freq = 2.0 * sqrt(dx * dx + dz * dz);
-        float amp = 1.0 - 1.0 / (0.65 * freq);
-        float angle = -time * 10.0 + freq * 6.0;
-        m_world_pos = m_object_pos;
-        m_world_pos[1] += sin(angle) * amp;
 
-        m_world_norm = normalize(vec3(0.0,-amp * freq * cos(angle),1.0));
-    }
-    else {
-        m_world_pos = m_object_pos;
-        m_world_norm = normalize(normal);
-    }
+    m_world_pos = m_object_pos;
+    m_world_norm = normalize(normal);
 
     uv_out = uv;
     obj_index = obj;

@@ -15,12 +15,11 @@ out float obj_index;
 uniform mat4 proj;
 uniform mat4 view;
 uniform float time;
+uniform vec4 center;
 
 void main() {
-    // Task 16: assign the UV layout variable to the UV "out" variable
-//    uv_out = uv_in;
 
-    if (int(obj) == 1) {
+    if (int(obj) == 1 || time < 0) {
         vertPos = position;
 
         out_normal = normal;
@@ -30,16 +29,25 @@ void main() {
         gl_Position = proj * view * world_pos4;
 
     }
-    else if (int(obj) == 2) {
-        float dx = position.x;
-        float dz = position.z;
-        float freq = 2.0 * sqrt(dx * dx + dz * dz);
-        float amp = 1.0 - 1.0 / (0.65 * freq);
+    else if (int(obj) == 2 && time >= 0) {
+
+        // source: https://medium.com/@joshmarinacci/water-ripples-with-vertex-shaders-6a9ecbdf091f
+
+        // dx and dz are distances from a certain point
+//        vec4 center = vec4(-3.0, 0.0, 5.0, 1.0);
+
+        float dx = length(position.x - center);
+        float dz = length(position.z - center);
+
+//        float freq = 2.0 * sqrt(dx * dx + dz * dz);
+//        float amp = 1.0 - 1.0 / (0.65 * freq);
+        float freq = 0.2 * sqrt(dx * dx + dz * dz);
+        float amp = 1.0;
         float angle = -time * 10.0 + freq * 6.0;
         vertPos = position;
-        vertPos[1] += sin(angle) * amp;
+        vertPos.y += sin(angle) * amp / freq;
 
-        out_normal = normalize(vec3(0.0,-amp * freq * cos(angle),1.0));
+        out_normal = normalize(vec3(0.0, 1.0, -amp * freq * cos(angle)));
 
         gl_Position = proj * view * vec4(position, 1.0);
     }

@@ -58,11 +58,7 @@ private:
     glm::mat4 m_reflect = glm::mat4(1,0,0,0,
                                     0,-1,0,0,
                                     0,0,1,0,
-                                    0,0,0,1) * m_view
-/*                          *glm::mat4(-1,0,0,0,
-                                      0,1,0,0,
-                                      0,0,1,0,
-                                      0,0,0,1)*/ ;
+                                    0,0,0,1) * m_view;
 
     // Device Correction Variables
     int m_devicePixelRatio;
@@ -79,6 +75,9 @@ private:
     GLuint m_fbo_texture;
     GLuint m_fbo_renderbuffer;
     GLuint m_texture_shader;
+
+    glm::vec4 center  = glm::vec4(-3.0, 0.0, 5.0, 1.0);
+    bool should_ripple = false;
 
     glm::mat4 m_inv_view = inverse(glm::mat4(1));
     glm::mat4 m_proj  = glm::mat4(1);

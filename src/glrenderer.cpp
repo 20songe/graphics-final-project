@@ -241,8 +241,6 @@ void GLRenderer::paintGL()
     glBindVertexArray(m_sphere_vao);
 
     // Task 6: pass in m_model as a uniform into the shader program
-    GLint is_reflection_loc = glGetUniformLocation(m_shader, "is_reflection");
-    glUniform1i(is_reflection_loc, 1);
     GLint output = glGetUniformLocation(m_shader, "model");
     if (output == -1) {
         std::cout << "no location for model" << std::endl;
@@ -324,13 +322,15 @@ void GLRenderer::paintTexture(GLuint texture){
 
     GLuint height_loc = glGetUniformLocation(m_texture_shader, "height");
     GLuint width_loc = glGetUniformLocation(m_texture_shader, "width");
-//    GLuint reflect_loc = glGetUniformLocation(m_texture_shader, "reflection_projection");
 
     glUniform1f(height_loc, float(m_fbo_height));
     glUniform1f(width_loc, float(m_fbo_width));
 
     GLuint time_loc = glGetUniformLocation(m_texture_shader, "time");
     glUniform1f(time_loc, m_time);
+
+    GLuint center_loc = glGetUniformLocation(m_texture_shader, "center");
+    glUniform4fv(center_loc, 1, &center[0]);
 
     GLuint view_loc = glGetUniformLocation(m_texture_shader, "view");
     GLuint proj_loc = glGetUniformLocation(m_texture_shader, "proj");
@@ -399,8 +399,12 @@ void GLRenderer::resizeGL(int w, int h)
 }
 
 void GLRenderer::mousePressEvent(QMouseEvent *event) {
-    // Set initial mouse position
+    if (event->buttons().testFlag(Qt::LeftButton)) {
+        center += glm::vec4(0.5, 0.0, 0.0, 0.0);
+    }
+
     m_prevMousePos = event->pos();
+    should_ripple = !should_ripple;
 }
 
 void GLRenderer::mouseMoveEvent(QMouseEvent *event) {
@@ -435,11 +439,7 @@ void GLRenderer::rebuildMatrices() {
     m_reflect = glm::mat4(1,0,0,0,
                             0,-1,0,0,
                             0,0,1,0,
-                            0,0,0,1) * m_view
-/*                  *glm::mat4(-1,0,0,0,
-                              0,1,0,0,
-                              0,0,1,0,
-                              0,0,0,1)*/ ;
+                            0,0,0,1) * m_view;
 
     m_proj = glm::perspective(glm::radians(45.0),1.0 * width() / height(),0.01,100.0);
 
@@ -447,11 +447,16 @@ void GLRenderer::rebuildMatrices() {
 }
 
 void GLRenderer::timerEvent(QTimerEvent *event) {
-    int elapsedms   = m_elapsedTimer.elapsed();
-    float deltaTime = elapsedms * 0.001f;
-//    m_elapsedTimer.restart();
+    if (should_ripple) {
+        int elapsedms   = m_elapsedTimer.elapsed();
+        float deltaTime = elapsedms * 0.001f;
 
-    m_time = deltaTime / 5;
+        m_time = deltaTime / 5;
+    }
+    else {
+        m_time = -1;
+    }
+
 
     update(); // asks for a PaintGL() call to occur
 }
