@@ -25,12 +25,8 @@ uniform vec4 cam_pos;
 void main() {
     // Remember that you need to renormalize vectors here if you want them to be normalized
 
-    // Task 10: set your output color to white (i.e. vec4(1.0)). Make sure you get a white circle!
-//    fragColor = vec4(1.0);
-
-//    // Task 11: set your output color to the absolute value of your world-space normals,
-//    //          to make sure your normals are correct.
-//    fragColor = vec4(abs(m_world_norm), 1.0);
+    // set your output color to the absolute value of your world-space normals,
+    // to make sure your normals are correct.
     int int_obj = int(obj_index);
     if (int_obj != 2) {
         // Task 12: add ambient component to output color

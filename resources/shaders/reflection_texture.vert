@@ -34,14 +34,15 @@ void main() {
 
         // source: https://medium.com/@joshmarinacci/water-ripples-with-vertex-shaders-6a9ecbdf091f
 
-        float dx = length(position.x - center.x);
+        float dx = length(position.x - center.x); //probably here is the problem
         float dz = length(position.z - center.z);
 
         float dist = sqrt(dx * dx + dz * dz);
-        float radius = 10.0;
+        float radius = 10.0; //need to decrease this
         if (dist <= radius) {
             float freq = 0.5 * dist;
-            float amp = min(1, max(0, 1.0 - 1.0 / (0.65 * freq) - time * 1 / 5));
+//            float amp = min(1, max(0, 1.0 - 1.0 / (0.65 * freq) - time * 1 / 5));
+            float amp = 0.1;
             float angle = -time * 10.0 + freq * 6.0;
             vertPos = position;
             vertPos.y += sin(angle) * amp;

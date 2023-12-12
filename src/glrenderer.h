@@ -8,6 +8,7 @@
 #include "GL/glew.h" // Must always be first include
 #include <QOpenGLWidget>
 #include "glm/glm.hpp"
+#include "debug.h";
 
 #include <unordered_map>
 #include <QElapsedTimer>
