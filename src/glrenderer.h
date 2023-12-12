@@ -38,8 +38,8 @@ protected:
 
 private:
     GLuint m_shader;     // Stores id of shader program
-    GLuint m_sphere_vbo; // Stores id of vbo
-    GLuint m_sphere_vao; // Stores id of vao
+    GLuint m_obj_vbo; // Stores id of vbo
+    GLuint m_obj_vao; // Stores id of vao
 //    GLuint createTextureAttachment(int width, int height);
     void makeFBO();
     void paintTexture(GLuint texture);

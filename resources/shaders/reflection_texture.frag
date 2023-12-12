@@ -15,14 +15,14 @@ uniform float height;
 
 out vec4 fragColor;
 
-// Task 12: declare relevant uniform(s) here, for ambient lighting
+//declare relevant uniform(s) here, for ambient lighting
 uniform float m_ka;
 
-// Task 13: declare relevant uniform(s) here, for diffuse lighting
+//declare relevant uniform(s) here, for diffuse lighting
 uniform float m_kd;
 uniform vec4 light_pos;
 
-// Task 14: declare relevant uniform(s) here, for specular lighting
+//declare relevant uniform(s) here, for specular lighting
 uniform float m_ks;
 uniform float shininess;
 uniform vec4 cam_pos;

@@ -118,8 +118,7 @@ void GLRenderer::makeFBO(){
 
 // ================== Students, You'll Be Working In These Files
 
-void GLRenderer::initializeGL()
-{
+void GLRenderer::initializeGL(){
     m_defaultFBO = 2;
     m_timer = startTimer(1000/60);
     m_elapsedTimer.start();
@@ -145,8 +144,8 @@ void GLRenderer::initializeGL()
     // Enable depth testing
     glEnable(GL_DEPTH_TEST);
 
-    // Task 1: call ShaderLoader::createShaderProgram with the paths to the vertex
-    //         and fragment shaders. Then, store its return value in `m_shader`
+    //call ShaderLoader::createShaderProgram with the paths to the vertex
+    //and fragment shaders. Then, store its return value in `m_shader`
     std::cout << "here" << std::endl;
     m_shader = ShaderLoader::createShaderProgram("resources/shaders/default.vert", "resources/shaders/default.frag");
     m_texture_shader = ShaderLoader::createShaderProgram("resources/shaders/reflection_texture.vert", "resources/shaders/reflection_texture.frag");
@@ -157,10 +156,9 @@ void GLRenderer::initializeGL()
     glUniform1i(sampler_loc, GL_TEXTURE0);
     glUseProgram(0);
     // Generate and bind VBO
-    glGenBuffers(1, &m_sphere_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_sphere_vbo);
+    glGenBuffers(1, &m_obj_vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_obj_vbo);
     // Generate sphere data
-//    m_sphereData = generateSphereData(10,20);
     std::vector<float> data;
     std::vector<std::string> line;
     bool res = objloader.loadOBJ("scenefiles/tree.obj",
@@ -176,8 +174,8 @@ void GLRenderer::initializeGL()
     // Send data to VBO
     glBufferData(GL_ARRAY_BUFFER,m_sphereData.size() * sizeof(GLfloat),m_sphereData.data(), GL_STATIC_DRAW);
     // Generate, and bind vao
-    glGenVertexArrays(1, &m_sphere_vao);
-    glBindVertexArray(m_sphere_vao);
+    glGenVertexArrays(1, &m_obj_vao);
+    glBindVertexArray(m_obj_vao);
 
     // Enable and define attribute 0 to store vertex positions
     glEnableVertexAttribArray(0);
@@ -232,15 +230,15 @@ void GLRenderer::initializeGL()
 void GLRenderer::paintGL()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
-    // Task 2: activate the shader program by calling glUseProgram with `m_shader`
+    //activate the shader program by calling glUseProgram with `m_shader`
     glUseProgram(m_shader);
 
     // Clear screen color and depth before painting
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     // Bind Sphere Vertex Data
-    glBindVertexArray(m_sphere_vao);
+    glBindVertexArray(m_obj_vao);
 
-    // Task 6: pass in m_model as a uniform into the shader program
+    //pass in m_model as a uniform into the shader program
     GLint output = glGetUniformLocation(m_shader, "model");
     if (output == -1) {
         std::cout << "no location for model" << std::endl;
@@ -251,7 +249,7 @@ void GLRenderer::paintGL()
     GLint time_loc = glGetUniformLocation(m_shader, "time");
     glUniform1f(time_loc, m_time);
 
-    // Task 7: pass in m_view and m_proj
+    //pass in m_view and m_proj
     GLint view_loc = glGetUniformLocation(m_shader, "view");
     GLint proj_loc = glGetUniformLocation(m_shader, "proj");
 
@@ -263,7 +261,7 @@ void GLRenderer::paintGL()
     glUniformMatrix4fv(view_loc, 1, GL_FALSE, &m_reflect[0][0]);
     glUniformMatrix4fv(proj_loc, 1, GL_FALSE, &m_proj[0][0]);
 
-    // Task 12: pass m_ka into the fragment shader as a uniform
+    //pass m_ka into the fragment shader as a uniform
     GLint ka_loc = glGetUniformLocation(m_shader, "m_ka");
     if (ka_loc == -1) {
         std::cout << "ambient term not found" << std::endl;
@@ -271,7 +269,7 @@ void GLRenderer::paintGL()
     }
     glUniform1f(ka_loc, m_ka);
 
-    // Task 13: pass light position and m_kd into the fragment shader as a uniform
+    //pass light position and m_kd into the fragment shader as a uniform
     GLint kd_loc = glGetUniformLocation(m_shader, "m_kd");
     GLint light_loc = glGetUniformLocation(m_shader, "light_pos");
 
@@ -283,7 +281,7 @@ void GLRenderer::paintGL()
     glUniform1f(kd_loc, m_kd);
     glUniform4fv(light_loc, 1, &m_lightPos[0]);
 
-    // Task 14: pass shininess, m_ks, and world-space camera position
+    //pass shininess, m_ks, and world-space camera position
     GLint ks_loc = glGetUniformLocation(m_shader, "m_ks");
     GLint shiny_loc = glGetUniformLocation(m_shader, "shininess");
     GLint cam_loc = glGetUniformLocation(m_shader, "cam_pos");
@@ -318,7 +316,7 @@ void GLRenderer::paintGL()
 
 void GLRenderer::paintTexture(GLuint texture){
     glUseProgram(m_texture_shader);
-    // Task 32: Set your bool uniform on whether or not to filter the texture drawn
+    //Set your bool uniform on whether or not to filter the texture drawn
 
     GLuint height_loc = glGetUniformLocation(m_texture_shader, "height");
     GLuint width_loc = glGetUniformLocation(m_texture_shader, "width");
@@ -379,12 +377,11 @@ void GLRenderer::paintTexture(GLuint texture){
     glm::vec4 cameraPos = m_inv_view * glm::vec4(3.0, 10.0, 4.0, 1.0);
     glUniform4fv(cam_loc, 1, &cameraPos[0]);
 
-    glBindVertexArray(m_sphere_vao);
-    // Task 10: Bind "texture" to slot 0
+    glBindVertexArray(m_obj_vao);
+    //Bind "texture" to slot 0
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-//    glDrawArrays(GL_TRIANGLES, 0, 6);
     glDrawArrays(GL_TRIANGLES, 0, m_sphereData.size() / 9);
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);

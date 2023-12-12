@@ -40,22 +40,9 @@ void main() {
 
         // source: https://medium.com/@joshmarinacci/water-ripples-with-vertex-shaders-6a9ecbdf091f
 
-        // dx and dz are distances from a certain point
-////        vec4 center = vec4(-3.0, 0.0, 5.0, 1.0);
-
         float dx = length(position.x - center.x);
         float dz = length(position.z - center.z);
-//        float dist = sqrt(dx * dx + dz * dz);
-//        float freq = 10;
-//        float amp = 0.2;
-//        float PI = 3.14159;
 
-//        vertPos = position;
-//        vertPos.y += amp * sin(-PI * dist * freq + time);
-//        out_normal = normalize(vec3(0.0, 1.0, -amp * freq * cos(-PI * dist * freq + time)));
-
-//        float freq = 2.0 * sqrt(dx * dx + dz * dz);
-//        float amp = 1.0 - 1.0 / (0.65 * freq);
         float dist = sqrt(dx * dx + dz * dz);
         float radius = 10.0;
         if (dist <= radius) {
@@ -71,9 +58,6 @@ void main() {
             out_normal = normalize(normal);
             vertPos = position;
         }
-
-
-
 
         gl_Position = proj * view * vec4(vertPos, 1.0);
     }
