@@ -18,14 +18,6 @@ uniform float time;
 uniform vec4 center;
 
 void main() {
-
-//    vertPos = position;
-
-//    out_normal = normal;
-//    obj_index = obj;
-
-//    vec4 world_pos4 = vec4(position, 1.0);
-//    gl_Position = proj * view * world_pos4;
     if (int(obj) == 1 || time < 0) {
         vertPos = position;
 

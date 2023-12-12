@@ -31,18 +31,17 @@ vec4 blend(vec4 textureColor, vec4 diffuseColor, float blend) {
     return blend * textureColor + (1.f - blend) * diffuseColor;
 }
 
-void main()
-{
+void main(){
 
     int int_obj = int(obj_index);
     float width_step = 1.f / float(width);
     float height_step = 1.f / float(height);
 
-    if (int_obj == 2) {
+    if (int_obj == 2) { //do water reflection
         fragColor = vec4(0);
         vec2 uv = vec2 (gl_FragCoord.x / width, gl_FragCoord.y / height);
         for (int i = -4; i <= 4; i++) {
-            for (int j = -4; j <= 4; j++) {
+            for (int j = -4; j <= 4; j++) { //I guess this is blurring?
 
                 float u = float(i) * float(width_step) + uv.x;
                 float v = float(j) * float(height_step) + uv.y;
@@ -53,7 +52,6 @@ void main()
                 fragColor += blended;
             }
         }
-
 
         //add ambient component to output color
         fragColor = fragColor / 81;

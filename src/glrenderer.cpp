@@ -214,7 +214,7 @@ void GLRenderer::initializeGL(){
     glGenVertexArrays(1, &m_fullscreen_vao);
     glBindVertexArray(m_fullscreen_vao);
 
-    // Task 14: modify the code below to add a second attribute to the vertex attribute array
+    //modify the code below to add a second attribute to the vertex attribute array
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), nullptr);
     glEnableVertexAttribArray(1);
