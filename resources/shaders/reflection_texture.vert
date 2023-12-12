@@ -41,22 +41,41 @@ void main() {
         // source: https://medium.com/@joshmarinacci/water-ripples-with-vertex-shaders-6a9ecbdf091f
 
         // dx and dz are distances from a certain point
-//        vec4 center = vec4(-3.0, 0.0, 5.0, 1.0);
+////        vec4 center = vec4(-3.0, 0.0, 5.0, 1.0);
 
-        float dx = length(position.x - center);
-        float dz = length(position.z - center);
+        float dx = length(position.x - center.x);
+        float dz = length(position.z - center.z);
+//        float dist = sqrt(dx * dx + dz * dz);
+//        float freq = 10;
+//        float amp = 0.2;
+//        float PI = 3.14159;
+
+//        vertPos = position;
+//        vertPos.y += amp * sin(-PI * dist * freq + time);
+//        out_normal = normalize(vec3(0.0, 1.0, -amp * freq * cos(-PI * dist * freq + time)));
 
 //        float freq = 2.0 * sqrt(dx * dx + dz * dz);
 //        float amp = 1.0 - 1.0 / (0.65 * freq);
-        float freq = 0.2 * sqrt(dx * dx + dz * dz);
-        float amp = max(0, 1.0 - 1.0 / (0.65 * freq) - time * 1 / 5);
-        float angle = -time * 10.0 + freq * 6.0;
-        vertPos = position;
-        vertPos.y += sin(angle) * amp / freq;
+        float dist = sqrt(dx * dx + dz * dz);
+        float radius = 10.0;
+        if (dist <= radius) {
+            float freq = 0.5 * dist;
+            float amp = min(1, max(0, 1.0 - 1.0 / (0.65 * freq) - time * 1 / 5));
+            float angle = -time * 10.0 + freq * 6.0;
+            vertPos = position;
+            vertPos.y += sin(angle) * amp;
 
-        out_normal = normalize(vec3(0.0, 1.0, -amp * freq * cos(angle)));
+            out_normal = normalize(vec3(0.0, 1.0, -amp * freq * cos(angle)));
+        }
+        else {
+            out_normal = normalize(normal);
+            vertPos = position;
+        }
 
-        gl_Position = proj * view * vec4(position, 1.0);
+
+
+
+        gl_Position = proj * view * vec4(vertPos, 1.0);
     }
 
 
