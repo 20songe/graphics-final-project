@@ -400,6 +400,7 @@ void GLRenderer::resizeGL(int w, int h)
 
 void GLRenderer::mousePressEvent(QMouseEvent *event) {
     if (event->buttons().testFlag(Qt::LeftButton)) {
+        m_elapsedTimer.restart();
         center += glm::vec4(0.5, 0.0, 0.0, 0.0);
     }
 

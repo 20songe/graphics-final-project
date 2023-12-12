@@ -7,7 +7,7 @@ layout (location = 2) in vec3 normal;
 layout (location = 3) in float obj;
 
 // Task 16: create an "out" variable representing a UV coordinate
-out vec2 uv_out;
+//out vec2 uv_out;
 out vec3 vertPos;
 out vec3 out_normal;
 out float obj_index;
@@ -19,6 +19,13 @@ uniform vec4 center;
 
 void main() {
 
+//    vertPos = position;
+
+//    out_normal = normal;
+//    obj_index = obj;
+
+//    vec4 world_pos4 = vec4(position, 1.0);
+//    gl_Position = proj * view * world_pos4;
     if (int(obj) == 1 || time < 0) {
         vertPos = position;
 
@@ -42,7 +49,7 @@ void main() {
 //        float freq = 2.0 * sqrt(dx * dx + dz * dz);
 //        float amp = 1.0 - 1.0 / (0.65 * freq);
         float freq = 0.2 * sqrt(dx * dx + dz * dz);
-        float amp = 1.0;
+        float amp = max(0, 1.0 - 1.0 / (0.65 * freq) - time * 1 / 5);
         float angle = -time * 10.0 + freq * 6.0;
         vertPos = position;
         vertPos.y += sin(angle) * amp / freq;
