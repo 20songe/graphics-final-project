@@ -74,9 +74,9 @@ private:
     int m_fbo_height;
     GLuint m_fullscreen_vbo;
     GLuint m_fullscreen_vao;
-    GLuint m_fbo;
-    GLuint m_fbo_texture;
-    GLuint m_fbo_renderbuffer;
+    GLuint m_reflection_fbo;
+    GLuint m_reflection_texture;
+    GLuint m_reflection_renderbuffer;
     GLuint m_texture_shader;
 
     glm::vec4 center  = glm::vec4(-3.0, 0.0, 5.0, 1.0);
@@ -85,6 +85,8 @@ private:
     GLuint m_normal_texture;
     QImage m_image1;
     QImage m_image2;
+
+    GLuint m_refraction_fbo, m_refraction_texture, m_refraction_renderbuffer;
 
 
     glm::mat4 m_inv_view = inverse(glm::mat4(1));

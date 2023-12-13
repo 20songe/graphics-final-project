@@ -87,10 +87,10 @@ std::vector<float> generateSphereData(int phiTesselations, int thetaTesselations
 
 void GLRenderer::makeFBO(){
     // Generate and bind an empty texture, set its min/mag filter interpolation, then unbind
-    glGenTextures(1, &m_fbo_texture);
+    glGenTextures(1, &m_reflection_texture);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
+    glBindTexture(GL_TEXTURE_2D, m_reflection_texture);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -98,18 +98,18 @@ void GLRenderer::makeFBO(){
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Generate and bind a renderbuffer of the right size, set its format, then unbind
-    glGenRenderbuffers(1, &m_fbo_renderbuffer);
-    glBindRenderbuffer(GL_RENDERBUFFER, m_fbo_renderbuffer);
+    glGenRenderbuffers(1, &m_reflection_renderbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_reflection_renderbuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_fbo_width, m_fbo_height);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     // Generate and bind an FBO
-    glGenFramebuffers(1, &m_fbo);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    glGenFramebuffers(1, &m_reflection_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_reflection_fbo);
 
     // Add our texture as a color attachment, and our renderbuffer as a depth+stencil attachment, to our FBO
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fbo_texture, 0);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_fbo_renderbuffer);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_reflection_texture, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_reflection_renderbuffer);
 
     // Unbind the FBO
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
@@ -222,8 +222,11 @@ void GLRenderer::initializeGL(){
 
     glUseProgram(m_texture_shader);
 
-    GLuint sampler_loc = glGetUniformLocation(m_texture_shader, "texSampler");
-    glUniform1i(sampler_loc, 0);
+    GLuint reflection_loc = glGetUniformLocation(m_texture_shader, "texSampler");
+    glUniform1i(reflection_loc, 0);
+
+    GLuint refraction_loc = glGetUniformLocation(m_texture_shader, "refractionSampler");
+    glUniform1i(refraction_loc, 3);
 
     GLint dudvMap_loc = glGetUniformLocation(m_texture_shader, "dudvMap");
     glUniform1i(dudvMap_loc, 1); // Set the dudvMap uniform to use texture slot 1
@@ -308,7 +311,7 @@ void GLRenderer::initializeGL(){
 
 void GLRenderer::paintGL()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_reflection_fbo);
     //activate the shader program by calling glUseProgram with `m_shader`
     glUseProgram(m_shader);
 
@@ -390,7 +393,7 @@ void GLRenderer::paintGL()
     // clear the color and depth buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    paintTexture(m_fbo_texture);
+    paintTexture(m_reflection_texture);
 }
 
 void GLRenderer::paintTexture(GLuint texture){
@@ -440,7 +443,7 @@ void GLRenderer::paintTexture(GLuint texture){
     glUniform1f(kd_loc, m_kd);
     glUniform4fv(light_loc, 1, &m_lightPos[0]);
 
-    // Task 14: pass shininess, m_ks, and world-space camera position
+    // pass shininess, m_ks, and world-space camera position
     GLuint ks_loc = glGetUniformLocation(m_texture_shader, "m_ks");
     GLuint shiny_loc = glGetUniformLocation(m_texture_shader, "shininess");
     GLuint cam_loc = glGetUniformLocation(m_texture_shader, "cam_pos");
@@ -490,9 +493,9 @@ void GLRenderer::resizeGL(int w, int h)
 {
     m_proj = glm::perspective(glm::radians(45.0),1.0 * w / h,0.01,100.0);
     //change the FBO width and height
-    glDeleteTextures(1, &m_fbo_texture);
-    glDeleteRenderbuffers(1, &m_fbo_renderbuffer);
-    glDeleteFramebuffers(1, &m_fbo);
+    glDeleteTextures(1, &m_reflection_texture);
+    glDeleteRenderbuffers(1, &m_reflection_renderbuffer);
+    glDeleteFramebuffers(1, &m_reflection_fbo);
 
     m_screen_width = size().width() * m_devicePixelRatio;
     m_screen_height = size().height() * m_devicePixelRatio;

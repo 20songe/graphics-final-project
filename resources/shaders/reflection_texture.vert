@@ -27,31 +27,17 @@ void main() {
         obj_index = obj;
         world_pos4 = vec4(position, 1.0);
         gl_Position = proj * view * world_pos4;
-        //but we want object space here
 
-//        vec3 e1 = normalize(cross(normal, vec3(1, 0, 0)));
-
-//        //If normal and (1,0,0) are parallel, change e1
-//        if (e1 == vec3(0, 0, 0)) {
-//           vec3 e1 = normalize(cross(normal, vec3(0, 0, 1)));
-//        }
-//        vec3 e2 = normalize(cross(normal, e1));
-
-//        float u = dot(e1, position);
-//        float v = dot(e2, position);
-
-//      textureCoord = vec2(position.x/2.0 + 0.5, position.y/2.0 + 0.5);
-////        textureCoord = vec2(u,v);
-      textureCoord = vec2(uv_in.x,uv_in.y) * tiling;
+        textureCoord = vec2(uv_in.x,uv_in.y) * tiling;
 
     }
     else if (int(obj) == 2 && time >= 0) {
 
-        float dx = length(position.x - center.x); //probably here is the problem
+        float dx = length(position.x - center.x);
              float dz = length(position.z - center.z);
 
              float dist = sqrt(dx * dx + dz * dz);
-             float radius = 10.0; //need to decrease this
+             float radius = 10.0;
              if (dist <= radius) {
                  float freq = 0.5 * dist;
                  float amp = 0.1;

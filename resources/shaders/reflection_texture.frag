@@ -82,17 +82,10 @@ void main(){
 
         for (int i = -4; i <= 4; i++) {//blurring here
             for (int j = -4; j <= 4; j++) {
-
                 float u = float(i) * float(width_step) + reflectCoord.x;
                 float v = float(j) * float(height_step) + reflectCoord.y;
-
-
-//                vec3 reflectedLight = reflect(normalize(fromLightVector),normal);
-//                float specular = max(dot(reflectedLight,normalize(toCameraVector)),0.0);
-
-
                 vec4 diffuse = texture(texSampler, distorted_uv);
-                vec4 blended = blend(diffuse, vec4(0, 0, 1, 1), 0.7) + vec4(specularHighlights,0.0);
+                vec4 blended = blend(diffuse, vec4(0, 0, 1, 0), 0.7) + vec4(specularHighlights,0.0);
                 fragColor += blended;
             }
         }
