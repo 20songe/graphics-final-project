@@ -116,6 +116,8 @@ void GLRenderer::makeFBO(){
 
 }
 
+
+
 // ================== Students, You'll Be Working In These Files
 
 void GLRenderer::initializeGL(){
@@ -151,18 +153,22 @@ void GLRenderer::initializeGL(){
     m_texture_shader = ShaderLoader::createShaderProgram("resources/shaders/reflection_texture.vert", "resources/shaders/reflection_texture.frag");
     std::cout << "here1" << std::endl;
 
+
+    /**
+     * Loading Image, can be refactored
+     **/
     //load the dudv map image
     QString dudv_filepath = QString("resources/waterDUDV.png");
-//    QString dudv_filepath = QString("resources/kitten.png");
+    QString normal_map_filepath = QString("resources/normalMap.png");
 
     //obtain image from filepath
-    m_image.load(dudv_filepath);
+    m_image1.load(dudv_filepath);
 
-    if(m_image.isNull()){
+    if(m_image1.isNull()){
          qDebug() << "Failed to load the image:" << dudv_filepath;
     } else {
          //Format image to fit OpenGL
-         m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored(false, true);
+         m_image1 = m_image1.convertToFormat(QImage::Format_RGBA8888).mirrored(false, true);
 
          //Generate dudv texture
          glGenTextures(1, &m_dudv_texture);
@@ -171,7 +177,7 @@ void GLRenderer::initializeGL(){
          glBindTexture(GL_TEXTURE_2D, m_dudv_texture);
 
          //Load image into dudv texture
-         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image1.width(), m_image1.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image1.bits());
 
          //Set min and mag filters' interpolation mode to linear
          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -181,6 +187,37 @@ void GLRenderer::initializeGL(){
          glBindTexture(GL_TEXTURE_2D, 0);
     }
 
+
+    //obtain image from filepath
+    m_image2.load(normal_map_filepath);
+
+    if(m_image2.isNull()){
+         qDebug() << "Failed to load the image:" << normal_map_filepath;
+    } else {
+         //Format image to fit OpenGL
+         m_image2 = m_image2.convertToFormat(QImage::Format_RGBA8888).mirrored(false, true);
+
+         //Generate dudv texture
+         glGenTextures(1, &m_normal_texture);
+
+         //Bind dudv texture
+         glBindTexture(GL_TEXTURE_2D, m_normal_texture);
+
+         //Load image into normal texture
+         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image2.width(), m_image2.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image2.bits());
+
+         //Set min and mag filters' interpolation mode to linear
+         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+         //
+         //Unbind dudv texture
+         glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    /**
+     * Load Image ends
+     */
+
     glUseProgram(m_texture_shader);
 
     GLuint sampler_loc = glGetUniformLocation(m_texture_shader, "texSampler");
@@ -189,6 +226,8 @@ void GLRenderer::initializeGL(){
     GLint dudvMap_loc = glGetUniformLocation(m_texture_shader, "dudvMap");
     glUniform1i(dudvMap_loc, 1); // Set the dudvMap uniform to use texture slot 1
 
+    GLint normalMap_loc = glGetUniformLocation(m_texture_shader, "normalMap");
+    glUniform1i(normalMap_loc, 2); // Set the dudvMap uniform to use texture slot 2
     Debug::glErrorCheck();
 
     glUseProgram(0);
@@ -424,6 +463,10 @@ void GLRenderer::paintTexture(GLuint texture){
     //bind "dudv_texture" to slot 1
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_dudv_texture);
+
+    //bind "normal_texture" to slot 2
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, m_normal_texture);
 
     glDrawArrays(GL_TRIANGLES, 0, m_objData.size() / 9);
     glBindTexture(GL_TEXTURE_2D, 0);

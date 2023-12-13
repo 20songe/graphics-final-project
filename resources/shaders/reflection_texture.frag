@@ -6,10 +6,12 @@ in vec3 vertPos;
 in vec3 out_normal;
 in float obj_index;
 in vec2 textureCoord;
+in vec4 world_pos4;
 
 // Sampler2D variable
 uniform sampler2D texSampler;
 uniform sampler2D dudvMap;
+uniform sampler2D normalMap;
 
 uniform float width;
 uniform float height;
@@ -30,6 +32,8 @@ uniform float shininess;
 uniform vec4 cam_pos;
 
 const float waveStrength = 0.01;
+const float shineDamper = 20.0;
+const float reflectivity = 0.6;
 
 vec4 blend(vec4 textureColor, vec4 diffuseColor, float blend) {
     return blend * textureColor + (1.f - blend) * diffuseColor;
@@ -40,6 +44,10 @@ void main(){
     int int_obj = int(obj_index);
     float width_step = 1.f / float(width);
     float height_step = 1.f / float(height);
+
+    vec3 toCameraVector = vec3(cam_pos) - world_pos4.xyz;
+    vec3 fromLightVector = world_pos4.xyz - vec3(light_pos);
+
 
     if (int_obj == 2) { //do water reflection
         fragColor = vec4(0);
@@ -54,10 +62,21 @@ void main(){
                 vec2 distortion1 = (texture(dudvMap,vec2(textureCoord.x, textureCoord.y)).rg * 2.0 - 1.0)*waveStrength;
                 vec2 distorted_uv = vec2(uv) + distortion1;
 
+                //add normal map:
+                vec4 normal_color = texture(normalMap,distorted_uv);
+                vec3 normal = vec3(normal_color.r*2.0-1.0,normal_color.b, normal_color.g*2.0 - 1.0);
+
+                vec3 reflectedLight = reflect(normalize(fromLightVector),normal);
+                float specular = max(dot(reflectedLight,normalize(toCameraVector)),0.0);
+                specular = pow(specular, shineDamper);
+                vec3 specularHighlights = vec3(1.0,1.0,1.0) * specular * reflectivity;
+
+
                 vec4 diffuse = texture(texSampler, distorted_uv);
+//                vec4 diffuse = texture(normalMap, distorted_uv);
 //                vec4 diffuse = texture(dudvMap, vec2(u, v));
 //                  vec4 diffuse = texture(texSampler, vec2(u, v));
-                vec4 blended = blend(diffuse, vec4(0, 0, 1, 1), 0.7);
+                vec4 blended = blend(diffuse, vec4(0, 0, 1, 1), 0.7) + vec4(specularHighlights,0.0);
 
 
 

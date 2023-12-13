@@ -11,6 +11,7 @@ out vec3 vertPos;
 out vec3 out_normal;
 out float obj_index;
 out vec2 textureCoord;
+out vec4 world_pos4;
 
 uniform mat4 proj;
 uniform mat4 view;
@@ -26,7 +27,7 @@ void main() {
         vertPos = position;
         out_normal = normal;
         obj_index = obj;
-        vec4 world_pos4 = vec4(position, 1.0);
+        world_pos4 = vec4(position, 1.0);
         gl_Position = proj * view * world_pos4;
         //but we want object space here
 

@@ -81,7 +81,10 @@ private:
     glm::vec4 center  = glm::vec4(-3.0, 0.0, 5.0, 1.0);
     bool should_ripple = false;
     GLuint m_dudv_texture;
-    QImage m_image;
+    GLuint m_normal_texture;
+    QImage m_image1;
+    QImage m_image2;
+
 
     glm::mat4 m_inv_view = inverse(glm::mat4(1));
     glm::mat4 m_proj  = glm::mat4(1);
