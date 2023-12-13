@@ -30,8 +30,9 @@ uniform vec4 light_pos;
 uniform float m_ks;
 uniform float shininess;
 uniform vec4 cam_pos;
+uniform float moveFactor;
 
-const float waveStrength = 0.01;
+const float waveStrength = 0.02; //adjusting this can help
 const float shineDamper = 100.0;
 const float reflectivity = 0.4;
 
@@ -47,29 +48,40 @@ void main(){
 
     vec3 toCameraVector = vec3(cam_pos) - world_pos4.xyz;
     vec3 fromLightVector = world_pos4.xyz - vec3(light_pos);
+    vec3 toLightVector = vec3(light_pos) - world_pos4.xyz;
 
 
     if (int_obj == 2) { //do water reflection
         fragColor = vec4(0);
-        vec2 uv = vec2 (gl_FragCoord.x / width, gl_FragCoord.y / height);
-        for (int i = -4; i <= 4; i++) {
-            for (int j = -4; j <= 4; j++) { //I guess this is blurring?
+        vec2 reflectCoord = vec2 (gl_FragCoord.x / width, gl_FragCoord.y / height); //reflection texture coordinate
 
-                float u = float(i) * float(width_step) + uv.x;
-                float v = float(j) * float(height_step) + uv.y;
+        //add some distortion to the reflectCoord
+        //add DUDV map:
+        vec2 distortion1 = (texture(dudvMap,vec2(textureCoord.x + moveFactor, textureCoord.y)).rg * 2.0 - 1.0)* waveStrength;
+        vec2 distorted_uv = vec2(reflectCoord) + distortion1;
+//        distorted_uv = clamp(distorted_uv, 0.001, 0.999); // at least we have reflection now lol
 
-                //add DUDV map:
-                vec2 distortion1 = (texture(dudvMap,vec2(textureCoord.x, textureCoord.y)).rg * 2.0 - 1.0)*waveStrength;
-                vec2 distorted_uv = vec2(uv) + distortion1;
+        //add normal map:
+        vec4 normal_color = texture(normalMap,distorted_uv);
+        vec3 normal = normalize(vec3(normal_color.r*2.0-1.0,normal_color.b *3.0, normal_color.g*2.0 - 1.0));
 
-                //add normal map:
-                vec4 normal_color = texture(normalMap,distorted_uv);
-                vec3 normal = vec3(normal_color.r*2.0-1.0,normal_color.b, normal_color.g*2.0 - 1.0);
+        vec3 halfVector = normalize(toCameraVector) + normalize(toLightVector);
+        float specular = max(dot(halfVector, normal), 0.0);
+        specular = pow(specular, shineDamper);
+                vec3 specularHighlights = vec3(1.0,1.0,1.0) * specular * reflectivity;
+//        vec3 specularHighlights = vec3(1.0,1.0,1.0) * specular * reflectivity * clamp(20/5.0, 0.0, 1.0);
 
-                vec3 reflectedLight = reflect(normalize(fromLightVector),normal);
-                float specular = max(dot(reflectedLight,normalize(toCameraVector)),0.0);
-                specular = pow(specular, shineDamper);
-                vec3 specularHighlights = vec3(0.5,0.5,0.5) * specular * reflectivity;
+
+        for (int i = -4; i <= 4; i++) {//blurring here
+            for (int j = -4; j <= 4; j++) {
+
+                float u = float(i) * float(width_step) + reflectCoord.x;
+                float v = float(j) * float(height_step) + reflectCoord.y;
+
+
+
+//                vec3 reflectedLight = reflect(normalize(fromLightVector),normal);
+//                float specular = max(dot(reflectedLight,normalize(toCameraVector)),0.0);
 
 
                 vec4 diffuse = texture(texSampler, distorted_uv);

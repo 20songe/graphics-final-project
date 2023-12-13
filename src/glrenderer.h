@@ -52,6 +52,7 @@ private:
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second
     QElapsedTimer m_elapsedTimer;                       // Stores timer which keeps track of actual time between frames
     float m_time; // stores current time
+    QElapsedTimer m_frameTimer; //add one to prevent messing up the m_elapsedTimer
 
     glm::mat4 m_model = glm::mat4(1);
     glm::mat4 m_view  = glm::mat4(1);

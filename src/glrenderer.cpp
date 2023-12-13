@@ -124,6 +124,7 @@ void GLRenderer::initializeGL(){
     m_defaultFBO = 2;
     m_timer = startTimer(1000/60);
     m_elapsedTimer.start();
+    m_frameTimer.start();
 
     m_devicePixelRatio = this->devicePixelRatio();
 
@@ -158,9 +159,9 @@ void GLRenderer::initializeGL(){
      * Loading Image, can be refactored
      **/
     //load the dudv map image
-    QString dudv_filepath = QString("resources/waterDUDV.png");
-//    QString normal_map_filepath = QString("resources/normalMap.png");
-    QString normal_map_filepath = QString("resources/matchingNormalMap.png");
+    QString dudv_filepath = QString("resources/waterNormals/waterDUDV.png");
+//    QString normal_map_filepath = QString("resources/waterNomals/normalMap.png");
+    QString normal_map_filepath = QString("resources/waterNormals/waterNormal_3.jpeg");
 
     //obtain image from filepath
     m_image1.load(dudv_filepath);
@@ -443,6 +444,7 @@ void GLRenderer::paintTexture(GLuint texture){
     GLuint ks_loc = glGetUniformLocation(m_texture_shader, "m_ks");
     GLuint shiny_loc = glGetUniformLocation(m_texture_shader, "shininess");
     GLuint cam_loc = glGetUniformLocation(m_texture_shader, "cam_pos");
+    GLuint move_loc = glGetUniformLocation(m_texture_shader, "moveFactor"); // just added
 
     if (ks_loc == -1 || shiny_loc == -1 || cam_loc == -1) {
         std::cout << "specular term not found" << std::endl;
@@ -454,6 +456,13 @@ void GLRenderer::paintTexture(GLuint texture){
 
     glm::vec4 cameraPos = m_inv_view * glm::vec4(3.0, 10.0, 4.0, 1.0);
     glUniform4fv(cam_loc, 1, &cameraPos[0]);
+
+    // load the moveFactor, offset with time in consideration
+    float moveFactor = 0.0f;
+    const float waveSpeed = 0.03f;
+    moveFactor += waveSpeed * m_frameTimer.elapsed()/1000.0f;
+    moveFactor = fmod(moveFactor, 1.0);
+    glUniform1f(move_loc, moveFactor);
 
     glBindVertexArray(m_obj_vao);
 
