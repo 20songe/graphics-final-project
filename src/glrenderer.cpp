@@ -183,7 +183,7 @@ void GLRenderer::initializeGL(){
     glUseProgram(m_texture_shader);
 
     GLuint sampler_loc = glGetUniformLocation(m_texture_shader, "texSampler");
-    glUniform1i(sampler_loc, 0);
+    glUniform1i(sampler_loc, 0); // Set the m_texture uniform to use texture slot 0
 
     GLint dudvMap_loc = glGetUniformLocation(m_texture_shader, "dudvMap");
     glUniform1i(dudvMap_loc, 1); // Set the dudvMap uniform to use texture slot 1
