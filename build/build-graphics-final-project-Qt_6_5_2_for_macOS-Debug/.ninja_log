@@ -61,3 +61,12 @@
 18	63	1702440866634586547	/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/build/build-graphics-final-project-Qt_6_5_2_for_macOS-Debug/graphics_final_project_autogen/mocs_compilation.cpp	96a18b5e7e5d0c37
 71	1288	1702440867848711413	CMakeFiles/graphics_final_project.dir/src/glrenderer.cpp.o	2b104c32d1733e25
 1288	1521	1702440868088528786	graphics_final_project	764131bb554563cf
+16	643	1702441573219455000	graphics_final_project_autogen/timestamp	96a18b5e7e5d0c37
+16	643	1702441573219455000	graphics_final_project_autogen/mocs_compilation.cpp	96a18b5e7e5d0c37
+16	643	1702441573219455000	/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/build/build-graphics-final-project-Qt_6_5_2_for_macOS-Debug/graphics_final_project_autogen/timestamp	96a18b5e7e5d0c37
+16	643	1702441573219455000	/Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/build/build-graphics-final-project-Qt_6_5_2_for_macOS-Debug/graphics_final_project_autogen/mocs_compilation.cpp	96a18b5e7e5d0c37
+644	1639	1702441574215077008	CMakeFiles/graphics_final_project.dir/graphics_final_project_autogen/mocs_compilation.cpp.o	a36f683345661b8d
+644	1643	1702441574217825199	CMakeFiles/graphics_final_project.dir/src/main.cpp.o	12e81cca299d741f
+644	1644	1702441574215078716	CMakeFiles/graphics_final_project.dir/src/mainwindow.cpp.o	e3f24978972a6f3a
+644	1785	1702441574361051066	CMakeFiles/graphics_final_project.dir/src/glrenderer.cpp.o	2b104c32d1733e25
+1785	2016	1702441574597003321	graphics_final_project	764131bb554563cf

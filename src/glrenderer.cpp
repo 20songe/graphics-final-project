@@ -160,7 +160,7 @@ void GLRenderer::initializeGL(){
     //load the dudv map image
     QString dudv_filepath = QString("resources/waterDUDV.png");
 //    QString normal_map_filepath = QString("resources/normalMap.png");
-    QString normal_map_filepath = QString("resources/waterNormal_3.png");
+    QString normal_map_filepath = QString("resources/matchingNormalMap.png");
 
     //obtain image from filepath
     m_image1.load(dudv_filepath);

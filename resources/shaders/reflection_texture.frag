@@ -32,7 +32,7 @@ uniform float shininess;
 uniform vec4 cam_pos;
 
 const float waveStrength = 0.01;
-const float shineDamper = 40.0;
+const float shineDamper = 100.0;
 const float reflectivity = 0.4;
 
 vec4 blend(vec4 textureColor, vec4 diffuseColor, float blend) {
@@ -69,7 +69,7 @@ void main(){
                 vec3 reflectedLight = reflect(normalize(fromLightVector),normal);
                 float specular = max(dot(reflectedLight,normalize(toCameraVector)),0.0);
                 specular = pow(specular, shineDamper);
-                vec3 specularHighlights = vec3(1.0,1.0,1.0) * specular * reflectivity;
+                vec3 specularHighlights = vec3(0.5,0.5,0.5) * specular * reflectivity;
 
 
                 vec4 diffuse = texture(texSampler, distorted_uv);
