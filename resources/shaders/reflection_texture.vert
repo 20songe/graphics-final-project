@@ -42,7 +42,7 @@ void main() {
         float v = dot(e2, position);
 
 //        textureCoord = vec2(position.x/2.0 + 0.5, position.y/2.0 + 0.5);
-        textureCoord = vec2(u,v);
+        textureCoord = vec2(uv_in.x,uv_in.y);
 
     }
     else if (int(obj) == 2 && time >= 0) {
