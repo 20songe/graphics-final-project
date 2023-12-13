@@ -388,7 +388,7 @@ void Realtime::initializeGL() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // particle system
-//    m_generator = *new particlesystem(100);
+    m_generator = *new particlesystem(100);
 
     // --- student code end ---
 
@@ -503,7 +503,7 @@ void Realtime::paintGL() {
     glDrawArrays(GL_TRIANGLES, 0, m_meshData1.size() / 3);
 
     // particle system
-//    m_generator.draw(m_shader);
+    m_generator.draw(m_shader);
 
     // clean
     glBindTexture(GL_TEXTURE_2D, 0);

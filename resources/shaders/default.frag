@@ -158,17 +158,24 @@ void main() {
     vec4 m_texture;
     vec4 m_opacity_texture;
     vec4 m_normal_texture;
+
     switch (int(materialIndex)) {
-        case 1: { // bark
+        case 0: { // bark
             m_texture = texture(m_texture1, obj_uv);
             m_opacity_texture = texture(m_opacity_texture1, obj_uv);
             m_normal_texture = texture(m_normal_texture1, obj_uv);
             break;
         }
-        case 0: { // leaf
+        case 1: { // leaf
             m_texture = texture(m_texture0, obj_uv);
             m_opacity_texture = texture(m_opacity_texture0, obj_uv);
             m_normal_texture = texture(m_normal_texture0, obj_uv);
+            break;
+        }
+        default: {
+            textureMapping = false;
+            normalMapping  = false;
+            opacityMapping = false;
             break;
         }
     }
@@ -295,12 +302,7 @@ void main() {
     // opacity mapping
     if (opacityMapping) { // check if opacity mapping on...
         vec4 opacity = m_opacity_texture;
-
-//        fragColor[3] = opacity[0];
-        if (opacity[0] <= 0.f) {
-            discard;
-        }
-
+        fragColor[3] = opacity[0];
     } else {
         fragColor[3] = 1.f;
     }
