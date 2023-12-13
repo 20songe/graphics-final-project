@@ -430,6 +430,17 @@ void GLRenderer::paintTexture(GLuint texture){
 void GLRenderer::resizeGL(int w, int h)
 {
     m_proj = glm::perspective(glm::radians(45.0),1.0 * w / h,0.01,100.0);
+    //change the FBO width and height
+    glDeleteTextures(1, &m_fbo_texture);
+    glDeleteRenderbuffers(1, &m_fbo_renderbuffer);
+    glDeleteFramebuffers(1, &m_fbo);
+
+    m_screen_width = size().width() * m_devicePixelRatio;
+    m_screen_height = size().height() * m_devicePixelRatio;
+    m_fbo_width = m_screen_width;
+    m_fbo_height = m_screen_height;
+
+    makeFBO();
 }
 
 void GLRenderer::mousePressEvent(QMouseEvent *event) {
