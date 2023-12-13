@@ -32,8 +32,8 @@ uniform float shininess;
 uniform vec4 cam_pos;
 
 const float waveStrength = 0.01;
-const float shineDamper = 20.0;
-const float reflectivity = 0.6;
+const float shineDamper = 40.0;
+const float reflectivity = 0.4;
 
 vec4 blend(vec4 textureColor, vec4 diffuseColor, float blend) {
     return blend * textureColor + (1.f - blend) * diffuseColor;
