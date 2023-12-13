@@ -29,6 +29,8 @@ uniform float m_ks;
 uniform float shininess;
 uniform vec4 cam_pos;
 
+const float waveStrength = 0.01;
+
 vec4 blend(vec4 textureColor, vec4 diffuseColor, float blend) {
     return blend * textureColor + (1.f - blend) * diffuseColor;
 }
@@ -48,8 +50,16 @@ void main(){
                 float u = float(i) * float(width_step) + uv.x;
                 float v = float(j) * float(height_step) + uv.y;
 
-                vec4 diffuse = texture(texSampler, vec2(u, v));
+                //add DUDV map:
+                vec2 distortion1 = (texture(dudvMap,vec2(textureCoord.x, textureCoord.y)).rg * 2.0 - 1.0)*waveStrength;
+                vec2 distorted_uv = vec2(uv) + distortion1;
+
+                vec4 diffuse = texture(texSampler, distorted_uv);
+//                vec4 diffuse = texture(dudvMap, vec2(u, v));
+//                  vec4 diffuse = texture(texSampler, vec2(u, v));
                 vec4 blended = blend(diffuse, vec4(0, 0, 1, 1), 0.7);
+
+
 
                 fragColor += blended;
             }
@@ -83,11 +93,6 @@ void main(){
         //add specular component to output color
         vec3 posToCam = normalize(vec3(cam_pos) - vertPos);
         vec3 reflection = normalize(-posToLight - 2.0 * dot(normN, -posToLight) * normN);
-
-        //add DUDV map:
-        vec2 distortion1 = texture(dudvMap,vec2(textureCoord.x, textureCoord.y)).rg * 2.0 - 1.0;
-        vec3 extendedDistortion = vec3(distortion1, 0.0);
-        reflection += extendedDistortion;
         fragColor += vec4(m_ks * pow(clamp(dot(reflection, posToCam), 0.0, 1.0), shininess));
     }
     else {

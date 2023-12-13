@@ -153,6 +153,7 @@ void GLRenderer::initializeGL(){
 
     //load the dudv map image
     QString dudv_filepath = QString("resources/waterDUDV.png");
+//    QString dudv_filepath = QString("resources/kitten.png");
 
     //obtain image from filepath
     m_image.load(dudv_filepath);
@@ -180,17 +181,22 @@ void GLRenderer::initializeGL(){
          glBindTexture(GL_TEXTURE_2D, 0);
     }
 
+    glUseProgram(m_texture_shader);
+
     GLuint sampler_loc = glGetUniformLocation(m_texture_shader, "texSampler");
     glUniform1i(sampler_loc, 0);
 
     GLint dudvMap_loc = glGetUniformLocation(m_texture_shader, "dudvMap");
-    glUniform1i(dudvMap_loc, 2); // Set the dudvMap uniform to use texture slot 2
+    glUniform1i(dudvMap_loc, 1); // Set the dudvMap uniform to use texture slot 1
+
+    Debug::glErrorCheck();
+
     glUseProgram(0);
 
     // Generate and bind VBO
     glGenBuffers(1, &m_obj_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_obj_vbo);
-    // Generate sphere data
+    // Generate data
     std::vector<float> data;
     std::vector<std::string> line;
     bool res = objloader.loadOBJ("scenefiles/tree.obj",
@@ -415,8 +421,8 @@ void GLRenderer::paintTexture(GLuint texture){
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
 
-    //bind "dudv_texture" to slot 2
-    glActiveTexture(GL_TEXTURE2);
+    //bind "dudv_texture" to slot 1
+    glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, m_dudv_texture);
 
     glDrawArrays(GL_TRIANGLES, 0, m_objData.size() / 9);

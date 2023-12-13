@@ -9,7 +9,7 @@ inline void glErrorCheck(const char* fileName, int lineNum) { //this function wi
     GLenum errorNumber = glGetError();
     while (errorNumber != GL_NO_ERROR) {
         // Task 2: Edit this print statement to be more descriptive
-        std::cout << "File Name"<< fileName << "Line Number"<< lineNum<< errorNumber << std::endl;
+        std::cout << "File Name "<< fileName << " Line Number "<< lineNum<< " Error: " <<errorNumber << std::endl;
         errorNumber = glGetError();
     }
 }
