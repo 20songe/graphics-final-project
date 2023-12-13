@@ -488,11 +488,11 @@ void Realtime::paintGL() {
     glBindVertexArray(m_mesh_vao0);
     glDrawArrays(GL_TRIANGLES, 0, m_meshData0.size() / 3);
 
-    // render water
-    m_numWaterPoints = 2;
-
-    m_waterPointCenters[0] = glm::vec4(0.f);
-    m_waterPointCenters[1] = glm::vec4(1.f);
+    // render water and ripples
+    specular = glm::vec4(0.75f);
+    glUniform4fv(glGetUniformLocation(m_shader, "cSpecular"), 1, &specular[0]);
+    shininess = 1e6f;
+    glUniform1fv(glGetUniformLocation(m_shader, "m_shininess"), 1, &shininess);
 
     glUniform1i(glGetUniformLocation(m_shader, "m_water"), true);
     glUniform1i(glGetUniformLocation(m_shader, "m_numWaterPoints"), m_numWaterPoints);
@@ -679,6 +679,27 @@ void Realtime::mouseMoveEvent(QMouseEvent *event) {
     }
 }
 
+void Realtime::pushRipple(glm::vec4 waterCenterPoint) {
+
+    // debugging
+    std::cout << "hit: (" << waterCenterPoint[0] << ", " << waterCenterPoint[2] << ")" << std::endl;
+
+    // increment num water points
+    m_numWaterPoints += m_numWaterPoints >= 8 ? 0 : 1;
+
+    // make room for new water point
+    for (int i = m_numWaterPoints; i > 0; i--) {
+        if (i == 8) continue;
+        m_waterPointElapsedTimes[i] = m_waterPointElapsedTimes[i - 1];
+        m_waterPointCenters[i] = m_waterPointCenters[i - 1];
+    }
+
+    // add new water point
+    m_waterPointElapsedTimes[0] = 0.f;
+    m_waterPointCenters[0] = waterCenterPoint;
+
+}
+
 void Realtime::timerEvent(QTimerEvent *event) {
     int elapsedms   = m_elapsedTimer.elapsed();
     float deltaTime = elapsedms * 0.001f;
@@ -719,13 +740,27 @@ void Realtime::timerEvent(QTimerEvent *event) {
     // particle system
     m_generator.updateParticles(deltaTime);
 
-    // water ripples
-    m_waterPointElapsedTimes[0] += deltaTime;
-    m_waterPointElapsedTimes[1] = 1.f;
+    // debugging water ripples
+    m_debuggingTime += deltaTime;
+    if (m_debuggingTime > .5f) {
+        m_debuggingTime = 0.f;
+
+        float r0 = (float) rand() / (RAND_MAX);
+        float r1 = (float) rand() / (RAND_MAX);
+
+        glm::vec4 randPosition(r0, 0.f, r1, 1.f);
+        pushRipple(randPosition);
+    }
+
+    // update water ripples elapsed times
+    for (int i = 0; i < m_numWaterPoints; i++) {
+        m_waterPointElapsedTimes[i] += deltaTime;
+    }
 
     // --- student code end ---
 
     update(); // asks for a PaintGL() call to occur
+
 }
 
 // DO NOT EDIT

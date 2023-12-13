@@ -36,36 +36,7 @@ void waterRipples() {
     worldSpaceNormal = mat3(m_model) * normal;
     gl_Position = m_proj * m_view * (m_model * vec4(vertex, 1.f) + vec4(m_offset, 1.f));
 
-    // water ripples
-    float strength = 1.f;
-    float movementSpeed = 1.f;
-
-    for (int i = 0; i < m_numWaterPoints; i++) {
-
-        // distance from water point center...
-        float dist = distance(vec3(m_waterPointCenters[i]), worldSpacePos);
-
-        // ripple value, from [0, 2 * strength]
-        float amplitude = strength * sin((dist - m_waterPointElapsedTimes[i]) * movementSpeed * 2.f * 3.14f) + strength;
-
-        // normal calculation
-        vec3 direction = worldSpacePos - vec3(m_waterPointCenters[i]);
-        direction[1] = 0.f;
-        direction = normalize(direction) + vec3(1.f);
-
-        float da = cos((dist - m_waterPointElapsedTimes[i]) * movementSpeed * 2.f * 3.14f);
-
-        worldSpaceNormal = normalize(direction * da + worldSpaceNormal);
-
-        break;
-
-    }
-
-    // ge delta time in here...
-    // how o get the ripping effect... use sin on the distance??
-
-
-
+    // TODO: water ripple verts
 
 }
 

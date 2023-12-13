@@ -50,6 +50,12 @@ uniform sampler2D m_texture1;
 uniform sampler2D m_opacity_texture1;
 uniform sampler2D m_normal_texture1;
 
+// water ripples
+uniform bool m_water;
+uniform int m_numWaterPoints;
+uniform vec4[8] m_waterPointCenters;
+uniform float[8] m_waterPointElapsedTimes;
+
 // falloff function
 float falloff(float x, float angle, float penumbra) {
     float thetaInner = angle - penumbra;
@@ -81,43 +87,112 @@ float angle(vec3 x, vec3 y) {
     return acos(num / dem);
 }
 
+// calculate ripple normals for water
+vec3 rippleNormal() {
+
+    // return value
+    vec3 outNormal = vec3(0.f);
+
+    // changeable values
+    float strength = 1.f;
+    float movementSpeed = 0.5f;
+    float frequency = 5.f;
+
+    float distFalloffStrength = 1.f;
+    float timeFalloffStrength = 1e-1f;
+
+    for (int i = 0; i < m_numWaterPoints; i++) {
+
+        // distance from water point center...
+        float dist = distance(vec3(m_waterPointCenters[i]), worldSpacePos);
+
+        // falloff
+        float adjStrength = strength;
+        adjStrength = dist >= adjStrength? 0.f : adjStrength - dist * distFalloffStrength;
+
+        if (dist > 0.0f) {
+            adjStrength -= (1.f / dist) * m_waterPointElapsedTimes[i] * timeFalloffStrength;
+            if (adjStrength < 0.f) adjStrength = 0.f;
+        }
+
+        // ripple value, from [-strength, strength]
+        float amplitude = adjStrength * sin((dist - m_waterPointElapsedTimes[i] * movementSpeed) * frequency * 2.f * 3.14f);
+
+        // pseudo normals calculation
+        vec2 direction = normalize(vec2(worldSpacePos[0], worldSpacePos[2]) - vec2(m_waterPointCenters[i][0], m_waterPointCenters[i][2]));
+        float slope = cos((dist - m_waterPointElapsedTimes[i] * movementSpeed) * frequency * 2.f * 3.14f);
+
+        vec3 sideNormal = slope * vec3(direction[0], 0.f, direction[1]);
+        float sideNormalMag = length(sideNormal);
+
+        vec3 undampedNormal = sideNormal + (1.f - sideNormalMag) * vec3(0.f, 1.f, 0.f);
+
+        // falloff normal
+        vec3 dampedNormal = undampedNormal;
+        dampedNormal = dampedNormal + dist * dist * 10.f * vec3(0.f , 1.f, 0.f);
+
+        float dampingValue = dist > 1e-4f ? 1.f / dist : 100.f;
+        dampingValue *= m_waterPointElapsedTimes[i] * m_waterPointElapsedTimes[i];
+        dampedNormal = dampedNormal + dampingValue * vec3(0.f , 1.f, 0.f);
+
+        // bounds checking
+        if (dist < 1e-4f) dampedNormal = vec3(0.f , 1.f, 0.f);
+
+        // superimpose normals
+        outNormal += normalize(dampedNormal);
+
+    }
+
+    return normalize(outNormal);
+
+}
+
 void main() {
 
-//    // settings textures
-//    vec4 m_texture;
-//    vec4 m_opacity_texture;
-//    vec4 m_normal_texture;
-//    switch (int(materialIndex)) {
-//        case 0: { // bark
-//            m_texture = texture(m_texture1, obj_uv);
-//            m_opacity_texture = texture(m_opacity_texture1, obj_uv);
-//            m_normal_texture = texture(m_normal_texture1, obj_uv);
-//            break;
-//        }
-//        case 1: { // leaf
-//            m_texture = texture(m_texture0, obj_uv);
-//            m_opacity_texture = texture(m_opacity_texture0, obj_uv);
-//            m_normal_texture = texture(m_normal_texture0, obj_uv);
-//            break;
-//        }
-//    }
+    // turns on and off texture mapping
+    bool textureMapping = true;
+    bool normalMapping = true;
+    bool opacityMapping = true;
 
-    vec4 m_texture = texture(m_opacity_texture1, obj_uv);
-    vec4 m_opacity_texture = texture(m_opacity_texture1, obj_uv);
-    vec4 m_normal_texture = texture(m_opacity_texture1, obj_uv);
+    // settings textures
+    vec4 m_texture;
+    vec4 m_opacity_texture;
+    vec4 m_normal_texture;
+    switch (int(materialIndex)) {
+        case 1: { // bark
+            m_texture = texture(m_texture1, obj_uv);
+            m_opacity_texture = texture(m_opacity_texture1, obj_uv);
+            m_normal_texture = texture(m_normal_texture1, obj_uv);
+            break;
+        }
+        case 0: { // leaf
+            m_texture = texture(m_texture0, obj_uv);
+            m_opacity_texture = texture(m_opacity_texture0, obj_uv);
+            m_normal_texture = texture(m_normal_texture0, obj_uv);
+            break;
+        }
+    }
 
     // texture coloring
     vec4 textureColor = m_texture;
 
     // normal mapping
-    float strength = 5.f;
+    vec3 texturedNormal = normalize(worldSpaceNormal);
+    if (normalMapping) { // check for normal mapping
+        float strength = 5.f;
 
-    vec3 up = vec3(0.f, 0.f, 1.f); // -> worldSpaceNormal
-    vec3 axis = cross(up, worldSpaceNormal);
-    mat3 transform = rotationMatrix(axis, -angle(up, worldSpaceNormal));
+        vec3 up = vec3(0.f, 0.f, 1.f); // -> worldSpaceNormal
+        vec3 axis = cross(up, worldSpaceNormal);
+        mat3 transform = rotationMatrix(axis, -angle(up, worldSpaceNormal));
 
-    vec3 mapNormal = normalize(2 * vec3(m_normal_texture) - vec3(1.f));
-    vec3 texturedNormal = normalize(worldSpaceNormal + strength * transform * mapNormal);
+        vec3 mapNormal = normalize(2 * vec3(m_normal_texture) - vec3(1.f));
+        texturedNormal = normalize(worldSpaceNormal + strength * transform * mapNormal);
+    }
+
+    // edit normals for water
+    if (m_water) {
+        texturedNormal = rippleNormal();
+    }
 
     // phong lighting
 
@@ -129,11 +204,12 @@ void main() {
         // difffuse component
         vec3 dir = -normalize(vec3(m_dirLightDirs[i]));
 
-        // diffuse texture color
-        fragColor = fragColor + clamp(dot(dir, texturedNormal), 0.0, 1.0) * m_dirLightColors[i] * textureColor;
-
-        // no texture
-        // fragColor = fragColor + m_kd * clamp(dot(dir, texturedNormal), 0.0, 1.0) * m_dirLightColors[i] * cDiffuse;
+        // diffuse color
+        if (textureMapping) { // check for texture mapping
+            fragColor = fragColor + clamp(dot(dir, texturedNormal), 0.0, 1.0) * m_dirLightColors[i] * textureColor;
+        } else {
+            fragColor = fragColor + m_kd * clamp(dot(dir, texturedNormal), 0.0, 1.0) * m_dirLightColors[i] * cDiffuse;
+        }
 
         // specular component
         vec3 surfToLight = dir; // this is right!!
@@ -159,7 +235,12 @@ void main() {
         // diffuse
         vec3 posToLightDir = normalize(vec3(m_pointLightPos[i]) - worldSpacePos);
         float dotDiffuse = clamp(dot(texturedNormal, posToLightDir), 0.f, 1.f);
-        vec4 diffuse = m_kd * dotDiffuse * cDiffuse;
+        vec4 diffuse;
+        if (textureMapping) { // check for texture mapping
+            diffuse = dotDiffuse * textureColor;
+        } else {
+            diffuse = m_kd * dotDiffuse * cDiffuse;
+        }
         fragColor = fragColor + m_pointLightColors[i] * diffuse * f;
 
         // specular
@@ -190,7 +271,12 @@ void main() {
         // diffuse
         vec3 posToLightDir = normalize(vec3(m_spotLightPos[i]) - worldSpacePos);
         float dotDiffuse = clamp(dot(texturedNormal, posToLightDir), 0.f, 1.f);
-        vec4 diffuse = m_kd * dotDiffuse * cDiffuse;
+        vec4 diffuse;
+        if (textureMapping) { // check for texture mapping
+            diffuse = dotDiffuse * textureColor;
+        } else {
+            diffuse = m_kd * dotDiffuse * cDiffuse;
+        }
         fragColor = fragColor + m_spotLightColors[i] * diffuse * f * falloffValue;
 
         // specular
@@ -207,8 +293,17 @@ void main() {
     }
 
     // opacity mapping
-    vec4 opacity = m_opacity_texture;
-    fragColor[3] = opacity[0];
+    if (opacityMapping) { // check if opacity mapping on...
+        vec4 opacity = m_opacity_texture;
+
+//        fragColor[3] = opacity[0];
+        if (opacity[0] <= 0.f) {
+            discard;
+        }
+
+    } else {
+        fragColor[3] = 1.f;
+    }
 
 }
 

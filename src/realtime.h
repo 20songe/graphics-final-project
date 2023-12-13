@@ -63,9 +63,13 @@ private:
 
     // final project
 
+    float m_debuggingTime = 0.f;
+
     int m_numWaterPoints;
     float m_waterPointElapsedTimes[8];
     glm::vec4 m_waterPointCenters[8];
+
+    void pushRipple(glm::vec4 waterPointCenter);
 
     particlesystem m_generator;
 
