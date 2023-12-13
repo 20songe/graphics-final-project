@@ -63,12 +63,20 @@ void main(){
 
         //add normal map:
         vec4 normal_color = texture(normalMap,distorted_uv);
-        vec3 normal = normalize(vec3(normal_color.r*2.0-1.0,normal_color.b *3.0, normal_color.g*2.0 - 1.0));
+        vec3 normal = vec3(normal_color.r*2.0-1.0,normal_color.b, normal_color.g*2.0 - 1.0);
+        normal = normalize(normal);
 
-        vec3 halfVector = normalize(toCameraVector) + normalize(toLightVector);
-        float specular = max(dot(halfVector, normal), 0.0);
+
+         //no crazy highlight here
+        vec3 reflectedLight = reflect(normalize(fromLightVector), normal);
+        float specular = max(dot(reflectedLight, normalize(toCameraVector)), 0.0);
         specular = pow(specular, shineDamper);
-                vec3 specularHighlights = vec3(1.0,1.0,1.0) * specular * reflectivity;
+        vec3 specularHighlights = vec3(1.0,1.0,1.0) * specular * reflectivity;
+
+        //crazy highlight here
+//        vec3 halfVector = normalize(toCameraVector) + normalize(toLightVector);
+//        float specular = max(dot(halfVector, normal), 0.0);
+//        specular = pow(specular, shineDamper);
 //        vec3 specularHighlights = vec3(1.0,1.0,1.0) * specular * reflectivity * clamp(20/5.0, 0.0, 1.0);
 
 
@@ -79,19 +87,12 @@ void main(){
                 float v = float(j) * float(height_step) + reflectCoord.y;
 
 
-
 //                vec3 reflectedLight = reflect(normalize(fromLightVector),normal);
 //                float specular = max(dot(reflectedLight,normalize(toCameraVector)),0.0);
 
 
                 vec4 diffuse = texture(texSampler, distorted_uv);
-//                vec4 diffuse = texture(normalMap, distorted_uv);
-//                vec4 diffuse = texture(dudvMap, vec2(u, v));
-//                  vec4 diffuse = texture(texSampler, vec2(u, v));
                 vec4 blended = blend(diffuse, vec4(0, 0, 1, 1), 0.7) + vec4(specularHighlights,0.0);
-
-
-
                 fragColor += blended;
             }
         }
