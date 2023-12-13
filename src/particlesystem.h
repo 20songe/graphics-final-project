@@ -10,8 +10,10 @@ struct Particle {
     glm::mat3 model;
     glm::vec3 axis;
 
+    bool m_hit = false;
+
     float m_lifeTime;
-    float m_maxLifeTime = 7.5f; // seconds
+    float m_maxLifeTime = 15.f; // seconds
 
     Particle() : Position(0.0f), Velocity(0.0f), model(1.0f) { }
 };
@@ -23,14 +25,13 @@ public:
     particlesystem(unsigned int n); // number of particles
 
     void init();
-    void updateParticles(float dt);
+    std::vector<glm::vec3> updateParticles(float dt);
     void draw(GLuint m_shader);
 
 private:
     std::vector<Particle> particles;
 
     unsigned int n;
-    float m_rotationIncrement = 0.f;
 
     unsigned int m_particle_vbo;
     unsigned int m_particle_vao;

@@ -39,7 +39,7 @@ glm::mat3 rotationParticle(float angle, glm::vec3 axis) {
 void particlesystem::init() {
 
     // particle quad
-    float size = 0.125f;
+    float size = 0.25f;
     std::vector<GLfloat> particle_quad = { // vertex, normals, uvs, material
         size, 0.f,  size,  0.f, 1.f, 0.f,  1.f, 0.f,  1.f,
        -size, 0.f, -size,  0.f, 1.f, 0.f,  0.f, 1.f,  1.f,
@@ -96,22 +96,28 @@ void particlesystem::resetParticle(Particle &particle) {
     particle.axis = glm::normalize(glm::vec3(rand(), rand(), rand()));
     particle.model = rotationParticle(0, particle.axis);
 
+    particle.m_hit = false;
+
     particle.m_lifeTime = 0.f;
 
 }
 
-void particlesystem::updateParticles(float dt) {
-
-    // increment rotation
-    m_rotationIncrement += 2.5f * dt;
+std::vector<glm::vec3> particlesystem::updateParticles(float dt) {
 
     // reset unused particles
+    std::vector<glm::vec3> positions;
     for (auto& particle : particles) {
         if (particle.m_lifeTime > particle.m_maxLifeTime) // lifetime check
             resetParticle(particle);
 
-        if (particle.Position[1] < 0.f) // height check
-            resetParticle(particle);
+        if (!particle.m_hit && particle.Position[1] < 0.f) { // hit water...
+            particle.m_hit = true;
+            particle.m_lifeTime = particle.m_maxLifeTime - 2.5f;
+            particle.model = glm::mat3(1.f);
+            particle.Position[1] = 0.05f;
+            positions.push_back(particle.Position);
+        }
+
     }
 
     // wind
@@ -123,8 +129,11 @@ void particlesystem::updateParticles(float dt) {
         // increment lifetime
         particle.m_lifeTime += dt;
 
+        // lock particle positions after hit
+        if (particle.m_hit) continue;
+
         // rotations
-        particle.model = rotationParticle(m_rotationIncrement, particle.axis);
+        particle.model = rotationParticle(particle.Position[1], particle.axis);
 
         // propogation
         glm::vec3 windIndvidual = (1.f / 50.f) * glm::vec3(rand() % 100 + 1 - 50);
@@ -132,6 +141,9 @@ void particlesystem::updateParticles(float dt) {
         particle.Position += particle.Velocity * dt;
 
     }
+
+    // return reset positions for ripples
+    return positions;
 
 }
 

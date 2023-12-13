@@ -108,6 +108,252 @@ void Realtime::makeFBO(){
 
 }
 
+GLuint Realtime::selectTexture(int selection) {
+    switch (selection) {
+    case 0: {
+        return m_texture0;
+        break;
+    }
+    case 1: {
+        return m_texture1;
+        break;
+    }
+    case 2: {
+        return m_texture2;
+        break;
+    }
+    case 3: {
+        return m_texture3;
+        break;
+    }
+    case 4: {
+        return m_texture4;
+        break;
+    }
+    case 5: {
+        return m_texture5;
+        break;
+    }
+    case 6: {
+        return m_texture6;
+        break;
+    }
+    case 7: {
+        return m_texture7;
+        break;
+    }
+    default: {
+        return m_texture0;
+        break;
+    }
+    }
+}
+
+GLuint Realtime::selectOpacityTexture(int selection) {
+    switch (selection) {
+    case 0: {
+        return m_opacity_texture0;
+        break;
+    }
+    case 1: {
+        return m_opacity_texture1;
+        break;
+    }
+    case 2: {
+        return m_opacity_texture2;
+        break;
+    }
+    case 3: {
+        return m_opacity_texture3;
+        break;
+    }
+    case 4: {
+        return m_opacity_texture4;
+        break;
+    }
+    case 5: {
+        return m_opacity_texture5;
+        break;
+    }
+    case 6: {
+        return m_opacity_texture6;
+        break;
+    }
+    case 7: {
+        return m_opacity_texture7;
+        break;
+    }
+    default: {
+        return m_opacity_texture0;
+        break;
+    }
+    }
+}
+
+GLuint Realtime::selectNormalTexture(int selection) {
+    switch (selection) {
+    case 0: {
+        return m_normal_texture0;
+        break;
+    }
+    case 1: {
+        return m_normal_texture1;
+        break;
+    }
+    case 2: {
+        return m_normal_texture2;
+        break;
+    }
+    case 3: {
+        return m_normal_texture3;
+        break;
+    }
+    case 4: {
+        return m_normal_texture4;
+        break;
+    }
+    case 5: {
+        return m_normal_texture5;
+        break;
+    }
+    case 6: {
+        return m_normal_texture6;
+        break;
+    }
+    case 7: {
+        return m_normal_texture7;
+        break;
+    }
+    default: {
+        return m_normal_texture0;
+        break;
+    }
+    }
+}
+
+std::vector<float> Realtime::selectMeshData(int selection) {
+    switch (selection) {
+    case 0: {
+        return m_meshData0;
+        break;
+    }
+    case 1: {
+        return m_meshData1;
+        break;
+    }
+    case 2: {
+        return m_meshData2;
+        break;
+    }
+    case 3: {
+        return m_meshData3;
+        break;
+    }
+    case 4: {
+        return m_meshData4;
+        break;
+    }
+    case 5: {
+        return m_meshData5;
+        break;
+    }
+    case 6: {
+        return m_meshData6;
+        break;
+    }
+    case 7: {
+        return m_meshData7;
+        break;
+    }
+    default: {
+        return m_meshData0;
+        break;
+    }
+    }
+}
+
+GLuint Realtime::selectVbo(int selection) {
+    switch (selection) {
+    case 0: {
+        return m_mesh_vbo0;
+        break;
+    }
+    case 1: {
+        return m_mesh_vbo1;
+        break;
+    }
+    case 2: {
+        return m_mesh_vbo2;
+        break;
+    }
+    case 3: {
+        return m_mesh_vbo3;
+        break;
+    }
+    case 4: {
+        return m_mesh_vbo4;
+        break;
+    }
+    case 5: {
+        return m_mesh_vbo5;
+        break;
+    }
+    case 6: {
+        return m_mesh_vbo6;
+        break;
+    }
+    case 7: {
+        return m_mesh_vbo7;
+        break;
+    }
+    default: {
+        return m_mesh_vbo0;
+        break;
+    }
+    }
+}
+
+GLuint Realtime::selectVao(int selection) {
+    switch (selection) {
+    case 0: {
+        return m_mesh_vao0;
+        break;
+    }
+    case 1: {
+        return m_mesh_vao1;
+        break;
+    }
+    case 2: {
+        return m_mesh_vao2;
+        break;
+    }
+    case 3: {
+        return m_mesh_vao3;
+        break;
+    }
+    case 4: {
+        return m_mesh_vao4;
+        break;
+    }
+    case 5: {
+        return m_mesh_vao5;
+        break;
+    }
+    case 6: {
+        return m_mesh_vao6;
+        break;
+    }
+    case 7: {
+        return m_mesh_vao7;
+        break;
+    }
+    default: {
+        return m_mesh_vao0;
+        break;
+    }
+    }
+}
+
 // --- student code end ---
 
 void Realtime::initializeGL() {
@@ -205,7 +451,7 @@ void Realtime::initializeGL() {
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glUseProgram(m_shader);
-    glUniform1i(glGetUniformLocation(m_shader, "m_texture0"), 0);
+    glUniform1i(glGetUniformLocation(m_shader, "m_texture"), 0);
     glUseProgram(0);
 
     filepath = QString(":/resources/images/leaf_opacity.png");
@@ -222,7 +468,7 @@ void Realtime::initializeGL() {
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glUseProgram(m_shader);
-    glUniform1i(glGetUniformLocation(m_shader, "m_opacity_texture0"), 1);
+    glUniform1i(glGetUniformLocation(m_shader, "m_opacity_texture"), 1);
     glUseProgram(0);
 
     filepath = QString(":/resources/images/leaf_normal.png");
@@ -239,7 +485,7 @@ void Realtime::initializeGL() {
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glUseProgram(m_shader);
-    glUniform1i(glGetUniformLocation(m_shader, "m_normal_texture0"), 2);
+    glUniform1i(glGetUniformLocation(m_shader, "m_normal_texture"), 2);
     glUseProgram(0);
 
     // bark
@@ -248,8 +494,8 @@ void Realtime::initializeGL() {
     m_image = QImage(filepath);
     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
 
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, m_texture1);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture2);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
 
@@ -259,15 +505,15 @@ void Realtime::initializeGL() {
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glUseProgram(m_shader);
-    glUniform1i(glGetUniformLocation(m_shader, "m_texture1"), 3);
+    glUniform1i(glGetUniformLocation(m_shader, "m_texture"), 0);
     glUseProgram(0);
 
     filepath = QString(":/resources/images/white.png");
     m_image = QImage(filepath);
     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
 
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, m_opacity_texture1);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_opacity_texture2);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
     glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -276,15 +522,15 @@ void Realtime::initializeGL() {
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glUseProgram(m_shader);
-    glUniform1i(glGetUniformLocation(m_shader, "m_opacity_texture1"), 4);
+    glUniform1i(glGetUniformLocation(m_shader, "m_opacity_texture"), 1);
     glUseProgram(0);
 
     filepath = QString(":/resources/images/bark_normal.jpg");
     m_image = QImage(filepath);
     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
 
-    glActiveTexture(GL_TEXTURE5);
-    glBindTexture(GL_TEXTURE_2D, m_normal_texture1);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, m_normal_texture2);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
     glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -293,7 +539,169 @@ void Realtime::initializeGL() {
     glBindTexture(GL_TEXTURE_2D, 0);
 
     glUseProgram(m_shader);
-    glUniform1i(glGetUniformLocation(m_shader, "m_normal_texture1"), 5);
+    glUniform1i(glGetUniformLocation(m_shader, "m_normal_texture"), 2);
+    glUseProgram(0);
+
+    // rocks
+
+    filepath = QString(":/resources/images/rocks_color.jpg");
+    m_image = QImage(filepath);
+    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture3);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glUseProgram(m_shader);
+    glUniform1i(glGetUniformLocation(m_shader, "m_texture"), 0);
+    glUseProgram(0);
+
+    filepath = QString(":/resources/images/white.png");
+    m_image = QImage(filepath);
+    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_opacity_texture3);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glUseProgram(m_shader);
+    glUniform1i(glGetUniformLocation(m_shader, "m_opacity_texture"), 1);
+    glUseProgram(0);
+
+    filepath = QString(":/resources/images/rocks_normal.jpg");
+    m_image = QImage(filepath);
+    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, m_normal_texture3);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glUseProgram(m_shader);
+    glUniform1i(glGetUniformLocation(m_shader, "m_normal_texture"), 2);
+    glUseProgram(0);
+
+    // moss
+
+    filepath = QString(":/resources/images/moss_color.jpg");
+    m_image = QImage(filepath);
+    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture4);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glUseProgram(m_shader);
+    glUniform1i(glGetUniformLocation(m_shader, "m_texture"), 0);
+    glUseProgram(0);
+
+    filepath = QString(":/resources/images/white.png");
+    m_image = QImage(filepath);
+    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_opacity_texture4);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glUseProgram(m_shader);
+    glUniform1i(glGetUniformLocation(m_shader, "m_opacity_texture"), 1);
+    glUseProgram(0);
+
+    filepath = QString(":/resources/images/moss_normal.jpg");
+    m_image = QImage(filepath);
+    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, m_normal_texture4);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glUseProgram(m_shader);
+    glUniform1i(glGetUniformLocation(m_shader, "m_normal_texture"), 2);
+    glUseProgram(0);
+
+    // grass
+
+    filepath = QString(":/resources/images/grass_color.jpg");
+    m_image = QImage(filepath);
+    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_texture5);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glUseProgram(m_shader);
+    glUniform1i(glGetUniformLocation(m_shader, "m_texture"), 0);
+    glUseProgram(0);
+
+    filepath = QString(":/resources/images/white.png");
+    m_image = QImage(filepath);
+    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, m_opacity_texture5);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glUseProgram(m_shader);
+    glUniform1i(glGetUniformLocation(m_shader, "m_opacity_texture"), 1);
+    glUseProgram(0);
+
+    filepath = QString(":/resources/images/grass_normal.jpg");
+    m_image = QImage(filepath);
+    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, m_normal_texture5);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D,  GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glUseProgram(m_shader);
+    glUniform1i(glGetUniformLocation(m_shader, "m_normal_texture"), 2);
     glUseProgram(0);
 
     // set texture shader
@@ -348,10 +756,22 @@ void Realtime::initializeGL() {
     // generate vbo's
     glGenBuffers(1, &m_mesh_vbo0);
     glGenBuffers(1, &m_mesh_vbo1);
+    glGenBuffers(1, &m_mesh_vbo2);
+    glGenBuffers(1, &m_mesh_vbo3);
+    glGenBuffers(1, &m_mesh_vbo4);
+    glGenBuffers(1, &m_mesh_vbo5);
+    glGenBuffers(1, &m_mesh_vbo6);
+    glGenBuffers(1, &m_mesh_vbo7);
 
     // generate vao's
     glGenVertexArrays(1, &m_mesh_vao0);
     glGenVertexArrays(1, &m_mesh_vao1);
+    glGenVertexArrays(1, &m_mesh_vao2);
+    glGenVertexArrays(1, &m_mesh_vao3);
+    glGenVertexArrays(1, &m_mesh_vao4);
+    glGenVertexArrays(1, &m_mesh_vao5);
+    glGenVertexArrays(1, &m_mesh_vao6);
+    glGenVertexArrays(1, &m_mesh_vao7);
 
     // mesh
     glBindBuffer(GL_ARRAY_BUFFER, m_mesh_vbo0);
@@ -387,8 +807,110 @@ void Realtime::initializeGL() {
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+    // mesh
+    glBindBuffer(GL_ARRAY_BUFFER, m_mesh_vbo2);
+    glBufferData(GL_ARRAY_BUFFER, m_meshData2.size() * sizeof(GLfloat), m_meshData2.data(), GL_STATIC_DRAW);
+    glBindVertexArray(m_mesh_vao2);
+
+    glEnableVertexAttribArray(0); // vertices
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(0));
+    glEnableVertexAttribArray(1); // normals
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(2); // uvs
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(6 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(3); // material index
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(8 * sizeof(GLfloat)));
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // mesh
+    glBindBuffer(GL_ARRAY_BUFFER, m_mesh_vbo3);
+    glBufferData(GL_ARRAY_BUFFER, m_meshData3.size() * sizeof(GLfloat), m_meshData3.data(), GL_STATIC_DRAW);
+    glBindVertexArray(m_mesh_vao3);
+
+    glEnableVertexAttribArray(0); // vertices
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(0));
+    glEnableVertexAttribArray(1); // normals
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(2); // uvs
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(6 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(3); // material index
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(8 * sizeof(GLfloat)));
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // mesh
+    glBindBuffer(GL_ARRAY_BUFFER, m_mesh_vbo4);
+    glBufferData(GL_ARRAY_BUFFER, m_meshData4.size() * sizeof(GLfloat), m_meshData4.data(), GL_STATIC_DRAW);
+    glBindVertexArray(m_mesh_vao4);
+
+    glEnableVertexAttribArray(0); // vertices
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(0));
+    glEnableVertexAttribArray(1); // normals
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(2); // uvs
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(6 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(3); // material index
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(8 * sizeof(GLfloat)));
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // mesh
+    glBindBuffer(GL_ARRAY_BUFFER, m_mesh_vbo5);
+    glBufferData(GL_ARRAY_BUFFER, m_meshData5.size() * sizeof(GLfloat), m_meshData5.data(), GL_STATIC_DRAW);
+    glBindVertexArray(m_mesh_vao5);
+
+    glEnableVertexAttribArray(0); // vertices
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(0));
+    glEnableVertexAttribArray(1); // normals
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(2); // uvs
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(6 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(3); // material index
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(8 * sizeof(GLfloat)));
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // mesh
+    glBindBuffer(GL_ARRAY_BUFFER, m_mesh_vbo6);
+    glBufferData(GL_ARRAY_BUFFER, m_meshData6.size() * sizeof(GLfloat), m_meshData6.data(), GL_STATIC_DRAW);
+    glBindVertexArray(m_mesh_vao6);
+
+    glEnableVertexAttribArray(0); // vertices
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(0));
+    glEnableVertexAttribArray(1); // normals
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(2); // uvs
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(6 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(3); // material index
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(8 * sizeof(GLfloat)));
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // mesh
+    glBindBuffer(GL_ARRAY_BUFFER, m_mesh_vbo7);
+    glBufferData(GL_ARRAY_BUFFER, m_meshData7.size() * sizeof(GLfloat), m_meshData7.data(), GL_STATIC_DRAW);
+    glBindVertexArray(m_mesh_vao7);
+
+    glEnableVertexAttribArray(0); // vertices
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(0));
+    glEnableVertexAttribArray(1); // normals
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(3 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(2); // uvs
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(6 * sizeof(GLfloat)));
+    glEnableVertexAttribArray(3); // material index
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), reinterpret_cast<void *>(8 * sizeof(GLfloat)));
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     // particle system
-    m_generator = *new particlesystem(100);
+    m_generator = *new particlesystem(15);
 
     // --- student code end ---
 
@@ -447,62 +969,70 @@ void Realtime::paintGL() {
     glUniform1fv(glGetUniformLocation(m_shader, "m_spotLightAngle"), 8, &m_spotLightAngle[0]);
     glUniform1fv(glGetUniformLocation(m_shader, "m_spotLightP"), 8, &m_spotLightP[0]);
 
-    // texture information
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_texture0);
+    // render mesh
+    for (int i = 7; i >= 0; i--) {
 
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, m_opacity_texture0);
+        // texture information
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, selectTexture(i));
 
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, m_normal_texture0);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, selectOpacityTexture(i));
 
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, selectNormalTexture(i));
 
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_2D, m_texture1);
+        // calculation information
+        glm::mat4 identity(1.f);
+        glUniformMatrix4fv(glGetUniformLocation(m_shader, "m_model"), 1, false, &identity[0][0]);
 
-    glActiveTexture(GL_TEXTURE4);
-    glBindTexture(GL_TEXTURE_2D, m_opacity_texture1);
+        glm::vec4 ambient(0.5f);
+        glm::vec4 diffuse(0.5f);
+        glm::vec4 specular(0.5f);
+        float shininess = 25.f;
+        glUniform4fv(glGetUniformLocation(m_shader, "cAmbient"), 1, &ambient[0]);
+        glUniform4fv(glGetUniformLocation(m_shader, "cDiffuse"), 1, &diffuse[0]);
+        glUniform4fv(glGetUniformLocation(m_shader, "cSpecular"), 1, &specular[0]);
+        glUniform1fv(glGetUniformLocation(m_shader, "m_shininess"), 1, &shininess);
+        glUniform1i(glGetUniformLocation(m_shader, "m_water"), false);
 
-    glActiveTexture(GL_TEXTURE5);
-    glBindTexture(GL_TEXTURE_2D, m_normal_texture1);
+        glm::vec3 offset(0.f);
+        glUniform3fv(glGetUniformLocation(m_shader, "m_offset"), 1, &offset[0]);
 
-    // calculation information
-    glm::mat4 identity(1.f);
-    glUniformMatrix4fv(glGetUniformLocation(m_shader, "m_model"), 1, false, &identity[0][0]);
+        // water overrides
+        if (i == 1) {
+            ambient  = glm::vec4(0.25f, 0.41f, 0.44f, 1.f);
+            diffuse  = glm::vec4(0.25f, 0.41f, 0.44f, 1.f);
+            specular = glm::vec4(1.f);
+            shininess = 25.f;
+            glUniform4fv(glGetUniformLocation(m_shader, "cAmbient"), 1, &ambient[0]);
+            glUniform4fv(glGetUniformLocation(m_shader, "cDiffuse"), 1, &diffuse[0]);
+            glUniform4fv(glGetUniformLocation(m_shader, "cSpecular"), 1, &specular[0]);
+            glUniform1f(glGetUniformLocation(m_shader, "m_shininess"), shininess);
 
-    glm::vec4 ambient(0.5f);
-    glm::vec4 diffuse(0.5f);
-    glm::vec4 specular(0.5f);
-    float shininess = 25.f;
-    glUniform4fv(glGetUniformLocation(m_shader, "cAmbient"), 1, &ambient[0]);
-    glUniform4fv(glGetUniformLocation(m_shader, "cDiffuse"), 1, &diffuse[0]);
-    glUniform4fv(glGetUniformLocation(m_shader, "cSpecular"), 1, &specular[0]);
-    glUniform1fv(glGetUniformLocation(m_shader, "m_shininess"), 1, &shininess);
-    glUniform1i(glGetUniformLocation(m_shader, "m_water"), false);
+            glUniform1i(glGetUniformLocation(m_shader, "m_water"), true);
 
-    glm::vec3 offset(0.f);
-    glUniform3fv(glGetUniformLocation(m_shader, "m_offset"), 1, &offset[0]);
+            glUniform1i(glGetUniformLocation(m_shader, "m_numWaterPoints"), m_numWaterPoints);
+            glUniform4fv(glGetUniformLocation(m_shader, "m_waterPointCenters"), 8, &m_waterPointCenters[0][0]);
+            glUniform1fv(glGetUniformLocation(m_shader, "m_waterPointElapsedTimes"), 8, &m_waterPointElapsedTimes[0]);
+        }
 
-    // render meshes
-    glBindVertexArray(m_mesh_vao0);
-    glDrawArrays(GL_TRIANGLES, 0, m_meshData0.size() / 3);
+        // render meshes
+        glBindVertexArray(selectVao(i));
+        glDrawArrays(GL_TRIANGLES, 0, selectMeshData(i).size() / 3);
 
-    // render water and ripples
-    specular = glm::vec4(0.75f);
-    glUniform4fv(glGetUniformLocation(m_shader, "cSpecular"), 1, &specular[0]);
-    shininess = 1e6f;
-    glUniform1fv(glGetUniformLocation(m_shader, "m_shininess"), 1, &shininess);
-
-    glUniform1i(glGetUniformLocation(m_shader, "m_water"), true);
-    glUniform1i(glGetUniformLocation(m_shader, "m_numWaterPoints"), m_numWaterPoints);
-    glUniform4fv(glGetUniformLocation(m_shader, "m_waterPointCenters"), 8, &m_waterPointCenters[0][0]);
-    glUniform1fv(glGetUniformLocation(m_shader, "m_waterPointElapsedTimes"), 8, &m_waterPointElapsedTimes[0]);
-
-    glBindVertexArray(m_mesh_vao1);
-    glDrawArrays(GL_TRIANGLES, 0, m_meshData1.size() / 3);
+    }
 
     // particle system
+    glUniform1i(glGetUniformLocation(m_shader, "m_water"), false);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, selectTexture(0));
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, selectOpacityTexture(0));
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, selectNormalTexture(0));
+
     m_generator.draw(m_shader);
 
     // clean
@@ -568,44 +1098,52 @@ void Realtime::sceneChanged(int selection) {
 
     // --- student code ---
 
+    std::cout << "scene file loaded to slot: " << selection << std::endl;
+
     // obj loading
     switch (selection) {
         case 0: {
-
-            // parse
             m_objloader.parse(settings.sceneFilePath.c_str(), m_meshData0);
-
-            // update mesh data
-            glBindBuffer(GL_ARRAY_BUFFER, m_mesh_vbo0);
-            glBufferData(GL_ARRAY_BUFFER, m_meshData0.size() * sizeof(GLfloat), m_meshData0.data(), GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-
             break;
         }
         case 1: {
-
-            // parse
             m_objloader.parse(settings.sceneFilePath.c_str(), m_meshData1);
-
-            // update mesh data
-            glBindBuffer(GL_ARRAY_BUFFER, m_mesh_vbo1);
-            glBufferData(GL_ARRAY_BUFFER, m_meshData1.size() * sizeof(GLfloat), m_meshData1.data(), GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+            break;
+        }
+        case 2: {
+            m_objloader.parse(settings.sceneFilePath.c_str(), m_meshData2);
+            break;
+        }
+        case 3: {
+            m_objloader.parse(settings.sceneFilePath.c_str(), m_meshData3);
+            break;
+        }
+        case 4: {
+            m_objloader.parse(settings.sceneFilePath.c_str(), m_meshData4);
+            break;
+        }
+        case 5: {
+            m_objloader.parse(settings.sceneFilePath.c_str(), m_meshData5);
+            break;
+        }
+        case 6: {
+            m_objloader.parse(settings.sceneFilePath.c_str(), m_meshData6);
+            break;
+        }
+        case 7: {
+            m_objloader.parse(settings.sceneFilePath.c_str(), m_meshData7);
             break;
         }
         default: {
-            // parse
             m_objloader.parse(settings.sceneFilePath.c_str(), m_meshData0);
-
-            // update mesh data
-            glBindBuffer(GL_ARRAY_BUFFER, m_mesh_vbo0);
-            glBufferData(GL_ARRAY_BUFFER, m_meshData0.size() * sizeof(GLfloat), m_meshData0.data(), GL_STATIC_DRAW);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
-
             break;
         }
     }
+
+    // update mesh data
+    glBindBuffer(GL_ARRAY_BUFFER, selectVbo(selection));
+    glBufferData(GL_ARRAY_BUFFER, selectMeshData(selection).size() * sizeof(GLfloat), selectMeshData(selection).data(), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // --- student code end ---
 
@@ -681,9 +1219,6 @@ void Realtime::mouseMoveEvent(QMouseEvent *event) {
 
 void Realtime::pushRipple(glm::vec4 waterCenterPoint) {
 
-    // debugging
-    std::cout << "hit: (" << waterCenterPoint[0] << ", " << waterCenterPoint[2] << ")" << std::endl;
-
     // increment num water points
     m_numWaterPoints += m_numWaterPoints >= 8 ? 0 : 1;
 
@@ -738,18 +1273,11 @@ void Realtime::timerEvent(QTimerEvent *event) {
     }
 
     // particle system
-    m_generator.updateParticles(deltaTime);
+    std::vector<glm::vec3> positions = m_generator.updateParticles(deltaTime);
 
-    // debugging water ripples
-    m_debuggingTime += deltaTime;
-    if (m_debuggingTime > .5f) {
-        m_debuggingTime = 0.f;
-
-        float r0 = (float) rand() / (RAND_MAX);
-        float r1 = (float) rand() / (RAND_MAX);
-
-        glm::vec4 randPosition(r0, 0.f, r1, 1.f);
-        pushRipple(randPosition);
+    // particles to ripple system
+    for (auto pos : positions) {
+        pushRipple(glm::vec4(pos[0], 0.f, pos[2], 1.f));
     }
 
     // update water ripples elapsed times

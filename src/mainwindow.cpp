@@ -58,22 +58,22 @@ void MainWindow::initialize() {
 
     // Create file uploader for scene file
     uploadFile0 = new QPushButton();
-    uploadFile0->setText(QStringLiteral("Upload Scene File 0"));
+    uploadFile0->setText(QStringLiteral("Upload Scene File Leaves"));
 
     uploadFile1 = new QPushButton();
-    uploadFile1->setText(QStringLiteral("Upload Scene File 1"));
+    uploadFile1->setText(QStringLiteral("Upload Scene File Water"));
 
     uploadFile2 = new QPushButton();
-    uploadFile2->setText(QStringLiteral("Upload Scene File 2"));
+    uploadFile2->setText(QStringLiteral("Upload Scene File Tree"));
 
     uploadFile3 = new QPushButton();
-    uploadFile3->setText(QStringLiteral("Upload Scene File 3"));
+    uploadFile3->setText(QStringLiteral("Upload Scene File Rocks"));
 
     uploadFile4 = new QPushButton();
-    uploadFile4->setText(QStringLiteral("Upload Scene File 4"));
+    uploadFile4->setText(QStringLiteral("Upload Scene File Moss"));
 
     uploadFile5 = new QPushButton();
-    uploadFile5->setText(QStringLiteral("Upload Scene File 5"));
+    uploadFile5->setText(QStringLiteral("Upload Scene File Grass"));
 
     uploadFile6 = new QPushButton();
     uploadFile6->setText(QStringLiteral("Upload Scene File 6"));
@@ -264,9 +264,7 @@ void MainWindow::onUploadFile0() {
     QString configFilePath = QFileDialog::getOpenFileName(this, tr("Upload File"),
                                                           QDir::currentPath()
                                                               .append(QDir::separator())
-                                                              .append("..")
-                                                              .append(QDir::separator())
-                                                              .append("projects-final")
+                                                              .append("resources")
                                                               .append(QDir::separator())
                                                               .append("obj-files"), tr("Scene Files (*.obj)"));
 

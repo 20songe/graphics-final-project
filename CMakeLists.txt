@@ -74,9 +74,14 @@ qt6_add_resources(${PROJECT_NAME} "Resources"
         resources/images/leaf_normal.png
         resources/images/leaf_color.png
         resources/images/leaf_opacity.png
-        resources/images/testing.png
         resources/images/bark_color.jpg
         resources/images/bark_normal.jpg
+        resources/images/rocks_color.jpg
+        resources/images/rocks_normal.jpg
+        resources/images/moss_color.jpg
+        resources/images/moss_normal.jpg
+        resources/images/grass_color.jpg
+        resources/images/grass_normal.jpg
         resources/images/white.png
         resources/shaders/default.frag
         resources/shaders/default.vert

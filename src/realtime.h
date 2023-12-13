@@ -77,6 +77,15 @@ private:
 
     QImage m_image;
 
+    GLuint selectTexture(int selection);
+    GLuint selectOpacityTexture(int selection);
+    GLuint selectNormalTexture(int selection);
+
+    std::vector<float> selectMeshData(int selection);
+
+    GLuint selectVbo(int selection);
+    GLuint selectVao(int selection);
+
     std::vector<float> m_meshData0;
     std::vector<float> m_meshData1;
     std::vector<float> m_meshData2;
