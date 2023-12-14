@@ -21,12 +21,12 @@ with them but can be used to add more textures if necessary via the realtime.cpp
 can ignore these buttons.
 
 ## Features Implemented
-- parsing OBJ files - Daniel and Erica
+- parsing OBJ files - Daniel, Erica, and Ria
 - normal mapping - Daniel and Rosella
 - du/dv mapping - Rosella
 - realtime reflections - Erica and Rosella
 - ripples - Daniel, Erica, and Rosella
-- realtime textures - Daniel
+- realtime textures - Daniel and Ria
 - particle generator - Ria
 
 ## Disclaimer
