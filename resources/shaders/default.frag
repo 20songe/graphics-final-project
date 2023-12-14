@@ -135,6 +135,9 @@ vec3 rippleNormal() {
 }
 
 void main() {
+    if (worldSpacePos.y <= 0) {
+        discard;
+    }
 
     // turns on and off texture mapping
     bool textureMapping = true;

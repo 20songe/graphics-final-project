@@ -3,171 +3,333 @@
 
 #version 330 core
 
-in vec2 vertCoordinates;
-uniform sampler2D sampler;
-
-uniform float deltaX;
-uniform float deltaY;
+in vec3 worldSpacePos;
+in vec3 worldSpaceNormal;
 
 out vec4 fragColor;
 
-void invert() {
-    fragColor = vec4(1.f) - fragColor;
+uniform vec4 worldSpaceCameraPos;
+
+uniform float m_ka;
+uniform float m_kd;
+uniform float m_ks;
+
+uniform float m_shininess;
+uniform vec4 cAmbient;
+uniform vec4 cDiffuse;
+uniform vec4 cSpecular;
+
+// lights
+uniform int m_numDirLights;
+uniform int m_numPointLights;
+uniform int m_numSpotLights;
+
+uniform vec4 m_dirLightDirs[8];
+uniform vec4 m_dirLightColors[8];
+
+uniform vec4 m_pointLightPos[8];
+uniform vec4 m_pointLightColors[8];
+uniform vec3 m_pointLightAttenuation[8];
+
+uniform vec4 m_spotLightPos[8];
+uniform vec4 m_spotLightDirs[8];
+uniform vec4 m_spotLightColors[8];
+uniform vec3 m_spotLightAttenuation[8];
+uniform float m_spotLightAngle[8];
+uniform float m_spotLightP[8];
+
+// texture mapping
+in vec2 obj_uv;
+in float materialIndex;
+
+uniform sampler2D m_texture;
+uniform sampler2D m_opacity_texture;
+uniform sampler2D m_normal_texture;
+
+// water info
+uniform sampler2D texSampler;
+uniform float width;
+uniform float height;
+uniform sampler2D dudvMap;
+uniform sampler2D normalMap;
+in vec2 textureCoord;
+
+////declare relevant uniform(s) here, for specular lighting
+//uniform float m_ks;
+//uniform float shininess;
+//uniform vec4 cam_pos;
+uniform float moveFactor;
+
+const float waveStrength = 0.01; //adjusting this can help
+const float shineDamper = 100.0;
+const float reflectivity = 0.4;
+
+// water ripples
+uniform bool m_water;
+uniform int m_numWaterPoints;
+uniform vec4[8] m_waterPointCenters;
+uniform float[8] m_waterPointElapsedTimes;
+
+// falloff function
+float falloff(float x, float angle, float penumbra) {
+    float thetaInner = angle - penumbra;
+    if (thetaInner > angle) return 1.f;
+    if (x < thetaInner) return 0.f;
+    return -2.f * pow((x - thetaInner) / penumbra, 3.f) + 3.f * pow((x - thetaInner) / penumbra, 2.f);
 }
 
-vec3 rgb2hsl(vec3 rgb) {
-    float r = rgb[0];
-    float g = rgb[1];
-    float b = rgb[2];
+// rotation about axis
+mat3 rotationMatrix(vec3 axis, float angle) {
 
-    float maximum = max(max(r, g), b);
-    float minimum = min(min(r, g), b);
+    axis = normalize(axis);
+    float s = sin(angle);
+    float c = cos(angle);
+    float oc = 1.0 - c;
 
-    float hue;
-    float sat;
-    float lum = (maximum + minimum) / 2.f;
-
-    if (maximum == minimum) { // no saturation
-        hue = 0.f;
-        sat = 0.f;
-    } else {
-
-        float c = maximum - minimum; // chroma
-        sat = c / (1.f - abs(2.f * lum - 1.f));
-
-        if (maximum == r) {
-            hue = (g - b) / c;
-        } else if (maximum == g) {
-            hue = (b - r) / c + 2.f;
-        } else {
-            hue = (r - g) / c + 4.f;
-        }
-
-    }
-    hue = hue / 6.f;
-    if (hue < 0.f) hue += 1.f;
-
-    return vec3(hue, sat, lum); // hue, sat, lum
-
-}
-
-float hue2rgb(float p, float q, float t) {
-  if (t < 0.f) t += 1.f;
-  if (t > 1.f) t -= 1.f;
-  if (t < 1.f / 6.f) return p + (q - p) * 6.f * t;
-  if (t < 1.f / 2.f) return q;
-  if (t < 2.f / 3.f) return p + (q - p) * (2.f / 3.f - t) * 6.f;
-  return p;
-}
-
-vec3 hsl2rgb(vec3 hsl) { // all inputs from [0, 1]
-  float r;
-  float g;
-  float b;
-
-  if (hsl[1] == 0) { // no saturation
-    r = hsl[2];
-    g = hsl[2];
-    b = hsl[2];
-  } else {
-
-    float q = 0.f;
-    if (hsl[2] < 0.5f) {
-        q = hsl[2] * (1 + hsl[1]);
-    } else {
-        q = hsl[2] + hsl[1] - hsl[2] * hsl[1];
-    }
-
-    float p = 2.f * hsl[2] - q;
-
-    r = hue2rgb(p, q, hsl[0] + 1.f / 3.f);
-    g = hue2rgb(p, q, hsl[0]);
-    b = hue2rgb(p, q, hsl[0] - 1.f / 3.f);
-
-  }
-
-  return vec3(r, g, b);
-
-}
-
-void saturate() {
-
-    vec3 hsl = rgb2hsl(vec3(fragColor));
-    hsl[1] *= 2.f;
-    fragColor = vec4(hsl2rgb(hsl), 1.f);
-
-}
-
-void hue() {
-
-    vec3 hsl = rgb2hsl(vec3(fragColor));
-    hsl[0] *= 2.f;
-    fragColor = vec4(hsl2rgb(hsl), 1.f);
-
-}
-
-void blur() {
-    int m = 2;
-    int n = 2;
-    vec4 color = vec4(0.f);
-    for (int i = -m; i <= m; i++) {
-        for (int j = -n; j <= n; j++) {
-            vec2 coord = vertCoordinates;
-            color = color + texture(sampler, vec2(coord[0] + (float(i)) * deltaX, coord[1] + (float(j)) * deltaY));
-        }
-    }
-    fragColor = (1.f / ((2.f * m + 1.f) * (2.f * n + 1.f))) * color;
-}
-
-void sharpen() {
-
-    mat3 kernel = mat3(
-        -1.f, -1.f, -1.f,
-        -1.f, 17.f, -1.f,
-        -1.f, -1.f, -1.f
+    return mat3(
+        oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s,
+        oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s,
+        oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c
     );
 
-    vec4 color = vec4(0.f);
-    for (int i = -1; i <= 1; i++) {
-        for (int j = -1; j <= 1; j++) {
-            vec2 coord = vertCoordinates;
-            float value = kernel[i + 1][j + 1];
-            color = color + value * texture(sampler, vec2(coord[0] + (float(i)) * deltaX, coord[1] + (float(j)) * deltaY));
-        }
-    }
-
-    fragColor = (1.f / 9.f) * color;
-
 }
 
-void sobel() {
+// angle between vectors
+float angle(vec3 x, vec3 y) {
+    float num = dot(x, y);
+    float dem = length(x) * length(y);
+    return acos(num / dem);
+}
 
-    mat3 kernel = mat3(
-        1.f, 0.f, -1.f,
-        2.f, 0.f, -2.f,
-        1.f, 0.f, -1.f
-    );
+// calculate ripple normals for water
+vec3 rippleNormal() {
 
-    vec4 color = vec4(0.f);
-    for (int i = -1; i <= 1; i++) {
-        for (int j = -1; j <= 1; j++) {
-            vec2 coord = vertCoordinates;
-            float value = kernel[i + 1][j + 1];
-            color = color + value * texture(sampler, vec2(coord[0] + (float(i)) * deltaX, coord[1] + (float(j)) * deltaY));
-        }
+    // return value
+    vec3 outNormal = vec3(0.f);
+
+    // changeable values
+    float movementSpeed = 0.5f;
+    float frequency = 5.f;
+
+    float distFalloffStrength = 1.f;
+    float timeFalloffStrength = 1e-1f;
+
+    for (int i = 0; i < m_numWaterPoints; i++) {
+
+        // distance and direction from water point center...
+        float dist = distance(vec3(m_waterPointCenters[i]), worldSpacePos);
+        vec2 direction = normalize(vec2(worldSpacePos[0], worldSpacePos[2]) - vec2(m_waterPointCenters[i][0], m_waterPointCenters[i][2]));
+
+        // ripple value and derivative
+        float amplitude = sin((dist - m_waterPointElapsedTimes[i] * movementSpeed) * frequency * 2.f * 3.14f);
+        float slope = cos((dist - m_waterPointElapsedTimes[i] * movementSpeed) * frequency * 2.f * 3.14f);
+
+        // pseudo normals calculation
+        vec3 sideNormal = slope * vec3(direction[0], 0.f, direction[1]);
+        float sideNormalMag = length(sideNormal);
+        vec3 undampedNormal = normalize(sideNormal + (1.f - sideNormalMag) * vec3(0.f, 1.f, 0.f));
+
+        // damping
+        float damping = 0.f;
+        if (dist < m_waterPointElapsedTimes[i] * movementSpeed - 0.25f) damping = 1.f;
+        if (dist > m_waterPointElapsedTimes[i] * movementSpeed + 0.125f) damping = 1.f;
+
+        vec3 dampedNormal = (1.f - damping) * undampedNormal + damping * vec3(0.f, 1.f, 0.f);
+
+        damping = clamp(dist * dist, 0.f, 1.f); // distance falloff
+        dampedNormal = (1.f - damping) * dampedNormal + damping * vec3(0.f, 1.f, 0.f);
+
+        // bounds checking
+        if (dist < 1e-4f) dampedNormal = vec3(0.f , 1.f, 0.f);
+
+        // superimpose normals
+        outNormal += normalize(dampedNormal);
+
     }
 
-    fragColor = color;
+    // faking wave strength...
+    return 1.25f * normalize(outNormal);
 
 }
 
 void main() {
 
-    fragColor = texture(sampler, vertCoordinates);
+    // turns on and off texture mapping
+    bool textureMapping = true;
+    bool normalMapping = true;
+    bool opacityMapping = true;
 
-//    fragColor = vec4(1.f);
+    float width_step = 1.0 / width;
+    float height_step = 1.0 / height;
+    float water_blend = 0.8;
+
+    // turn off textures for water...
+    vec4 waterColor = vec4(0,0,0,1);
+    if (m_water) {
+        textureMapping = false;
+        normalMapping = false;
+        opacityMapping = false;
+        vec2 reflectCoord = vec2 (gl_FragCoord.x / width, 1.0 - gl_FragCoord.y / height);
+//        vec2 distortion1 = (texture(dudvMap,vec2(textureCoord.x + moveFactor, textureCoord.y)).rg * 2.0 - 1.0)* waveStrength;
+//        vec2 distorted_uv = vec2(reflectCoord) + distortion1;
+
+        int radius = 0;
+        for (int i = -radius; i <= radius; i++) {//blurring here
+                    for (int j = -radius; j <= radius; j++) {
+                        float u = float(i) * float(width_step) + reflectCoord.x;
+                        float v = float(j) * float(height_step) + reflectCoord.y;
+                        vec2 distortion1 = (texture(dudvMap,vec2(u + moveFactor, v)).rg * 2.0 - 1.0)* waveStrength;
+                        vec2 distorted_uv = vec2(u,v) + distortion1;
+                        vec4 diffuse = water_blend * texture(texSampler, distorted_uv) + (1 - water_blend) * cDiffuse;
+                        waterColor += diffuse;
+                    }
+                }
+
+                //add ambient component to output color
+        waterColor = waterColor / pow((2 * radius + 1), 2);
+//        waterColor = blend * texture(texSampler, reflectCoord) * (1.0 - blend) * cDiffuse;
+//        waterColor = texture(texSampler, distorted_uv);
+
+//        //add normal map:
+//        vec4 normal_color = texture(normalMap,distorted_uv);
+//        vec3 normal = vec3(normal_color.r*2.0-1.0,normal_color.b, normal_color.g*2.0 - 1.0);
+//        normal = normalize(normal);
+    }
+
+    // texture coloring
+    vec4 textureColor = texture(m_texture, obj_uv);
+
+    // normal mapping
+    vec3 texturedNormal = normalize(worldSpaceNormal);
+    if (normalMapping) { // check for normal mapping
+        float strength = 5.f;
+
+        vec3 up = vec3(0.f, 0.f, 1.f); // -> worldSpaceNormal
+        vec3 axis = cross(up, worldSpaceNormal);
+        mat3 transform = rotationMatrix(axis, -angle(up, worldSpaceNormal));
+
+        vec3 mapNormal = normalize(2 * vec3(texture(m_normal_texture, obj_uv)) - vec3(1.f));
+        texturedNormal = normalize(worldSpaceNormal + strength * transform * mapNormal);
+    }
+
+    // edit normals for water
+    if (m_water) {
+        texturedNormal = rippleNormal();
+    }
+
+    // phong lighting
+
+    float blend = 0.5f;
+
+    // ambient
+    fragColor = m_ka * cAmbient;
+
+    for (int i = 0; i < m_numDirLights; i++) { // directional lighing
+
+        // difffuse component
+        vec3 dir = -normalize(vec3(m_dirLightDirs[i]));
+
+        // diffuse color
+        if (textureMapping) { // check for texture mapping
+            float dotDiffuse = clamp(dot(dir, texturedNormal), 0.f, 1.f);
+            vec4 diffuse = (m_kd * cDiffuse * (1.f - blend) + textureColor * blend) * dotDiffuse;
+            fragColor = fragColor + m_dirLightColors[i] * diffuse;
+        } else {
+            fragColor = fragColor + m_kd * clamp(dot(dir, texturedNormal), 0.f, 1.f) * m_dirLightColors[i] * waterColor;
+        }
+
+        // specular component
+        vec3 surfToLight = dir; // this is right!!
+        vec3 reflected = surfToLight - 2.f * dot(texturedNormal, surfToLight) * texturedNormal;
+        vec3 surfToCamera = normalize(vec3(worldSpaceCameraPos) - worldSpacePos); // this is right...
+        float value = clamp(dot(-reflected, surfToCamera), 0.f, 1.f);
+
+        if (value <= 0.f) continue;
+        if (m_shininess <= 0.f) continue;
+
+        fragColor = fragColor + m_ks * pow(value, m_shininess) * m_dirLightColors[i] * cSpecular;
+
+    }
+
+    for (int i = 0; i < m_numPointLights; i++) { // point lighting
+
+        // attenuation
+        float dist = distance(worldSpacePos, vec3(m_pointLightPos[i]));
+        float f = min(1.f, 1.f / (m_pointLightAttenuation[i][0] + dist * m_pointLightAttenuation[i][1] + dist * dist * m_pointLightAttenuation[i][2]));
+
+        // diffuse
+        vec3 posToLightDir = normalize(vec3(m_pointLightPos[i]) - worldSpacePos);
+        float dotDiffuse = clamp(dot(texturedNormal, posToLightDir), 0.f, 1.f);
+        vec4 diffuse;
+        if (textureMapping) { // check for texture mapping
+            diffuse = dotDiffuse * textureColor;
+        } else {
+            diffuse = m_kd * dotDiffuse * waterColor;
+        }
+        fragColor = fragColor + m_pointLightColors[i] * diffuse * f;
+
+        // specular
+        vec3 directionToCamera = normalize(vec3(worldSpaceCameraPos) - worldSpacePos);
+        vec3 reflect = normalize(reflect(-posToLightDir, texturedNormal));
+        float dotSpec = clamp(dot(reflect, directionToCamera), 0.f, 1.f);
+
+        if (dotSpec <= 0.0) continue;
+        if (m_shininess <= 0.0) continue;
+
+        vec4 specular = m_ks * cSpecular * pow(dotSpec, m_shininess);
+        fragColor = fragColor + m_pointLightColors[i] * specular * f;
+
+    }
+
+    for (int i = 0; i < m_numSpotLights; i++) {
+
+        // attenuation
+        float dist = distance(worldSpacePos, vec3(m_pointLightPos[i]));
+        float f = min(1.f, 1.f / (m_spotLightAttenuation[i][0] + dist * m_spotLightAttenuation[i][1] + dist * dist * m_spotLightAttenuation[i][2]));
+
+        // falloff
+        vec3 lightToPosDir = normalize(worldSpacePos - vec3(m_spotLightPos[i]));
+        float angleDif = acos(dot(lightToPosDir, vec3(normalize(m_spotLightDirs[i]))));
+        float falloffValue = 1 - falloff(angleDif, m_spotLightAngle[i], m_spotLightP[i]);
+        if (angleDif >= m_spotLightAngle[i]) continue; // stop if outside the angle
+
+        // diffuse
+        vec3 posToLightDir = normalize(vec3(m_spotLightPos[i]) - worldSpacePos);
+        float dotDiffuse = clamp(dot(texturedNormal, posToLightDir), 0.f, 1.f);
+        vec4 diffuse;
+        if (textureMapping) { // check for texture mapping
+            diffuse = dotDiffuse * textureColor;
+        } else {
+            diffuse = m_kd * dotDiffuse * waterColor;
+        }
+        fragColor = fragColor + m_spotLightColors[i] * diffuse * f * falloffValue;
+
+        // specular
+        vec3 directionToCamera = normalize(vec3(worldSpaceCameraPos) - worldSpacePos);
+        vec3 reflect = normalize(reflect(-posToLightDir, texturedNormal));
+        float dotSpec = clamp(dot(reflect, directionToCamera), 0.f, 1.f);
+
+        if (dotSpec <= 0.0) continue;
+        if (m_shininess <= 0.0) continue;
+
+        vec4 specular = m_ks * cSpecular * pow(dotSpec, m_shininess);
+        fragColor = fragColor + m_spotLightColors[i] * specular * f * falloffValue;
+
+    }
+
+    // opacity mapping
+    if (opacityMapping) { // check if opacity mapping on...
+        vec4 opacity = texture(m_opacity_texture, obj_uv);
+        fragColor[3] = opacity[0];
+    } else {
+        fragColor[3] = 1.f;
+    }
+
+    // water opacity
+    if (m_water) {
+        fragColor[3] = 0.95f;
+    }
 
 }
 
 // --- student code end ---
-

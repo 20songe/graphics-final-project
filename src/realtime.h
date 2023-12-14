@@ -7,6 +7,7 @@
 #endif
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include "debug.h"
 
 #include <unordered_map>
 #include <QElapsedTimer>
@@ -45,6 +46,7 @@ private:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
+    void paintTexture(GLuint texture);
 
     // Tick Related Variables
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second
@@ -188,6 +190,12 @@ private:
     glm::vec3 m_spotLightAttenuation[8];
     float m_spotLightAngle[8];
     float m_spotLightP[8];
+
+    // water and reflections
+    GLuint m_dudv_texture;
+    GLuint m_normal_texture;
+    QImage m_image1;
+    QImage m_image2;
 
     // --- student code end ---
 

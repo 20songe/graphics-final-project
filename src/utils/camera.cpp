@@ -164,5 +164,4 @@ void camera::updateLook(float _deltaX, float _deltaY) {
     inverseViewMatrix = glm::inverse(viewMatrix);
 }
 
-
 // --- student code end ---

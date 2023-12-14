@@ -367,6 +367,12 @@
 	"HEADERS" : 
 	[
 		[
+			"C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/src/debug.h",
+			"MU",
+			"UVLADIE3JM/moc_debug.cpp",
+			null
+		],
+		[
 			"C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/src/mainwindow.h",
 			"MU",
 			"UVLADIE3JM/moc_mainwindow.cpp",

@@ -264,7 +264,9 @@ void MainWindow::onUploadFile0() {
     QString configFilePath = QFileDialog::getOpenFileName(this, tr("Upload File"),
                                                           QDir::currentPath()
                                                               .append(QDir::separator())
-                                                              .append("resources")
+                                                              .append("..")
+                                                              .append(QDir::separator())
+                                                              .append("projects-final")
                                                               .append(QDir::separator())
                                                               .append("obj-files"), tr("Scene Files (*.obj)"));
 

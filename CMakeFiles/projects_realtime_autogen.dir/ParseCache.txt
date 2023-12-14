@@ -137,6 +137,7 @@ C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/src/mainwindow.h
  mdp:C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/glm/vec3.hpp
  mdp:C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/glm/vec4.hpp
  mdp:C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/glm/vector_relational.hpp
+ mdp:C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/src/debug.h
  mdp:C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/src/particlesystem.h
  mdp:C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/src/realtime.h
  mdp:C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/src/utils/aspectratiowidget/aspectratiowidget.hpp
@@ -1145,3 +1146,4 @@ C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/src/utils/objloader.cp
 C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/src/utils/sceneparser.cpp
 C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/src/utils/shapes.cpp
 C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/src/particlesystem.cpp
+C:/Users/kai55/Desktop/cs1230/projects-realtime-hypochoco/src/debug.h

@@ -45,6 +45,7 @@ add_executable(${PROJECT_NAME}
     src/utils/camera.h src/utils/camera.cpp
     src/utils/objloader.h src/utils/objloader.cpp
     src/particlesystem.h src/particlesystem.cpp
+    src/debug.h
 )
 
 # GLM: this creates its library and allows you to `#include "glm/..."`

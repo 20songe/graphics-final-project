@@ -63,8 +63,8 @@ void Realtime::finish() {
 
     glDeleteProgram(m_shader);
     glDeleteProgram(m_texture_shader);
-    glDeleteVertexArrays(1, &m_fullscreen_vao);
-    glDeleteBuffers(1, &m_fullscreen_vbo);
+//    glDeleteVertexArrays(1, &m_fullscreen_vao);
+//    glDeleteBuffers(1, &m_fullscreen_vbo);
     glDeleteTextures(1, &m_fbo_texture);
     glDeleteRenderbuffers(1, &m_fbo_renderbuffer);
     glDeleteFramebuffers(1, &m_fbo);
@@ -406,6 +406,77 @@ void Realtime::initializeGL() {
     m_shader = ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/default.frag");
     m_texture_shader = ShaderLoader::createShaderProgram(":/resources/shaders/texture.vert", ":/resources/shaders/texture.frag");
 
+    //load the dudv map image
+    QString dudv_filepath = QString("resources/waterNormals/waterDUDV.png");
+    //    QString normal_map_filepath = QString("resources/waterNomals/normalMap.png");
+    QString normal_map_filepath = QString("resources/waterNormals/waterNormal_3.jpeg");
+
+    //obtain image from filepath
+    m_image1.load(dudv_filepath);
+
+    if(m_image1.isNull()){
+        qDebug() << "Failed to load the image:" << dudv_filepath;
+    } else {
+        //Format image to fit OpenGL
+        m_image1 = m_image1.convertToFormat(QImage::Format_RGBA8888).mirrored(false, true);
+
+        //Generate dudv texture
+        glGenTextures(1, &m_dudv_texture);
+
+        //Bind dudv texture
+        glBindTexture(GL_TEXTURE_2D, m_dudv_texture);
+
+        //Load image into dudv texture
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image1.width(), m_image1.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image1.bits());
+
+        //Set min and mag filters' interpolation mode to linear
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        //
+        //Unbind dudv texture
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    glUseProgram(m_texture_shader);
+
+    GLuint sampler_loc = glGetUniformLocation(m_texture_shader, "texSampler");
+    glUniform1i(sampler_loc, 3);
+
+    GLint dudvMap_loc = glGetUniformLocation(m_texture_shader, "dudvMap");
+    glUniform1i(dudvMap_loc, 4); // Set the dudvMap uniform to use texture slot 1
+
+    GLint normalMap_loc = glGetUniformLocation(m_texture_shader, "normalMap");
+    glUniform1i(normalMap_loc, 5); // Set the dudvMap uniform to use texture slot 2
+    Debug::glErrorCheck();
+
+    glUseProgram(0);
+
+    //obtain image from filepath
+    m_image2.load(normal_map_filepath);
+
+    if(m_image2.isNull()){
+        qDebug() << "Failed to load the image:" << normal_map_filepath;
+    } else {
+        //Format image to fit OpenGL
+        m_image2 = m_image2.convertToFormat(QImage::Format_RGBA8888).mirrored(false, true);
+
+        //Generate dudv texture
+        glGenTextures(1, &m_normal_texture);
+
+        //Bind dudv texture
+        glBindTexture(GL_TEXTURE_2D, m_normal_texture);
+
+        //Load image into normal texture
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image2.width(), m_image2.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image2.bits());
+
+        //Set min and mag filters' interpolation mode to linear
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        //
+        //Unbind dudv texture
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
     // loading textures
     glGenTextures(1, &m_texture0);
     glGenTextures(1, &m_texture1);
@@ -454,6 +525,10 @@ void Realtime::initializeGL() {
     glUniform1i(glGetUniformLocation(m_shader, "m_texture"), 0);
     glUseProgram(0);
 
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_texture"), 0);
+    glUseProgram(0);
+
     filepath = QString(":/resources/images/leaf_opacity.png");
     m_image = QImage(filepath);
     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
@@ -471,6 +546,10 @@ void Realtime::initializeGL() {
     glUniform1i(glGetUniformLocation(m_shader, "m_opacity_texture"), 1);
     glUseProgram(0);
 
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_opacity_texture"), 1);
+    glUseProgram(0);
+
     filepath = QString(":/resources/images/leaf_normal.png");
     m_image = QImage(filepath);
     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
@@ -486,6 +565,10 @@ void Realtime::initializeGL() {
 
     glUseProgram(m_shader);
     glUniform1i(glGetUniformLocation(m_shader, "m_normal_texture"), 2);
+    glUseProgram(0);
+
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_normal_texture"), 2);
     glUseProgram(0);
 
     // bark
@@ -508,6 +591,10 @@ void Realtime::initializeGL() {
     glUniform1i(glGetUniformLocation(m_shader, "m_texture"), 0);
     glUseProgram(0);
 
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_texture"), 0);
+    glUseProgram(0);
+
     filepath = QString(":/resources/images/white.png");
     m_image = QImage(filepath);
     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
@@ -525,6 +612,10 @@ void Realtime::initializeGL() {
     glUniform1i(glGetUniformLocation(m_shader, "m_opacity_texture"), 1);
     glUseProgram(0);
 
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_opacity_texture"), 1);
+    glUseProgram(0);
+
     filepath = QString(":/resources/images/bark_normal.jpg");
     m_image = QImage(filepath);
     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
@@ -540,6 +631,10 @@ void Realtime::initializeGL() {
 
     glUseProgram(m_shader);
     glUniform1i(glGetUniformLocation(m_shader, "m_normal_texture"), 2);
+    glUseProgram(0);
+
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_normal_texture"), 2);
     glUseProgram(0);
 
     // rocks
@@ -562,6 +657,10 @@ void Realtime::initializeGL() {
     glUniform1i(glGetUniformLocation(m_shader, "m_texture"), 0);
     glUseProgram(0);
 
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_texture"), 0);
+    glUseProgram(0);
+
     filepath = QString(":/resources/images/white.png");
     m_image = QImage(filepath);
     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
@@ -579,6 +678,10 @@ void Realtime::initializeGL() {
     glUniform1i(glGetUniformLocation(m_shader, "m_opacity_texture"), 1);
     glUseProgram(0);
 
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_opacity_texture"), 1);
+    glUseProgram(0);
+
     filepath = QString(":/resources/images/rocks_normal.jpg");
     m_image = QImage(filepath);
     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
@@ -594,6 +697,10 @@ void Realtime::initializeGL() {
 
     glUseProgram(m_shader);
     glUniform1i(glGetUniformLocation(m_shader, "m_normal_texture"), 2);
+    glUseProgram(0);
+
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_normal_texture"), 2);
     glUseProgram(0);
 
     // moss
@@ -616,6 +723,10 @@ void Realtime::initializeGL() {
     glUniform1i(glGetUniformLocation(m_shader, "m_texture"), 0);
     glUseProgram(0);
 
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_texture"), 0);
+    glUseProgram(0);
+
     filepath = QString(":/resources/images/white.png");
     m_image = QImage(filepath);
     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
@@ -633,6 +744,10 @@ void Realtime::initializeGL() {
     glUniform1i(glGetUniformLocation(m_shader, "m_opacity_texture"), 1);
     glUseProgram(0);
 
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_opacity_texture"), 1);
+    glUseProgram(0);
+
     filepath = QString(":/resources/images/moss_normal.jpg");
     m_image = QImage(filepath);
     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
@@ -648,6 +763,10 @@ void Realtime::initializeGL() {
 
     glUseProgram(m_shader);
     glUniform1i(glGetUniformLocation(m_shader, "m_normal_texture"), 2);
+    glUseProgram(0);
+
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_normal_texture"), 2);
     glUseProgram(0);
 
     // grass
@@ -670,6 +789,10 @@ void Realtime::initializeGL() {
     glUniform1i(glGetUniformLocation(m_shader, "m_texture"), 0);
     glUseProgram(0);
 
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_texture"), 0);
+    glUseProgram(0);
+
     filepath = QString(":/resources/images/white.png");
     m_image = QImage(filepath);
     m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
@@ -685,6 +808,10 @@ void Realtime::initializeGL() {
 
     glUseProgram(m_shader);
     glUniform1i(glGetUniformLocation(m_shader, "m_opacity_texture"), 1);
+    glUseProgram(0);
+
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_opacity_texture"), 1);
     glUseProgram(0);
 
     filepath = QString(":/resources/images/grass_normal.jpg");
@@ -704,40 +831,16 @@ void Realtime::initializeGL() {
     glUniform1i(glGetUniformLocation(m_shader, "m_normal_texture"), 2);
     glUseProgram(0);
 
-    // set texture shader
     glUseProgram(m_texture_shader);
-    glUniform1i(glGetUniformLocation(m_texture_shader, "sampler"), GL_TEXTURE0);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_normal_texture"), 2);
     glUseProgram(0);
-
-    std::vector<GLfloat> fullscreen_quad_data = {
-        -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
-        -1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
-         1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
-         1.0f,  1.0f, 0.0f,  1.0f, 1.0f,
-        -1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
-         1.0f, -1.0f, 0.0f,  1.0f, 0.0f
-    };
-
-    glGenBuffers(1, &m_fullscreen_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, m_fullscreen_vbo);
-    glBufferData(GL_ARRAY_BUFFER, fullscreen_quad_data.size()*sizeof(GLfloat), fullscreen_quad_data.data(), GL_STATIC_DRAW);
-    glGenVertexArrays(1, &m_fullscreen_vao);
-    glBindVertexArray(m_fullscreen_vao);
-
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), nullptr);
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), reinterpret_cast<void*>(3 * sizeof(GLfloat)));
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
 
     // init FBO
     makeFBO();
 
     // make default camera
     m_camera.setCamera(
-        glm::vec4(3.f, 3.f, 3.f, 1.f),    // pos
+        glm::vec4(3.f, 3.f, 3.f, 1.f) * 5.f,    // pos
         glm::vec4(-3.f, -3.f, -3.f, 0.f), // look
         glm::vec4(0.f, 1.f, 0.f, 0.f),    // up
         0.f,
@@ -941,10 +1044,12 @@ void Realtime::paintGL() {
     // activate shader
     glUseProgram(m_shader);
 
+    glm::vec3 camPos = m_camera.getPosition();
+
     // pass in camera information
     glUniformMatrix4fv(glGetUniformLocation(m_shader, "m_view"), 1, false, &m_view[0][0]);
     glUniformMatrix4fv(glGetUniformLocation(m_shader, "m_proj"), 1, false, &m_proj[0][0]);
-    glUniform4fv(glGetUniformLocation(m_shader, "worldSpaceCameraPos"), 1, &m_camera.getPosition()[0]);
+    glUniform4fv(glGetUniformLocation(m_shader, "worldSpaceCameraPos"), 1, &camPos[0]);
 
     // pass in render data
     glUniform1fv(glGetUniformLocation(m_shader, "m_ka"), 1, &m_ka);
@@ -1042,32 +1147,149 @@ void Realtime::paintGL() {
 
     // cleanup frame buffer
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
-    glViewport(0, 0, m_screen_width * 1.f, m_screen_height * 1.f);
+    glViewport(0, 0, m_screen_width * m_devicePixelRatio, m_screen_height * m_devicePixelRatio);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    paintTexture(m_fbo_texture);
+}
+
+void Realtime::paintTexture(GLuint texture) {
     // texture shaders
+    glm::mat4 m_view = m_camera.getViewMatrix();
+    glm::mat4 m_proj = m_camera.getProjectionMatrix();
+
+    // scene data
+    float m_ka = 0.5f;
+    float m_kd = 0.5f;
+    float m_ks = 0.5f;
+
+    // activate shader
     glUseProgram(m_texture_shader);
-    glBindVertexArray(m_fullscreen_vao);
+
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, m_dudv_texture);
+
+    glActiveTexture(GL_TEXTURE5);
+    glBindTexture(GL_TEXTURE_2D, m_normal_texture);
+
+    // pass in water mapping information
+    glUniform1f(glGetUniformLocation(m_texture_shader, "width"), float(m_fbo_width));
+    glUniform1f(glGetUniformLocation(m_texture_shader, "height"), float(m_fbo_height));
+
+    // load the moveFactor, offset with time in consideration
+    float moveFactor = 0.0f;
+    const float waveSpeed = 0.03f;
+    int elapsedms   = m_elapsedTimer.elapsed();
+    float deltaTime = elapsedms * 0.001f;
+    moveFactor += waveSpeed * deltaTime;
+    moveFactor = fmod(moveFactor, 1.0);
+    GLuint move_loc = glGetUniformLocation(m_texture_shader, "moveFactor"); // just added
+    glUniform1f(move_loc, moveFactor);
+
+
+    // pass in camera information
+    glUniformMatrix4fv(glGetUniformLocation(m_texture_shader, "m_view"), 1, false, &m_view[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(m_texture_shader, "m_proj"), 1, false, &m_proj[0][0]);
+    glUniform4fv(glGetUniformLocation(m_texture_shader, "worldSpaceCameraPos"), 1, &m_camera.getPosition()[0]);
+
+    // pass in render data
+    glUniform1fv(glGetUniformLocation(m_texture_shader, "m_ka"), 1, &m_ka);
+    glUniform1fv(glGetUniformLocation(m_texture_shader, "m_kd"), 1, &m_kd);
+    glUniform1fv(glGetUniformLocation(m_texture_shader, "m_ks"), 1, &m_ks);
+
+    // pass in light data
+    glUniform1iv(glGetUniformLocation(m_texture_shader, "m_numDirLights"), 1, &m_numDirLights);
+    glUniform4fv(glGetUniformLocation(m_texture_shader, "m_dirLightDirs"), 8, &m_dirLightDirs[0][0]);
+    glUniform4fv(glGetUniformLocation(m_texture_shader, "m_dirLightColors"), 8, &m_dirLightColors[0][0]);
+
+    glUniform1iv(glGetUniformLocation(m_texture_shader, "m_numPointLights"), 1, &m_numPointLights);
+    glUniform4fv(glGetUniformLocation(m_texture_shader, "m_pointLightPos"), 8, &m_pointLightPos[0][0]);
+    glUniform4fv(glGetUniformLocation(m_texture_shader, "m_pointLightColors"), 8, &m_pointLightColors[0][0]);
+    glUniform3fv(glGetUniformLocation(m_texture_shader, "m_pointLightAttenuation"), 8, &m_pointLightAttenuation[0][0]);
+
+    glUniform1iv(glGetUniformLocation(m_texture_shader, "m_numSpotLights"), 1, &m_numSpotLights);
+    glUniform4fv(glGetUniformLocation(m_texture_shader, "m_spotLightPos"), 8, &m_spotLightPos[0][0]);
+    glUniform4fv(glGetUniformLocation(m_texture_shader, "m_spotLightDirs"), 8, &m_spotLightDirs[0][0]);
+    glUniform4fv(glGetUniformLocation(m_texture_shader, "m_spotLightColors"), 8, &m_spotLightColors[0][0]);
+    glUniform3fv(glGetUniformLocation(m_texture_shader, "m_spotLightAttenuation"), 8, &m_spotLightAttenuation[0][0]);
+    glUniform1fv(glGetUniformLocation(m_texture_shader, "m_spotLightAngle"), 8, &m_spotLightAngle[0]);
+    glUniform1fv(glGetUniformLocation(m_texture_shader, "m_spotLightP"), 8, &m_spotLightP[0]);
+
+    // render mesh
+    for (int i = 7; i >= 0; i--) {
+
+        // texture information
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, selectTexture(i));
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, selectOpacityTexture(i));
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, selectNormalTexture(i));
+
+        // calculation information
+        glm::mat4 identity(1.f);
+        glUniformMatrix4fv(glGetUniformLocation(m_texture_shader, "m_model"), 1, false, &identity[0][0]);
+
+        glm::vec4 ambient(0.5f);
+        glm::vec4 diffuse(0.5f);
+        glm::vec4 specular(0.5f);
+        float shininess = 25.f;
+        glUniform4fv(glGetUniformLocation(m_texture_shader, "cAmbient"), 1, &ambient[0]);
+        glUniform4fv(glGetUniformLocation(m_texture_shader, "cDiffuse"), 1, &diffuse[0]);
+        glUniform4fv(glGetUniformLocation(m_texture_shader, "cSpecular"), 1, &specular[0]);
+        glUniform1fv(glGetUniformLocation(m_texture_shader, "m_shininess"), 1, &shininess);
+        glUniform1i(glGetUniformLocation(m_texture_shader, "m_water"), false);
+
+        glm::vec3 offset(0.f);
+        glUniform3fv(glGetUniformLocation(m_texture_shader, "m_offset"), 1, &offset[0]);
+
+        // water overrides
+        if (i == 1) {
+            ambient  = glm::vec4(0.25f, 0.41f, 0.44f, 1.f);
+            diffuse  = glm::vec4(0.25f, 0.41f, 0.44f, 1.f);
+            specular = glm::vec4(1.f);
+            shininess = 25.f;
+            glUniform4fv(glGetUniformLocation(m_texture_shader, "cAmbient"), 1, &ambient[0]);
+            glUniform4fv(glGetUniformLocation(m_texture_shader, "cDiffuse"), 1, &diffuse[0]);
+            glUniform4fv(glGetUniformLocation(m_texture_shader, "cSpecular"), 1, &specular[0]);
+            glUniform1f(glGetUniformLocation(m_texture_shader, "m_shininess"), shininess);
+
+            glUniform1i(glGetUniformLocation(m_texture_shader, "m_water"), true);
+
+            glUniform1i(glGetUniformLocation(m_texture_shader, "m_numWaterPoints"), m_numWaterPoints);
+            glUniform4fv(glGetUniformLocation(m_texture_shader, "m_waterPointCenters"), 8, &m_waterPointCenters[0][0]);
+            glUniform1fv(glGetUniformLocation(m_texture_shader, "m_waterPointElapsedTimes"), 8, &m_waterPointElapsedTimes[0]);
+
+        }
+
+        // render meshes
+        glBindVertexArray(selectVao(i));
+        glDrawArrays(GL_TRIANGLES, 0, selectMeshData(i).size() / 3);
+
+    }
+
+    // particle system
+    glUniform1i(glGetUniformLocation(m_texture_shader, "m_water"), false);
+
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
+    glBindTexture(GL_TEXTURE_2D, selectTexture(0));
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, selectOpacityTexture(0));
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, selectNormalTexture(0));
 
-    auto deltaX = 1.f / m_screen_width;
-    auto deltaY = 1.f / m_screen_height;
+    m_generator.draw(m_texture_shader);
 
-    glUniform1fv(glGetUniformLocation(m_texture_shader, "deltaX"), 1, &deltaX);
-    glUniform1fv(glGetUniformLocation(m_texture_shader, "deltaY"), 1, &deltaY);
 
-    glUniform1i(glGetUniformLocation(m_texture_shader, "filter1"), settings.filter1);
-    glUniform1i(glGetUniformLocation(m_texture_shader, "filter2"), settings.filter2);
-    glUniform1i(glGetUniformLocation(m_texture_shader, "filter3"), settings.filter3);
-    glUniform1i(glGetUniformLocation(m_texture_shader, "filter4"), settings.filter4);
-
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    // clean
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
     glUseProgram(0);
-
-    // --- student code end ---
 
 }
 
@@ -1208,7 +1430,7 @@ void Realtime::mouseMoveEvent(QMouseEvent *event) {
 
         // rotation
         if (deltaX != 0 || deltaY != 0) {
-            m_camera.updateLook(deltaX, deltaY);
+//            m_camera.updateLook(deltaX, deltaY);
         }
 
         // --- student code end ---
