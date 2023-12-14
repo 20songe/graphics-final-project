@@ -103,6 +103,8 @@ void GLRenderer::makeFBO(){
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_fbo_width, m_fbo_height);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
+    Debug::glErrorCheck();
+
     // Generate and bind an FBO
     glGenFramebuffers(1, &m_reflection_fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_reflection_fbo);
@@ -113,7 +115,40 @@ void GLRenderer::makeFBO(){
 
     // Unbind the FBO
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+    Debug::glErrorCheck();
 
+}
+
+void GLRenderer::makeRefractionFBO(){
+    // Generate and bind an empty texture, set its min/mag filter interpolation, then unbind
+    glGenTextures(1, &m_refraction_texture);
+
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, m_refraction_texture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_fbo_width, m_fbo_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,  GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    Debug::glErrorCheck();
+
+    // Generate and bind a renderbuffer of the right size, set its format, then unbind
+    glGenRenderbuffers(1, &m_refraction_renderbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_refraction_renderbuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, m_fbo_width, m_fbo_height);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // Generate and bind an FBO
+    glGenFramebuffers(1, &m_refraction_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_refraction_fbo);
+
+    // Add our texture as a color attachment, and our renderbuffer as a depth+stencil attachment, to our FBO
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_refraction_texture, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_refraction_renderbuffer);
+
+    // Unbind the FBO
+    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 }
 
 
@@ -121,7 +156,7 @@ void GLRenderer::makeFBO(){
 // ================== Students, You'll Be Working In These Files
 
 void GLRenderer::initializeGL(){
-    m_defaultFBO = 2;
+    m_defaultFBO = 3;
     m_timer = startTimer(1000/60);
     m_elapsedTimer.start();
     m_frameTimer.start();
@@ -164,13 +199,13 @@ void GLRenderer::initializeGL(){
     QString normal_map_filepath = QString("resources/waterNormals/waterNormal_5.jpeg");
 
     //obtain image from filepath
-    m_image1.load(dudv_filepath);
+    m_image_dudv.load(dudv_filepath);
 
-    if(m_image1.isNull()){
+    if(m_image_dudv.isNull()){
          qDebug() << "Failed to load the image:" << dudv_filepath;
     } else {
          //Format image to fit OpenGL
-         m_image1 = m_image1.convertToFormat(QImage::Format_RGBA8888).mirrored(false, true);
+         m_image_dudv = m_image_dudv.convertToFormat(QImage::Format_RGBA8888).mirrored(false, true);
 
          //Generate dudv texture
          glGenTextures(1, &m_dudv_texture);
@@ -179,7 +214,7 @@ void GLRenderer::initializeGL(){
          glBindTexture(GL_TEXTURE_2D, m_dudv_texture);
 
          //Load image into dudv texture
-         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image1.width(), m_image1.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image1.bits());
+         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image_dudv.width(), m_image_dudv.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image_dudv.bits());
 
          //Set min and mag filters' interpolation mode to linear
          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -191,13 +226,13 @@ void GLRenderer::initializeGL(){
 
 
     //obtain image from filepath
-    m_image2.load(normal_map_filepath);
+    m_image_normal.load(normal_map_filepath);
 
-    if(m_image2.isNull()){
+    if(m_image_normal.isNull()){
          qDebug() << "Failed to load the image:" << normal_map_filepath;
     } else {
          //Format image to fit OpenGL
-         m_image2 = m_image2.convertToFormat(QImage::Format_RGBA8888).mirrored(false, true);
+         m_image_normal = m_image_normal.convertToFormat(QImage::Format_RGBA8888).mirrored(false, true);
 
          //Generate dudv texture
          glGenTextures(1, &m_normal_texture);
@@ -206,7 +241,7 @@ void GLRenderer::initializeGL(){
          glBindTexture(GL_TEXTURE_2D, m_normal_texture);
 
          //Load image into normal texture
-         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image2.width(), m_image2.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image2.bits());
+         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image_normal.width(), m_image_normal.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image_normal.bits());
 
          //Set min and mag filters' interpolation mode to linear
          glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -222,11 +257,11 @@ void GLRenderer::initializeGL(){
 
     glUseProgram(m_texture_shader);
 
-    GLuint reflection_loc = glGetUniformLocation(m_texture_shader, "texSampler");
-    glUniform1i(reflection_loc, 0);
-
     GLuint refraction_loc = glGetUniformLocation(m_texture_shader, "refractionSampler");
     glUniform1i(refraction_loc, 3);
+
+    GLuint reflection_loc = glGetUniformLocation(m_texture_shader, "texSampler");
+    glUniform1i(reflection_loc, 0);
 
     GLint dudvMap_loc = glGetUniformLocation(m_texture_shader, "dudvMap");
     glUniform1i(dudvMap_loc, 1); // Set the dudvMap uniform to use texture slot 1
@@ -289,6 +324,7 @@ void GLRenderer::initializeGL(){
             1.0f, 0.0f
         };
 
+
     // Generate and bind a VBO and a VAO for a fullscreen quad
     glGenBuffers(1, &m_fullscreen_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, m_fullscreen_vbo);
@@ -307,17 +343,17 @@ void GLRenderer::initializeGL(){
     glBindVertexArray(0);
 
     makeFBO();
+    makeRefractionFBO();
 }
 
-void GLRenderer::paintGL()
-{
-    glBindFramebuffer(GL_FRAMEBUFFER, m_reflection_fbo);
+void GLRenderer::renderScene(GLuint fbo, GLuint texture,glm::mat4 viewMatrix, bool reflect){
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     //activate the shader program by calling glUseProgram with `m_shader`
     glUseProgram(m_shader);
 
     // Clear screen color and depth before painting
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // Bind Sphere Vertex Data
+    // Bind Vertex Data
     glBindVertexArray(m_obj_vao);
 
     //pass in m_model as a uniform into the shader program
@@ -340,7 +376,7 @@ void GLRenderer::paintGL()
         return;
     }
 
-    glUniformMatrix4fv(view_loc, 1, GL_FALSE, &m_reflect[0][0]);
+    glUniformMatrix4fv(view_loc, 1, GL_FALSE, &viewMatrix[0][0]);
     glUniformMatrix4fv(proj_loc, 1, GL_FALSE, &m_proj[0][0]);
 
     //pass m_ka into the fragment shader as a uniform
@@ -392,11 +428,107 @@ void GLRenderer::paintGL()
 
     // clear the color and depth buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    paintTexture(m_reflection_texture);
+    paintTexture(texture,reflect);
 }
 
-void GLRenderer::paintTexture(GLuint texture){
+
+
+
+void GLRenderer::paintGL(){
+
+
+    Debug::glErrorCheck();
+    //refraction pass
+    renderScene(m_refraction_fbo,m_refraction_texture,m_refract, false);
+    //reflection pass
+    renderScene(m_reflection_fbo,m_reflection_texture,m_reflect, true);
+
+//    glBindFramebuffer(GL_FRAMEBUFFER, m_reflection_fbo);
+//    //activate the shader program by calling glUseProgram with `m_shader`
+//    glUseProgram(m_shader);
+
+//    // Clear screen color and depth before painting
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    // Bind Vertex Data
+//    glBindVertexArray(m_obj_vao);
+
+//    //pass in m_model as a uniform into the shader program
+//    GLint output = glGetUniformLocation(m_shader, "model");
+//    if (output == -1) {
+//        std::cout << "no location for model" << std::endl;
+//        return;
+//    }
+//    glUniformMatrix4fv(output, 1, GL_FALSE, &m_model[0][0]);
+
+//    GLint time_loc = glGetUniformLocation(m_shader, "time");
+//    glUniform1f(time_loc, m_time);
+
+//    //pass in m_view and m_proj
+//    GLint view_loc = glGetUniformLocation(m_shader, "view");
+//    GLint proj_loc = glGetUniformLocation(m_shader, "proj");
+
+//    if (view_loc == -1 || proj_loc == -1) {
+//        std::cout << "view and/or projection matrix not found" << std::endl;
+//        return;
+//    }
+
+//    glUniformMatrix4fv(view_loc, 1, GL_FALSE, &m_reflect[0][0]);
+//    glUniformMatrix4fv(proj_loc, 1, GL_FALSE, &m_proj[0][0]);
+
+//    //pass m_ka into the fragment shader as a uniform
+//    GLint ka_loc = glGetUniformLocation(m_shader, "m_ka");
+//    if (ka_loc == -1) {
+//        std::cout << "ambient term not found" << std::endl;
+//        return;
+//    }
+//    glUniform1f(ka_loc, m_ka);
+
+//    //pass light position and m_kd into the fragment shader as a uniform
+//    GLint kd_loc = glGetUniformLocation(m_shader, "m_kd");
+//    GLint light_loc = glGetUniformLocation(m_shader, "light_pos");
+
+//    if (kd_loc == -1 || light_loc == -1) {
+//        std::cout << "diffuse term not found" << std::endl;
+//        return;
+//    }
+
+//    glUniform1f(kd_loc, m_kd);
+//    glUniform4fv(light_loc, 1, &m_lightPos[0]);
+
+//    //pass shininess, m_ks, and world-space camera position
+//    GLint ks_loc = glGetUniformLocation(m_shader, "m_ks");
+//    GLint shiny_loc = glGetUniformLocation(m_shader, "shininess");
+//    GLint cam_loc = glGetUniformLocation(m_shader, "cam_pos");
+
+//    if (ks_loc == -1 || shiny_loc == -1 || cam_loc == -1) {
+//        std::cout << "specular term not found" << std::endl;
+//        return;
+//    }
+
+//    glUniform1f(ks_loc, m_ks);
+//    glUniform1f(shiny_loc, m_shininess);
+
+//    glm::vec4 cameraPos = m_inv_view * glm::vec4(3.0, 10.0, 4.0, 1.0);
+//    glUniform4fv(cam_loc, 1, &cameraPos[0]);
+
+//    // Draw Command
+//    glDrawArrays(GL_TRIANGLES, 0, m_objData.size() / 9);
+//    // Unbind Vertex Array
+//    glBindVertexArray(0);
+
+//    //deactivate the shader program by passing 0 into glUseProgram
+//    glUseProgram(0);
+
+//    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+//    glViewport(0, 0, m_screen_width, m_screen_height);
+
+//    // clear the color and depth buffers
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+//    paintTexture(m_reflection_texture);
+}
+
+void GLRenderer::paintTexture(GLuint texture, bool reflect){
     glUseProgram(m_texture_shader);
     //Set your bool uniform on whether or not to filter the texture drawn
 
@@ -423,7 +555,7 @@ void GLRenderer::paintTexture(GLuint texture){
     glUniformMatrix4fv(view_loc, 1, GL_FALSE, &m_view[0][0]);
     glUniformMatrix4fv(proj_loc, 1, GL_FALSE, &m_proj[0][0]);
 
-    // Task 12: pass m_ka into the fragment shader as a uniform
+    // pass m_ka into the fragment shader as a uniform
     GLuint ka_loc = glGetUniformLocation(m_texture_shader, "m_ka");
     if (ka_loc == -1) {
         std::cout << "ambient term not found" << std::endl;
@@ -469,9 +601,13 @@ void GLRenderer::paintTexture(GLuint texture){
 
     glBindVertexArray(m_obj_vao);
 
-    //Bind "texture" to slot 0
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    if (reflect == true){ //if reflect
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+    } else { //if refract
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, texture);
+    }
 
     //bind "dudv_texture" to slot 1
     glActiveTexture(GL_TEXTURE1);
@@ -481,7 +617,7 @@ void GLRenderer::paintTexture(GLuint texture){
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, m_normal_texture);
 
-    glDrawArrays(GL_TRIANGLES, 0, m_objData.size() / 9);
+    glDrawArrays(GL_TRIANGLES, 0, m_objData.size() / 9); //so it is here that is giving me errors
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
     glUseProgram(0);

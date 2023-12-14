@@ -12,6 +12,7 @@ in vec4 world_pos4;
 uniform sampler2D texSampler;
 uniform sampler2D dudvMap;
 uniform sampler2D normalMap;
+uniform sampler2D refractionSampler;
 
 uniform float width;
 uniform float height;
@@ -60,6 +61,8 @@ void main(){
         vec2 distortion1 = (texture(dudvMap,vec2(textureCoord.x + moveFactor, textureCoord.y)).rg * 2.0 - 1.0)* waveStrength;
         vec2 distorted_uv = vec2(reflectCoord) + distortion1;
 //        distorted_uv = clamp(distorted_uv, 0.001, 0.999); // at least we have reflection now lol
+
+        vec4 refractionColor = texture(refractionSampler, reflectCoord);
 
         //add normal map:
         vec4 normal_color = texture(normalMap,distorted_uv);

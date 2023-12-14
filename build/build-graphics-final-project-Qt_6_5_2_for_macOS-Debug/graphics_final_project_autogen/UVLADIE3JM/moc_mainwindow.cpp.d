@@ -795,6 +795,8 @@
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/detail/type_vec4.hpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/detail/type_vec4.inl \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/exponential.hpp \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/matrix_clip_space.hpp \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/matrix_clip_space.inl \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/matrix_double2x2.hpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/matrix_double2x2_precision.hpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/matrix_double2x3.hpp \
@@ -831,6 +833,12 @@
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/matrix_float4x3_precision.hpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/matrix_float4x4.hpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/matrix_float4x4_precision.hpp \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/matrix_projection.hpp \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/matrix_projection.inl \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/matrix_transform.hpp \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/matrix_transform.inl \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/scalar_constants.hpp \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/scalar_constants.inl \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/scalar_int_sized.hpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/scalar_uint_sized.hpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/ext/vector_bool2.hpp \
@@ -866,6 +874,12 @@
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/fwd.hpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/geometric.hpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/glm.hpp \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/gtc/constants.hpp \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/gtc/constants.inl \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/gtc/matrix_transform.hpp \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/gtc/matrix_transform.inl \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/gtx/transform.hpp \
+  /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/gtx/transform.inl \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/integer.hpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/mat2x2.hpp \
   /Users/lixiaodan/Documents/Graphics/Projects/graphics-final-project/glm/mat2x3.hpp \

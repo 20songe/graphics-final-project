@@ -1,6 +1,7 @@
 #pragma once
 
 // Defined before including GLEW to suppress deprecation messages on macOS
+#include "glm/gtx/transform.hpp"
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION
 #endif
@@ -41,9 +42,11 @@ private:
     GLuint m_shader;     // Stores id of shader program
     GLuint m_obj_vbo; // Stores id of vbo
     GLuint m_obj_vao; // Stores id of vao
-//    GLuint createTextureAttachment(int width, int height);
+
     void makeFBO();
-    void paintTexture(GLuint texture);
+    void makeRefractionFBO();
+    void renderScene(GLuint fbo, GLuint texture,glm::mat4 viewMatrix,bool reflect);
+    void paintTexture(GLuint texture, bool reflect);
     std::vector<float> m_objData;
 
     void timerEvent(QTimerEvent *event) override;
@@ -61,12 +64,13 @@ private:
                                     0,-1,0,0,
                                     0,0,1,0,
                                     0,0,0,1) * m_view;
+    glm::mat4 m_refract = glm::translate(glm::vec3(0, 0, -0.05)) * m_view;
 
     // Device Correction Variables
     int m_devicePixelRatio;
-    std::string const DUDV_MAP = "resources/waterDUDV.png";
 
     // FBO fields
+    GLuint m_texture_shader;
     GLuint m_defaultFBO;
     int m_screen_width;
     int m_screen_height;
@@ -74,31 +78,33 @@ private:
     int m_fbo_height;
     GLuint m_fullscreen_vbo;
     GLuint m_fullscreen_vao;
+
+    //reflection related FBOS
     GLuint m_reflection_fbo;
     GLuint m_reflection_texture;
     GLuint m_reflection_renderbuffer;
-    GLuint m_texture_shader;
-
     glm::vec4 center  = glm::vec4(-3.0, 0.0, 5.0, 1.0);
     bool should_ripple = false;
+
+    //refraction related FBOS
     GLuint m_dudv_texture;
     GLuint m_normal_texture;
-    QImage m_image1;
-    QImage m_image2;
-
     GLuint m_refraction_fbo, m_refraction_texture, m_refraction_renderbuffer;
 
+    //normal map
+    QImage m_image_dudv;
+    QImage m_image_normal;
 
+    //camera setting
     glm::mat4 m_inv_view = inverse(glm::mat4(1));
     glm::mat4 m_proj  = glm::mat4(1);
-
     glm::vec4 m_lightPos; // The world-space position of the point light
-
     float m_ka;
     float m_kd;
     float m_ks;
     float m_shininess;
 
+    //click related setting
     QPoint m_prevMousePos;
     float  m_angleX;
     float  m_angleY;
