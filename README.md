@@ -1,4 +1,4 @@
-# Chicken Salad - Final Project
+# Tree on Water - Final Project
 
 ## Contributors
 Daniel Cho, Rosella Liu, Ria Rajesh, Erica Song
